@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--
+            Views of quiz.serie
+        -->
+        <record  id="quiz_serie_view_tree" model="ir.ui.view">
+            <field name="name">quiz.serie.view.tree</field>
+            <field name="model">quiz.serie</field>
+            <field name="arch" type="xml">
+                <tree string="Serie Quiz">
+                    <field name="name"/>
+                    <field name="serie_type"/>
+                    <field name="question_count"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="quiz_serie_view_form" model="ir.ui.view">
+            <field name="name">quiz.serie.view.form</field>
+            <field name="model">quiz.serie</field>
+            <field name="arch" type="xml">
+                <form string="Serie Quiz">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="serie_type"/>
+                        </group>
+                        <notebook>
+                            <page string="Questions">
+                                <field name="question_ids" mode="tree">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="proposition_count"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Quizzes" groups="base.group_no_one">
+                                <field name="quiz_ids" mode="tree" readonly="1" create="false" edit="false">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="stage_id"/>
+                                        <field name="serie_count"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="quiz_serie_view_search" model="ir.ui.view">
+            <field name="name">quiz.serie.view.search</field>
+            <field name="model">quiz.serie</field>
+            <field name="arch" type="xml">
+               <search string="Quiz Serie">
+                    <field name="name" string="Serie"/>
+                    <field name="create_uid"/>
+                    <field name="quiz_ids"/>
+                    <filter string="My series" domain="[('create_uid', '=', uid)]" name="filter_my_series"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Type" name="serie_type" context="{'group_by': 'serie_type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--
+            Actions
+        -->
+        <record id="quiz_serie_action_from_quiz" model="ir.actions.act_window">
+            <field name="name">Series</field>
+            <field name="res_model">quiz.serie</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{
+                'search_default_quiz_ids': [active_id],
+                'default_quiz_ids': [active_id],
+            }</field>
+            <field name="search_view_id" ref="quiz_serie_view_search"/>
+        </record>
+
+        <record id="res_users_action_from_quiz" model="ir.actions.act_window">
+            <field name="name">Participants</field>
+            <field name="res_model">res.users</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{
+                'search_default_quiz_ids': [active_id],
+                'default_quiz_ids': [active_id],
+            }</field>
+            <field name="search_view_id" ref="base.view_users_search"/>
+        </record>
+
+
+        <!--
+            Views of quiz.quiz
+        -->
+        <record  id="quiz_quiz_view_tree" model="ir.ui.view">
+            <field name="name">quiz.quiz.view.tree</field>
+            <field name="model">quiz.quiz</field>
+            <field name="arch" type="xml">
+                <tree string="Quiz">
+                    <field name="name"/>
+                    <field name="create_date" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="quiz_quiz_view_form" model="ir.ui.view">
+            <field name="name">quiz.quiz.view.form</field>
+            <field name="model">quiz.quiz</field>
+            <field name="arch" type="xml">
+                <form string="Quiz">
+                    <header>
+                         <field name="stage_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" name="action_start" icon="fa-play" string="Start"/>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1><field name="name" placeholder="My Super Quizz"/></h1>
+                        </div>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                        <notebook>
+                            <page string="Series">
+                                <field name="serie_ids" mode="tree" create="0">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="question_count"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Participants">
+                                <field name="user_ids" mode="tree">
+                                    <tree>
+                                        <field name="id"/>
+                                        <field name="login"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="quiz_quiz_view_kanban" model="ir.ui.view">
+            <field name="name">quiz.quiz.kanban</field>
+            <field name="model">quiz.quiz</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="stage_id" class="oe_background_grey o_kanban_dashboard o_quiz_kanban">
+                    <field name="name"/>
+                    <field name="color"/>
+                    <field name="user_count"/>
+                    <field name="serie_count"/>
+                    <field name="create_uid"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click">
+                                <div class="o_quiz_kanban_boxes">
+                                    <div class="o_quiz_kanban_box">
+                                        <a type="action" name="%(quiz_serie_action_from_quiz)d">
+                                            <span class="o_value"><t t-esc="record.serie_count.value"/></span>
+                                            <span class="o_label">Series</span>
+                                        </a>
+                                    </div>
+                                    <div class="o_quiz_kanban_box">
+                                        <a type="action" name="%(res_users_action_from_quiz)d">
+                                            <span class="o_value"><t t-esc="record.user_count.value"/></span>
+                                            <span class="o_label">Participants</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="o_quiz_kanban_main">
+                                    <div class="o_kanban_card_content o_visible">
+                                        <div class="o_kanban_primary_left">
+                                            <div class="o_primary">
+                                                <span><t t-esc="record.name.value"/></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="o_quiz_kanban_manage">
+                                        <div class="o_dropdown_kanban dropdown" t-if="widget.editable">
+                                            <a class="dropdown-toggle btn" data-toggle="dropdown" href="#" >
+                                                <span class="fa fa-bars fa-lg"/>
+                                            </a>
+                                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                                <li><a type="edit">Edit Quiz</a></li>
+                                                <li t-if="widget.deletable"><a type="delete">Delete</a></li>
+                                                <li><ul class="oe_kanban_colorpicker" data-field="color"/></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!--
+            Views of quiz.serie.relation
+        -->
+        <record  id="quiz_serie_relation_view_tree" model="ir.ui.view">
+            <field name="name">quiz.serie.relation.view.tree</field>
+            <field name="model">quiz.serie.relation</field>
+            <field name="arch" type="xml">
+                <tree string="Quiz Serie Relation">
+                    <field name="quiz_id"/>
+                    <field name="serie_id"/>
+                    <field name="create_date" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="quiz_serie_relation_view_form" model="ir.ui.view">
+            <field name="name">quiz.serie.relation.view.form</field>
+            <field name="model">quiz.serie.relation</field>
+            <field name="arch" type="xml">
+                <form string="Serie in quiz">
+                    <sheet>
+                        <group>
+                            <field name="serie_id"/>
+                            <field name="quiz_id" invisible="1"/>
+                            <field name="sequence"/>
+                            <field name="question_count" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--
+            Views of quiz.stage
+        -->
+        <record id="quiz_stage_view_tree" model="ir.ui.view">
+            <field name="name">quiz.stage.view.tree</field>
+            <field name="model">quiz.stage</field>
+            <field name="arch" type="xml">
+                <tree editable="top">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="fold"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--
+            Views of quiz.question
+        -->
+        <record  id="quiz_question_view_tree" model="ir.ui.view">
+            <field name="name">quiz.question.view.tree</field>
+            <field name="model">quiz.question</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="proposition_count"/>
+                    <field name="create_uid"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="quiz_question_view_form" model="ir.ui.view">
+            <field name="name">quiz.question.view.form</field>
+            <field name="model">quiz.question</field>
+            <field name="arch" type="xml">
+                <form string="Question">
+                    <sheet>
+                        <div class="oe_right oe_button_box" name="button_box">
+                        </div>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group string="Proposition">
+                            <field name="proposition_ids" mode="tree" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="sequence"  widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="point"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="quiz_question_view_search" model="ir.ui.view">
+            <field name="name">quiz.question.view.search</field>
+            <field name="model">quiz.question</field>
+            <field name="arch" type="xml">
+               <search string="Quiz Question">
+                    <field name="name" string="Question"/>
+                    <field name="serie_id"/>
+                    <field name="create_uid"/>
+                    <filter string="My question" domain="[('create_uid', '=', uid)]" name="filter_my_question"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Serie" name="serie" context="{'group_by': 'serie_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--
+            Actions
+        -->
+
+        <!--
+            Menu Actions
+        -->
+        <record id="quiz_quiz_action_view" model="ir.actions.act_window">
+            <field name="name">Quizzes</field>
+            <field name="res_model">quiz.quiz</field>
+            <field name="view_mode">kanban,tree,form</field>
+        </record>
+
+        <record id="quiz_serie_action_view" model="ir.actions.act_window">
+            <field name="name">Serie</field>
+            <field name="res_model">quiz.serie</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="quiz_serie_relation_action_view" model="ir.actions.act_window">
+            <field name="name">Serie Quiz Relation</field>
+            <field name="res_model">quiz.serie.relation</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="quiz_stage_action_view" model="ir.actions.act_window">
+            <field name="name">Stage</field>
+            <field name="res_model">quiz.stage</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <!--
+            Menu Items
+        -->
+        <menuitem name="Quiz"
+            id="quiz.menu_main"
+            sequence="40"/>
+
+        <menuitem name="My Quiz"
+            id="quiz_my_quiz_menu"
+            parent="quiz.menu_main"
+            sequence="10"/>
+
+        <menuitem name="Quizzes"
+            id="quiz_quiz_menu_view"
+            parent="quiz.quiz_my_quiz_menu"
+            action="quiz_quiz_action_view"
+            sequence="10"/>
+
+        <menuitem name="Series"
+            id="quiz_serie_menu_view"
+            parent="quiz.quiz_my_quiz_menu"
+            action="quiz_serie_action_view"
+            sequence="15"/>
+
+        <menuitem name="Report"
+            id="report_quiz_menu"
+            parent="quiz.menu_main"
+            sequence="15"/>
+
+        <menuitem name="Configuration"
+            id="res_config_quiz_menu"
+            parent="quiz.menu_main"
+            sequence="20"/>
+
+        <menuitem name="Serie Quiz Relation"
+            id="quiz_serie_relation_menu_view"
+            parent="quiz.res_config_quiz_menu"
+            action="quiz_serie_relation_action_view"
+            sequence="10"/>
+
+        <menuitem name="Stages"
+            id="quiz_stage_menu_view"
+            parent="quiz.res_config_quiz_menu"
+            action="quiz_stage_action_view"
+            sequence="15"/>
+
+    </data>
+</odoo>

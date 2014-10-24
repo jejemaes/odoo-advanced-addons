@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- Stage Data -->
+        <record id="quiz_stage_draft" model="quiz.stage">
+            <field name="name">Draft</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="quiz_stage_running" model="quiz.stage">
+            <field name="name">Running</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="quiz_stage_stop" model="quiz.stage">
+            <field name="name">Stop/Pause</field>
+            <field name="sequence">3</field>
+        </record>
+
+        <record id="quiz_stage_done" model="quiz.stage">
+            <field name="name">Done</field>
+            <field name="sequence">4</field>
+            <field name="fold" eval="True"/>
+        </record>
+
+        <record id="quiz_stage_cancel" model="quiz.stage">
+            <field name="name">Cancelled</field>
+            <field name="sequence">5</field>
+            <field name="fold" eval="True"/>
+        </record>
+
+    </data>
+</odoo>

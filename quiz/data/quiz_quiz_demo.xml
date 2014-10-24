@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- Quiz Data -->
+        <record id="quiz_quiz_first_quiz" model="quiz.quiz">
+            <field name="name">My First Quizz</field>
+            <field name="description">This is not gonna be awesome, but we'll try !</field>
+        </record>
+
+        <record id="quiz_quiz_second_quiz" model="quiz.quiz">
+            <field name="name">My Second Quizz</field>
+            <field name="description">This is not gonna be awesome, but we'll try !</field>
+        </record>
+
+        <!-- Serie Data -->
+        <record id="quiz_serie_1" model="quiz.serie">
+            <field name="name">Serie 1</field>
+            <field name="serie_type">multiple_choice</field>
+            <field name="quiz_ids" eval="[(4, ref('quiz_quiz_first_quiz'))]"/>
+        </record>
+
+        <record id="quiz_serie_2" model="quiz.serie">
+            <field name="name">Serie 2</field>
+            <field name="serie_type">buzzer</field>
+            <field name="quiz_ids" eval="[(4, ref('quiz_quiz_first_quiz'))]"/>
+        </record>
+
+        <record id="quiz_serie_3" model="quiz.serie">
+            <field name="name">Serie 3</field>
+            <field name="serie_type">multiple_choice</field>
+            <field name="quiz_ids" eval="[(4, ref('quiz_quiz_second_quiz'))]"/>
+        </record>
+
+        <record id="quiz_serie_4" model="quiz.serie">
+            <field name="name">Serie 4</field>
+            <field name="serie_type">chrono</field>
+            <field name="quiz_ids" eval="[(4, ref('quiz_quiz_first_quiz')), (4, ref('quiz_quiz_second_quiz'))]"/>
+        </record>
+
+        <!-- Question Data -->
+        <record id="quiz_question_1" model="quiz.question">
+            <field name="name">Qui a ecrit Tintin ?</field>
+            <field name="serie_id" eval="ref('quiz_serie_1')"/>
+        </record>
+
+        <record id="quiz_question_2" model="quiz.question">
+            <field name="name">Quelle est la couleur du cheval blanc de Napoleon ?</field>
+            <field name="serie_id" eval="ref('quiz_serie_1')"/>
+        </record>
+
+        <record id="quiz_question_3" model="quiz.question">
+            <field name="name">Quelle est la capital de la Belgique ?</field>
+            <field name="serie_id" eval="ref('quiz_serie_1')"/>
+        </record>
+
+        <record id="quiz_question_4" model="quiz.question">
+            <field name="name">Qui ?</field>
+            <field name="serie_id" eval="ref('quiz_serie_2')"/>
+        </record>
+
+        <record id="quiz_question_5" model="quiz.question">
+            <field name="name">De quelle couleur est Mickael Jackson ?</field>
+            <field name="serie_id" eval="ref('quiz_serie_3')"/>
+        </record>
+
+        <!-- Proposition Data (only for question 1, 2, 3) -->
+        <record id="quiz_proposition_1a" model="quiz.proposition">
+            <field name="name">Barack Obama</field>
+            <field name="point">0</field>
+            <field name="question_id" ref="quiz_question_1"/>
+        </record>
+
+        <record id="quiz_proposition_1b" model="quiz.proposition">
+            <field name="name">Hergé</field>
+            <field name="point">10</field>
+            <field name="question_id" ref="quiz_question_1"/>
+        </record>
+
+        <record id="quiz_proposition_1c" model="quiz.proposition">
+            <field name="name">Francquin</field>
+            <field name="point">0</field>
+            <field name="question_id" ref="quiz_question_1"/>
+        </record>
+
+        <record id="quiz_proposition_1d" model="quiz.proposition">
+            <field name="name">Personne</field>
+            <field name="point">0</field>
+            <field name="question_id" ref="quiz_question_1"/>
+        </record>
+
+        <record id="quiz_proposition_2a" model="quiz.proposition">
+            <field name="name">Bleu</field>
+            <field name="point">0</field>
+            <field name="question_id" ref="quiz_question_2"/>
+        </record>
+
+        <record id="quiz_proposition_2b" model="quiz.proposition">
+            <field name="name">Vert</field>
+            <field name="point">0</field>
+            <field name="question_id" ref="quiz_question_2"/>
+        </record>
+
+        <record id="quiz_proposition_2c" model="quiz.proposition">
+            <field name="name">Blanc</field>
+            <field name="point">5</field>
+            <field name="question_id" ref="quiz_question_2"/>
+        </record>
+
+        <record id="quiz_proposition_2d" model="quiz.proposition">
+            <field name="name">Rouge</field>
+            <field name="point">0</field>
+            <field name="question_id" ref="quiz_question_2"/>
+        </record>
+
+        <record id="quiz_proposition_3a" model="quiz.proposition">
+            <field name="name">Brussels</field>
+            <field name="point">10</field>
+            <field name="question_id" ref="quiz_question_3"/>
+        </record>
+
+        <record id="quiz_proposition_3b" model="quiz.proposition">
+            <field name="name">Paris</field>
+            <field name="point">0</field>
+            <field name="question_id" ref="quiz_question_3"/>
+        </record>
+
+        <record id="quiz_proposition_3c" model="quiz.proposition">
+            <field name="name">Fleurus</field>
+            <field name="point">2</field>
+            <field name="question_id" ref="quiz_question_3"/>
+        </record>
+
+        <record id="quiz_proposition_3d" model="quiz.proposition">
+            <field name="name">Namur</field>
+            <field name="point">5</field>
+            <field name="question_id" ref="quiz_question_3"/>
+        </record>
+
+    </data>
+</odoo>
