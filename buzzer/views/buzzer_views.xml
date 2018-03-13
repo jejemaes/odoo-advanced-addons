@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--
+            Views of buzzer.channel
+        -->
+        <record  id="buzzer_channel_view_tree" model="ir.ui.view">
+            <field name="name">buzzer.channel.view.tree</field>
+            <field name="model">buzzer.channel</field>
+            <field name="arch" type="xml">
+                <tree string="Buzzer Channels">
+                    <field name="name"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="buzzer_channel_view_form" model="ir.ui.view">
+            <field name="name">buzzer.channel.view.form</field>
+            <field name="model">buzzer.channel</field>
+            <field name="arch" type="xml">
+                <form string="Buzzer Channel">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box" attrs="{'invisible': [('user_id', '!=', False), ('is_responsible', '=', False)]}">
+                            <button class="oe_stat_button" type="object" name="action_buzzer_panel" icon="fa-play" string="Start"/>
+                        </div>
+                        <div class="oe_button_box" name="button_box" attrs="{'invisible': ['|', ('user_id', '=', False), ('is_responsible', '=', True)]}">
+                            <button class="oe_stat_button" type="object" name="action_reset_responsible" icon="fa-stop" string="Stop"/>
+                        </div>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                            <field name="user_id"/>
+                            <field name="is_responsible" invisible="1"/>
+                        </group>
+                        <notebook>
+                            <page string="Participants">
+                                <field name="user_ids" mode="tree">
+                                    <tree>
+                                        <field name="im_status"/>
+                                        <field name="login"/>
+                                        <field name="password"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="buzzer_channel_action" model="ir.actions.act_window">
+            <field name="name">Channels</field>
+            <field name="res_model">buzzer.channel</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="buzzer_channel_action_client" model="ir.actions.client">
+            <field name="name">Buzzer Panel</field>
+            <field name="tag">buzzer.channel.panel</field>
+            <field name="res_model">buzzer.channel</field>
+            <field name="params" eval="&quot;{
+            }&quot;"/>
+        </record>
+
+        <menuitem name="Buzz"
+            id="menu_main"
+            sequence="40"/>
+
+        <menuitem name="Channels"
+            id="buzzer_menu_channel"
+            parent="menu_main"
+            action="buzzer_channel_action"
+            sequence="10"/>
+
+
+    </data>
+</odoo>

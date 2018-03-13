@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="assets_frontend" name="buzzer assets" inherit_id="web.assets_frontend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/buzzer/static/src/less/buzzer_frontend.less"/>
+                <script type="text/javascript" src="/bus/static/src/js/bus.js"/>
+                <script type="text/javascript" src="/buzzer/static/src/js/buzzer_common.js"/>
+                <script type="text/javascript" src="/buzzer/static/src/js/buzzer_frontend.js"/>
+            </xpath>
+        </template>
+
+        <template id="assets_backend" name="buzzer assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/buzzer/static/src/less/buzzer_backend.less"/>
+                <script type="text/javascript" src="/buzzer/static/src/js/buzzer_common.js"/>
+                <script type="text/javascript" src="/buzzer/static/src/js/buzzer_backend.js"/>
+            </xpath>
+        </template>
+
+    </data>
+
+</odoo>
