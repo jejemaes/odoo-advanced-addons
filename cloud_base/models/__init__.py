@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import update
+from . import update
