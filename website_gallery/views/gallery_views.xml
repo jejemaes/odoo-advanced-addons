@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <!-- Pre actions -->
+        <record id="action_website_gallery_image_from_gallery" model="ir.actions.act_window">
+            <field name="name">Pictures</field>
+            <field name="res_model">website.gallery.image</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new pictures
+                </p>
+            </field>
+            <field name="context">{
+                'default_gallery_id': active_id,
+                'search_default_gallery_id': active_id
+            }</field>
+        </record>
+
+        <!-- Gallery views -->
+
+        <record id="website_gallery_view_list" model="ir.ui.view">
+            <field name="name">website.gallery.list</field>
+            <field name="model">website.gallery</field>
+            <field name="arch" type="xml">
+                <tree string="Galleries">
+                    <field name="name"/>
+                    <field name="website_published"/>
+                    <field name="website_id" groups="website.group_multi_website"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="website_gallery_view_form" model="ir.ui.view">
+            <field name="name">website.gallery.form</field>
+            <field name="model">website.gallery</field>
+            <field name="arch" type="xml">
+                <form string="Gallery">
+                    <header>
+
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="website_publish_button"
+                                type="object" icon="fa-globe">
+                                <field name="website_published" widget="website_button"/>
+                            </button>
+                            <button type="action" name="%(website_gallery.action_website_gallery_image_from_gallery)d" class="oe_stat_button" icon="fa-camera">
+                                <field name="image_count" widget="statinfo" string="Pictures"/>
+                            </button>
+                        </div>
+                        <group>
+                            <div class="oe_title">
+                                <label for="name" class="oe_edit_only"/>
+                                <h1>
+                                    <field name="name" placeholder="Title"/>
+                                </h1>
+                            </div>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                            <group>
+                                <field name="author_name"/>
+                                <field name="image_id"/>
+                            </group>
+                            <group>
+                                <field name="image_per_page"/>
+                                <field name="display_type"/>
+                                <field name="website_id" options="{'no_create': True}" groups="website.group_multi_website"/>
+                            </group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="website_gallery_view_kanban" model="ir.ui.view">
+            <field name="name">website.gallery.kanban</field>
+            <field name="model">website.gallery</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="author_name"/>
+                    <field name="date"/>
+                    <field name="image_count"/>
+                    <field name="image_small_url"/>
+                    <templates>
+                       <t t-name="kanban-box">
+                           <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_hr_kanban_record">
+                                <div class="o_kanban_image_fill_left o_hr_rounded_circle" t-attf-style="background-image: url('#{record.image_small_url.raw_value}');"></div>
+                                <div class="oe_kanban_details">
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <h4 class="o_kanban_record_title">
+                                                <t t-esc="record.name.raw_value"/>
+                                            </h4>
+                                       </div>
+                                    </div>
+                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    <ul class="mt-3">
+                                        <li t-if="record.image_count.raw_value"><i class="fa fa-camera"/> <t t-esc="record.image_count.raw_value"/></li>
+                                        <li t-if="record.date.raw_value"><i class="fa fa-calendar"/> <t t-esc="record.date.raw_value"/></li>
+                                        <li t-if="record.author_name.raw_value"><i class="fa fa-user"/> <t t-esc="record.author_name.raw_value"/></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Image views  -->
+
+        <record id="website_gallery_image_view_list" model="ir.ui.view">
+            <field name="name">website.gallery.image.list</field>
+            <field name="model">website.gallery.image</field>
+            <field name="arch" type="xml">
+                <tree string="Images">
+                    <field name="name"/>
+                    <field name="gallery_type" invisible="1"/>
+                    <field name="website_published"/>
+                    <field name="public" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="website_gallery_image_view_form" model="ir.ui.view">
+            <field name="name">website.gallery.image.form</field>
+            <field name="model">website.gallery.image</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="website_publish_button"
+                                type="object" icon="fa-globe">
+                                <field name="website_published" widget="website_button"/>
+                            </button>
+                        </div>
+                        <field name="datas" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="Image Title"/>
+                            <h1>
+                                <field name="name" placeholder="Image Name"/>
+                            </h1>
+                            <field name="datas_fname"/>
+                            <field name="image_url"/>
+                            <field name="is_published" invisible="1"/>
+                        </div>
+                        <group>
+                            <field name="description"/>
+                            <field name="gallery_id"/>
+                            <field name="mimetype"/>
+                        </group>
+                        <group string="Technical" groups="base.group_no_one">
+                            <field name="sequence"/>
+                            <field name="public"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="website_gallery_image_view_search" model="ir.ui.view">
+            <field name="name">website.gallery.image.search</field>
+            <field name="model">website.gallery.image</field>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                    <field name="name" string="Title" filter_domain="['|', ('name','ilike',self), ('datas_fname','ilike',self)]"/>
+                    <field name="description"/>
+                    <field name="gallery_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Gallery" name="group_by_gallery" domain="[]" context="{'group_by': 'gallery_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="website_gallery_image_view_kanban" model="ir.ui.view">
+            <field name="name">website.gallery.image.kanban</field>
+            <field name="model">website.gallery.image</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="name"/>
+                    <field name="attachment_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                           <div class="oe_kanban_global_click">
+                                <div class="o_kanban_record_body">
+                                    <div t-if="record.attachment_id.value">
+                                        <field name="attachment_id" widget="attachment_image"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="o_kanban_record_headings">
+                                        <h4 class="o_kanban_record_title">
+                                            <t t-esc="record.name.raw_value"/>
+                                        </h4>
+                                   </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Tag views  -->
+
+        <record id="website_gallery_tag_view_list" model="ir.ui.view">
+            <field name="name">website.gallery.tag.list</field>
+            <field name="model">website.gallery.tag</field>
+            <field name="arch" type="xml">
+                <tree string="Tag Categories">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Actions -->
+
+        <record id="action_website_gallery" model="ir.actions.act_window">
+            <field name="name">Galleries</field>
+            <field name="res_model">website.gallery</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new gallery
+                </p>
+            </field>
+        </record>
+
+        <record id="action_website_gallery_settings" model="ir.actions.act_window">
+            <field name="name">Galleries</field>
+            <field name="res_model">website.gallery</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="action_website_gallery_image_settings" model="ir.actions.act_window">
+            <field name="name">Pictures</field>
+            <field name="res_model">website.gallery.image</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="action_website_gallery_tag_settings" model="ir.actions.act_window">
+            <field name="name">Gallery Tags</field>
+            <field name="res_model">website.gallery.tag</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Menus -->
+
+        <menuitem
+            id="website_gallery_menu_root"
+            name="Galleries"
+            sequence="25"
+            parent="website.menu_website_configuration"
+            groups="website.group_website_designer"
+            action="action_website_gallery"/>
+
+        <menuitem
+            id="website_gallery_menu_setting"
+            name="Galleries"
+            sequence="110"
+            parent="website.menu_website_global_configuration"
+            groups="website.group_website_designer"/>
+
+            <menuitem
+                id="website_gallery_menu_setting_gallery"
+                name="Galleries"
+                parent="website_gallery_menu_setting"
+                action="action_website_gallery_settings"
+                sequence="10"/>
+
+            <menuitem
+                id="website_gallery_menu_setting_gallery"
+                name="Pictures"
+                parent="website_gallery_menu_setting"
+                action="action_website_gallery_image_settings"
+                sequence="20"/>
+
+            <menuitem
+                id="website_gallery_menu_setting_tag"
+                name="Tags"
+                parent="website_gallery_menu_setting"
+                action="action_website_gallery_tag_settings"
+                sequence="30" />
+
+</odoo>
