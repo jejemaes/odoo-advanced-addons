@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- Gallery Top Fixed Picture -->
+<template id="gallery_top_cover">
+    <t t-if="not image_url" t-set="image_url" t-value="'http://721659-13-0-f4571e-all.runbot32.odoo.com/website_blog/static/src/img/blog_2.jpeg'"/>
+    <div id="o_gallery_top_cover">
+        <div class="d-flex flex-column bg-secondary" t-attf-style="background-image: url('#{image_url}');">
+            <div class="container position-relative d-flex flex-column justify-content-around mt-5 mb-5">
+                <div class="o_gallery_header p-2">
+                    <span class="text-white text-decoration-none">
+                        <h1 id="o_gallery_title"><t t-esc="title"/></h1>
+                        <h4 t-if="subtitle" id="o_gallery_subtitle"><t t-esc="subtitle"/></h4>
+                    </span>
+                </div>
+            </div>
+        </div>  
+    </div>
+</template>
+
+<!-- Gallery Index -->
+<template id="gallery_index" name="Gallery: Index">
+    <t t-call="website.layout">
+        <div id="wrap">
+            <t t-call="website_gallery.gallery_top_cover">
+                <t t-set="title">Your Galleries</t>
+                <t t-set="subtitle">See all your best pictures</t>
+            </t>
+            <nav class="navbar navbar-light bg-light">
+                <div class="container">
+                    <a class="navbar-brand"></a>
+                    <form class="form-inline">
+                        <input class="form-control mr-sm-2" type="search" name="search_term" placeholder="Search" aria-label="Search" t-att-value="search_term or ''"/>
+                        <button class="btn btn-outline-muted my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+                </div>
+            </nav>
+            <section id="o_gallery">
+                <div class="container py-4">
+                    <div class="row">
+                        <t t-foreach="galleries" t-as="gallery">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 o_gallery_card hover">
+                                <div class="o_gallery_card_inner">
+                                   <div class="o_gallery_card_img_box">
+                                        <img t-att-src="gallery.image_medium_url" t-att-alt="gallery.name" class="img-fluid"/>
+                                        <div class="o_overlay">
+                                            <div class="text">
+                                                <a class="btn btn-outline-light btn-lg" t-att-href="gallery.website_url">
+                                                    <i class="fa fa-eye"> See now !</i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                   </div>
+                                   <div class="o_gallery_card_box">
+                                        <h3><strong><t t-esc="gallery.name"/></strong></h3>
+                                        <div class="o_gallery_card_border"></div>
+                                        <p class="text-muted"><i class="fa fa-picture"/><t t-esc="gallery.image_count"/> pictures</p>
+                                        <p class="text-muted"><i class="fa fa-tags"/>
+                                            <t t-foreach="gallery.tag_ids" t-as="tag">
+                                                <t t-esc="tag.name"/>
+                                            </t>
+                                        </p>
+                                   </div>
+                                </div>
+                             </div>
+                         </t>
+                        <t t-if="not galleries">
+                            <p class="text-center">There is no published galleries for now</p>
+                        </t>
+                    </div>
+                    <div class="row justify-content-md-center mt-5">
+                        <t t-call="website.pager"/>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </t>
+</template>
+
+<!-- Gallery Page -->
+<template id="gallery_page" name="Gallery: Page with thumbnails">
+    <t t-call="website.layout">
+        <div id="wrap">
+            <t t-call="website_gallery.gallery_top_cover">
+                <t t-set="title" t-value="gallery.name"/>
+                <t t-set="image_url" t-value="gallery.image_url"/>
+            </t>
+            <nav class="navbar navbar-expand-sm navbar-light">
+                <div class="container">
+                    <ul class="navbar-nav navbar-brand">
+                        <li class="nav-item active">
+                            <a href="/gallery"><i class="fa fa-home"/> Galleries</a> <i class="fa fa-chevron-right"/> <t t-esc="gallery.name"/>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <section id="o_gallery">
+                <div class="container py-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="lead"><t t-esc="gallery.description"/></p>
+                            <p t-if="gallery.author_name">By <strong><t t-esc="gallery.author_name"/></strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <t t-call="website_gallery.gallery_grid">
+                                <t t-set="images" t-value="images"/>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="row justify-content-md-center mt-5">
+                        <t t-call="website.pager"/>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </t>
+</template>
+
+<template id="gallery_grid" name="Gallery: Pictures Grid">
+    <t t-set="layout_row" t-value="[4,4,4, 6,6, 2,10, 8,4, 5,7, 4,4,4, 10,2, 4,8]"/><!-- flatten of [[4,4,4], [6,6], [2,10], [8,4], [5,7], [4,4,4], [10,2], [4,8]] -->
+    <div class="container o_gallery_grid">
+        <div class="row">
+            <t t-foreach="images" t-as="image">
+                <div t-attf-class="col-sm-#{layout_row[image_index % len(layout_row)]} p-0">
+                    <t t-if="image.gallery_id.display_type == 'page'">
+                        <a class="o_gallery_grid_pict" t-att-href="image.website_url">
+                            <img t-att-src="image.image_medium_url" t-att-alt="image.name" class="o_gallery_img_page"/>
+                        </a>
+                    </t>
+                    <t t-if="image.gallery_id.display_type == 'modal'">
+                        <a class="o_gallery_grid_pict" t-att-href="image.image_url" t-attf-data-lightbox="gallery-#{image.gallery_id.id}">
+                            <img t-att-src="image.image_medium_url" t-att-alt="image.name" class="o_gallery_img_modal"/>
+                        </a>
+                    </t>
+                </div>   
+            </t>
+        </div>
+    </div>
+</template>
+
+<!-- Gallery Picture -->
+<template id="gallery_picture" name="Gallery: Picture page">
+    <t t-call="website.layout">
+        <div id="wrap">
+            <t t-call="website_gallery.gallery_top_cover">
+                <t t-set="title" t-value="gallery.name"/>
+                <t t-set="image_url" t-value="gallery.image_url"/>
+            </t>
+            <nav class="navbar navbar-expand-sm navbar-light">
+                <div class="container">
+                    <ul class="navbar-nav navbar-brand">
+                        <li class="nav-item active">
+                            <a href="/gallery"><i class="fa fa-home"/> Galleries</a> <i class="fa fa-chevron-right"/> 
+                            <a t-att-href="gallery.website_url"><t t-esc="gallery.name"/></a> <i class="fa fa-chevron-right"/>
+                            <t t-esc="image.name"/>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <section id="o_gallery">
+                <div class="container py-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <img t-att-src="image.image_url" t-att-alt="image.name" class="img-fluid"/>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </t>
+</template>
+
+</odoo>
