@@ -1,0 +1,19 @@
+<templates>
+
+    <t t-name="Gallery.gallery_import_button">
+        <button t-if='widget and widget.importEnabled' type="button" class="btn btn-secondary o_button_gallery_import">
+            Import from Google
+        </button>
+    </t>
+    <t t-extend="ListView.buttons">
+        <t t-jquery="button.o_list_button_add" t-operation="after">
+           <t t-call="Gallery.gallery_import_button"/>
+        </t>
+    </t>
+    <t t-extend="KanbanView.buttons">
+        <t t-jquery="button" t-operation="after">
+            <t t-call="Gallery.gallery_import_button"/>
+        </t>
+    </t>
+
+</templates>
