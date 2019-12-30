@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="website_gallery_view_form" model="ir.ui.view">
+        <field name="name">website.gallery.form</field>
+        <field name="model">website.gallery</field>
+        <field name="inherit_id" ref="website_gallery.website_gallery_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="gallery_type" invisible="1"/>
+                <button name="action_google_sync" type="object" attrs="{'invisible': [('gallery_type', '!=', 'google')]}" string="Google Sync"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
