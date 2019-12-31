@@ -140,4 +140,5 @@ class GoogleAPI(models.AbstractModel):
             'mimetype': media_item['mimeType'],
             'type': 'url',
             'url': media_item['baseUrl'],
+            'google_identifier': media_item['id'],
         }
