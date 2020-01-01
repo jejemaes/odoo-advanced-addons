@@ -79,6 +79,10 @@ class GalleryImportGoogle(models.TransientModel):
             'picture_count': data['mediaItemsCount'],
         }
 
+    def _get_return_url_for_auth(self):
+        action = self.env.ref('website_gallery.action_website_gallery')
+        return '/web?action=%s' % (action.id,)
+
 
 class GalleryImportGoogleLine(models.TransientModel):
     _name = 'website.gallery.import.google.line'
