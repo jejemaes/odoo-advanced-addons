@@ -14,7 +14,7 @@ from odoo.addons.google.models.google_api import GoogleException
 _logger = logging.getLogger(__name__)
 
 GOOGLE_PHOTOS_BASE_ENDPOINT = 'https://photoslibrary.googleapis.com/v1/'
-
+GOOGLE_PHOTOS_BASE_URL_LIFETIME = 60 # minutes, see https://developers.google.com/photos/library/guides/access-media-items#base-urls for more details
 
 class GoogleAPI(models.AbstractModel):
     _inherit = 'google.api'
@@ -141,4 +141,53 @@ class GoogleAPI(models.AbstractModel):
             'type': 'url',
             'url': media_item['baseUrl'],
             'google_identifier': media_item['id'],
+            'google_last_sync_date': fields.Datetime.now(),
         }
+
+    def _photos_batch_get_media_items(self, list_gid):
+        """
+            :param album_id: google identifier of the album
+
+            The response from google looks like
+            {
+                'mediaItemResults': [
+                    {
+                      "mediaItem":
+                        {
+                          "id": "AEDhYeO7MtyMH2OPduoDU-IAs2NeOzwMp4FQ0iwUZbedVBi00R1bVQbeWzuuDdwR77ZLmxR3P...",
+                          "productUrl": "https://photos.google.com/lr/album/AEDhYeMeKkFP...uVT7Eo2IdBd2YN2Ks0h5r/photo/AEDhYeO7MtyMH2OPduoDU",
+                          "baseUrl": "https://lh3.googleusercontent.com/lr/AGWb-e7...XNeta-0lZeawLr1Bkv2FKm2BcmYTmkGL5IlZGprY6fHdYrf0sLEOYP-...",
+                          "mimeType": "image/jpeg",
+                          "mediaMetadata": {
+                            "creationTime": "2019-12-21T17:58:59Z",
+                            "width": "4608",
+                            "height": "3072",
+                            "photo": {
+                              "cameraMake": "NIKON CORPORATION",
+                              "cameraModel": "NIKON D3100",
+                              "focalLength": 18,
+                              "apertureFNumber": 3.5,
+                              "isoEquivalent": 1600
+                            }
+                          },
+                          "filename": "DSC_0490.JPG"
+                        }
+                    },
+                    ...
+                ]
+            }
+            But this method will return a list of 'mediaItem' google values.
+        """
+        scopes = self.env['google.api']._api_get_scopes('website_gallery')
+        access_token = self.env['res.users'].browse(self.env.user.id)._google_get_valid_token(scopes)[self.env.user.id]
+        endpoint = '%s%s' % (GOOGLE_PHOTOS_BASE_ENDPOINT, 'mediaItems:batchGet')
+        params = {
+            'mediaItemIds': list_gid
+        }
+
+        (status, response) = self._api_do_request(endpoint, access_token, method='GET', params=params)
+
+        if status != 200:
+            return []
+
+        return [media_item['mediaItem'] for media_item in response['mediaItemResults']]
