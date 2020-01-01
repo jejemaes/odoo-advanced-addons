@@ -14,7 +14,7 @@
                     </span>
                 </div>
             </div>
-        </div>  
+        </div>
     </div>
 </template>
 
@@ -37,33 +37,37 @@
             </nav>
             <section id="o_gallery">
                 <div class="container py-4">
-                    <div class="row">
+                    <div class="row align-items-center">
                         <t t-foreach="galleries" t-as="gallery">
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 o_gallery_card hover">
-                                <div class="o_gallery_card_inner">
-                                   <div class="o_gallery_card_img_box">
-                                        <img t-att-src="gallery.image_medium_url" t-att-alt="gallery.name" class="img-fluid"/>
-                                        <div class="o_overlay">
-                                            <div class="text">
-                                                <a class="btn btn-outline-light btn-lg" t-att-href="gallery.website_url">
-                                                    <i class="fa fa-eye"> See now !</i>
-                                                </a>
+                            <div class="col-md-4 col-sm-6 px-2 col-xs-12 d-flex flex-grow-1">
+                                <div class="card w-100  mb-4">
+                                    <a t-att-href="gallery.website_url">
+                                        <div class="card-img-top" t-attf-style="padding-top: 50%; background-image: url(#{gallery.image_small_url}); background-size: cover; background-position:center"></div>
+                                    </a>
+                                    <div class="card-body p-3">
+                                        <a class="card-title h5 mb-2" t-att-href="gallery.website_url">
+                                            <t t-esc="gallery.name"/>
+                                        </a>
+                                        <div class="card-text mt-1">
+                                            <div class="mt-2 pt-1">
+                                                <t t-foreach="gallery.tag_ids" t-as="tag">
+                                                    <span class="badge badge-light"><t t-esc="tag.name"/></span>
+                                                </t>
                                             </div>
                                         </div>
-                                   </div>
-                                   <div class="o_gallery_card_box">
-                                        <h3><strong><t t-esc="gallery.name"/></strong></h3>
-                                        <div class="o_gallery_card_border"></div>
-                                        <p class="text-muted"><i class="fa fa-picture"/><t t-esc="gallery.image_count"/> pictures</p>
-                                        <p class="text-muted"><i class="fa fa-tags"/>
-                                            <t t-foreach="gallery.tag_ids" t-as="tag">
-                                                <t t-esc="tag.name"/>
-                                            </t>
-                                        </p>
-                                   </div>
+                                    </div>
+                                    <div class="card-footer bg-white text-600 px-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="font-weight-bold"><i class="fa fa-picture"/><t t-esc="gallery.image_count"/> pictures</small>
+                                            <div class="d-flex flex-grow-1 justify-content-end">
+                                                <small t-if="gallery.date"><span t-field="gallery.date"/></small>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                             </div>
-                         </t>
+
+                            </div>
+                        </t>
                         <t t-if="not galleries">
                             <p class="text-center">There is no published galleries for now</p>
                         </t>
@@ -134,7 +138,7 @@
                             <img t-att-src="image.image_medium_url" t-att-alt="image.name" class="o_gallery_img_modal"/>
                         </a>
                     </t>
-                </div>   
+                </div>
             </t>
         </div>
     </div>
@@ -152,7 +156,7 @@
                 <div class="container">
                     <ul class="navbar-nav navbar-brand">
                         <li class="nav-item active">
-                            <a href="/gallery"><i class="fa fa-home"/> Galleries</a> <i class="fa fa-chevron-right"/> 
+                            <a href="/gallery"><i class="fa fa-home"/> Galleries</a> <i class="fa fa-chevron-right"/>
                             <a t-att-href="gallery.website_url"><t t-esc="gallery.name"/></a> <i class="fa fa-chevron-right"/>
                             <t t-esc="image.name"/>
                         </li>
