@@ -32,7 +32,7 @@ class GoogleAuthToken(models.AbstractModel):
 
     def action_authorize_google(self):
         return_url = self._get_return_url_for_auth()
-        url = self.env['google.api']._auth_authorize_url('website_gallery', return_url=return_url)
+        url = self.env['google.api']._auth_authorize_url('website_gallery', return_url=return_url, additionnal_state={'uid': self.user_id.id})
         return {
             'name': 'Authorize Google Photos API',
             'type': 'ir.actions.act_url',

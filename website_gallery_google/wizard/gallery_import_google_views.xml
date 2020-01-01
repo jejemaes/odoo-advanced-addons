@@ -10,6 +10,12 @@
                 <field name="token_status" invisible="1"/>
                 <group attrs="{'invisible': [('token_status', '!=', 'no_token')]}">
                     <p>You are not yet allowed, please authorize this database to access your Google Photo account with the defined Google Application (Project).</p>
+                    <group>
+                        <field name="website_id"/>
+                    </group>
+                    <group>
+                        <field name="user_id"/>
+                    </group>
                 </group>
                 <group attrs="{'invisible': [('token_status', '=', 'no_token')]}">
                     <field name="line_ids" nolabel="1">

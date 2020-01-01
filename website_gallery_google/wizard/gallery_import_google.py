@@ -18,15 +18,29 @@ class GalleryImportGoogle(models.TransientModel):
             raise UserError(_('You can only apply this action from gallery.'))
         return super(GalleryImportGoogle, self).default_get(fields)
 
+    @api.model
+    def _default_website(self):
+        website = self.env['website'].search([('company_id', '=', self.env.user.company_id.id)], limit=1)
+        if not website:
+            website = self.env['website'].search([], limit=1)
+        return website
+
     next_page_token = fields.Char("Next Page Google Token", readonly=True)
     line_ids = fields.One2many('website.gallery.import.google.line', 'wizard_id', "Lines")
+    website_id = fields.Many2one('website', 'Website', required=True, default=_default_website)
+    user_id = fields.Many2one(string="Public User")
+
+    @api.onchange('website_id')
+    def _onchange_website_id(self):
+        if self.website_id:
+            self.user_id = self.website_id.user_id
 
     # ----------------------------------------------------------------------------
     # Actions
     # ----------------------------------------------------------------------------
 
     def action_load_google_galleries(self):
-        google_albums, next_page_token = self.env['google.api']._photos_fetch_albums()
+        google_albums, next_page_token = self.env['google.api'].sudo(self.user_id)._photos_fetch_albums()
 
         # update token
         self.next_page_token = next_page_token
@@ -92,4 +106,5 @@ class GalleryImportGoogleLine(models.TransientModel):
             'google_identifier': self.album_identifier,
             'gallery_type': 'google',
             'google_last_sync_date': False,
+            'website_id': self.wizard_id.website_id.id,
         }

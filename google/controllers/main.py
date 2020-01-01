@@ -15,12 +15,13 @@ class GoogleAuth(http.Controller):
         """ This route/function is called by Google when user Accept/Refuse the consent of Google """
         state = json.loads(kw['state'])
         dbname = state.get('dbname')
+        user_id = state.get('uid', request.session.uid)
         url_return = state.get('return_url', '/web')
         scopes = state['scopes']  # mandatory parameter
 
         with registry(dbname).cursor() as cr:
             if kw.get('code'):
-                request.env(cr, request.session.uid)['google.api']._auth_exchange_code_for_tokens(kw['code'], scopes)
+                request.env(cr, user_id)['google.api']._auth_exchange_code_for_tokens(kw['code'], scopes)
                 return redirect(url_return)
             elif kw.get('error'):
                 return redirect("%s%s%s" % (url_return, "?error=", kw['error']))
