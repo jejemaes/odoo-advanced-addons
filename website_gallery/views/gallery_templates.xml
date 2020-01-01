@@ -102,8 +102,11 @@
                 <div class="container py-4">
                     <div class="row">
                         <div class="col-12">
-                            <p class="lead"><t t-esc="gallery.description"/></p>
-                            <p t-if="gallery.author_name">By <strong><t t-esc="gallery.author_name"/></strong></p>
+                            <p t-esc="gallery.description"/>
+                        </div>
+                        <div class="col-12">
+                            <t t-if="gallery.author_name"><i class="fa fa-user"></i> <t t-esc="gallery.author_name"/></t>
+                            <t t-if="gallery.date"><i class="fa fa-clock"/><span t-field="gallery.date"/></t>
                         </div>
                     </div>
                     <div class="row">
