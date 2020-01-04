@@ -1,0 +1,26 @@
+
+
+.o_gantt_button_dates {
+    display: inline-block;
+}
+
+.gantt_tree_content {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 80%;
+}
+
+
+// Custom version
+.o_gantt_view {
+
+    .gantt_task_row {
+        .gantt_task_cell[class*="o_date"] {
+            cursor: cell;
+        }
+        .gantt_task_cell.o_today {
+            background: #FAF989;
+        }
+    }
+
+}
