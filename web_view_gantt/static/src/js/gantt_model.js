@@ -56,6 +56,7 @@ return AbstractModel.extend({
         this.context = params.context;
         this.colorField = params.colorField;
         this.progressField = params.progressField;
+        this.decorationFields = params.decorationFields;
         // this.displayUnavailability = params.displayUnavailability;
 
         this.defaultGroupBy = params.defaultGroupBy ? [params.defaultGroupBy] : [];
