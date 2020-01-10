@@ -141,7 +141,7 @@ return AbstractRenderer.extend({
             return '';
         };
         this.dhx_gantt.templates.task_class = function(start, end, task){
-            var classes = '';
+            var classes = _.str.sprintf('o_gantt_color_%s', task.color);
             // hide 'consolidate' group row
             if (task.type === self.dhx_gantt.config.types.project) {
                 classes += ' o_hidden';
@@ -157,7 +157,6 @@ return AbstractRenderer.extend({
             var currentTask = tasksInRow[0];
             data = currentTask.values;
         }
-        console.log("drag ------  canPlan=", this.canPlan, data);
         this.trigger_up('drag_task', {
             dates: [moment(this.dhx_gantt.roundDate(startDate)), moment(this.dhx_gantt.roundDate(endDate))],
             values: data || {},
@@ -281,6 +280,7 @@ return AbstractRenderer.extend({
                         progress: rec[self.progressField] ? rec[self.progressField] / 100.0 : 0.0,
                         parent: row.parentId,
                         values: row.data,
+                        color: rec[self.colorField] || 0,
                     });
                 });
             }

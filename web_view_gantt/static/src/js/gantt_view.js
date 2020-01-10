@@ -112,6 +112,14 @@ var GanttView = AbstractView.extend({
         var colorField = arch.attrs.color;
         var progressField = arch.attrs.progress;
 
+        // Decoration fields
+        var decorationFields = [];
+        _.each(arch.children, function (child) {
+            if (child.tag === 'field') {
+                decorationFields.push(child.attrs.name);
+            }
+        });
+
         // Initial date and scale
         var scale = arch.attrs.default_scale || params.context.gantt_scale || 'month';
         var initialDate = moment(params.initialDate || params.context.gantt_initial_date || new Date());
@@ -134,6 +142,7 @@ var GanttView = AbstractView.extend({
         this.loadParams.dateStopField = arch.attrs.date_stop;
         this.loadParams.colorField = colorField;
         this.loadParams.progressField = progressField;
+        this.loadParams.decorationFields = decorationFields;
         this.loadParams.initialDate = initialDate;
         this.loadParams.fields = this.fields;
         this.loadParams.defaultGroupBy = this.arch.attrs.default_group_by;
