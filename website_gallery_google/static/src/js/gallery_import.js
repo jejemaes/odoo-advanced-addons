@@ -79,7 +79,9 @@ ListController.include({
      */
     renderButtons: function () {
         this._super.apply(this, arguments); // Sets this.$buttons
-        ImportControllerMixin._bindImport.call(this);
+        if (this.modelName === 'website.gallery') {
+            ImportControllerMixin._bindImport.call(this);
+        }
     }
 });
 
@@ -109,7 +111,9 @@ KanbanController.include({
      */
     renderButtons: function () {
         this._super.apply(this, arguments); // Sets this.$buttons
-        ImportControllerMixin._bindImport.call(this);
+        if (this.modelName === 'website.gallery') {
+            ImportControllerMixin._bindImport.call(this);
+        }
     }
 });
 
