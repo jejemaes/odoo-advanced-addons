@@ -7,12 +7,16 @@
     </t>
     <t t-extend="ListView.buttons">
         <t t-jquery="button.o_list_button_add" t-operation="after">
-           <t t-call="Gallery.gallery_import_button"/>
+            <t t-if="widget.modelName === 'website.gallery'">
+                <t t-call="Gallery.gallery_import_button"/>
+            </t>
         </t>
     </t>
     <t t-extend="KanbanView.buttons">
         <t t-jquery="button" t-operation="after">
-            <t t-call="Gallery.gallery_import_button"/>
+            <t t-if="widget.modelName === 'website.gallery'">
+                <t t-call="Gallery.gallery_import_button"/>
+            </t>
         </t>
     </t>
 
