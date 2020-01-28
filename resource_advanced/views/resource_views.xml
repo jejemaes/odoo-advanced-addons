@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <!--
+        Resource Calendar Leaves Views
+    -->
+    <record id="resource_calendar_leaves_view_search" model="ir.ui.view">
+        <field name="name">resource.calendar.leaves.search</field>
+        <field name="model">resource.calendar.leaves</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="resource_id" string="Resource"/>
+                <field name="calendar_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Resource" name="group_by_resource_id" domain="[]" context="{'group_by': 'resource_id'}"/>
+                    <filter string="Calendar" name="group_by_calendar_id" domain="[]" context="{'group_by': 'calendar_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="resource_calendar_leaves_action_from_resource" model="ir.actions.act_window">
+        <field name="name">Leaves</field>
+        <field name="res_model">resource.calendar.leaves</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,calendar,form</field>
+        <field name="search_view_id" ref="resource_calendar_leaves_view_search"/>
+        <field name="context">{
+            'search_default_resource_id': active_id,
+            'default_resource_id': active_id,
+            'default_time_type': 'leave'
+        }</field>
+        <field name="domain">[('time_type', 'in', ['leave'])]</field>
+    </record>
+
+    <record id="resource.resource_calendar_leaves_action_from_calendar" model="ir.actions.act_window">
+        <field name="domain">[('time_type', 'in', ['leaves'])]</field>
+        <field name="search_view_id" ref="resource_calendar_leaves_view_search"/>
+    </record>
+
+    <!--
+        Resource Views
+    -->
+    <record id="resource_resource_view_tree" model="ir.ui.view">
+        <field name="name">resource.resource.tree</field>
+        <field name="model">resource.resource</field>
+        <field name="arch" type="xml">
+            <tree string="Resources">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="calendar_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="resource_resource_view_form" model="ir.ui.view">
+        <field name="name">resource.resouce.form</field>
+        <field name="model">resource.resource</field>
+        <field name="inherit_id" eval="False"/>
+        <field name="arch" type="xml">
+            <form string="Resource">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(resource_calendar_leaves_action_from_resource)d" type="action"
+                            class="oe_stat_button" icon="fa-calendar">
+                            <field name="leaves_count" widget="statinfo" string="Leaves"/>
+                        </button>
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title pr-0">
+                        <h1 class="d-flex flex-row justify-content-between">
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="infos">
+                            <field name="user_id"/>
+                            <field name="color"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group name="calendar_details">
+                            <field name="calendar_id" required="1"/>
+                            <field name="tz" required="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--
+        Resource Calendar Views
+    -->
+    <record id="resource_calendar_view_tree" model="ir.ui.view">
+        <field name="name">resource.calendar.tree.inherit</field>
+        <field name="model">resource.calendar</field>
+        <field name="inherit_id" ref="resource.view_resource_calendar_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="attendance_mode"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="resource_calendar_form" model="ir.ui.view">
+        <field name="name">resource.calendar.form.inherit</field>
+        <field name="model">resource.calendar</field>
+        <field name="inherit_id" ref="resource.resource_calendar_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='hours_per_day']" position="after">
+                <field name="attendance_mode"/>
+            </xpath>
+            <!--
+            <xpath expr="//field[@name='attendance_ids']" position="attributes">
+                <attribute name="attrs">{'column_invisible': [('attendance_mode', '=', 'full_day')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='attendance_ids']" position="after">
+                <field name="attendance_ids" attrs="{'column_invisible': [('attendance_mode', '!=', 'full_day')]}">
+                    <tree editable="top">
+                        <field name="dayofweek"/>
+                        <field name="is_working_day"/>
+                    </tree>
+                </field>
+            </xpath> -->
+        </field>
+    </record>
+
+    <!--
+        Resource Calendar Attendance Views
+    -->
+    <record id="resource_calendar_attendance_view_tree" model="ir.ui.view">
+        <field name="name">resource.calendar.attendance.tree</field>
+        <field name="model">resource.calendar.attendance</field>
+        <field name="inherit_id" ref="resource.view_resource_calendar_attendance_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="attendance_mode" invisible="1"/>
+                <field name="is_working_day" attrs="{'column_invisible': [('parent.attendance_mode', '!=', 'full_day')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="attrs">{'column_invisible': [('parent.attendance_mode', '!=', 'shift_per_day')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='hour_from']" position="attributes">
+                <attribute name="attrs">{'column_invisible': [('parent.attendance_mode', '!=', 'shift_per_day')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='hour_to']" position="attributes">
+                <attribute name="attrs">{'column_invisible': [('parent.attendance_mode', '!=', 'shift_per_day')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_from']" position="attributes">
+                <attribute name="attrs">{'column_invisible': [('parent.attendance_mode', '!=', 'shift_per_day')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_to']" position="attributes">
+                <attribute name="attrs">{'column_invisible': [('parent.attendance_mode', '!=', 'shift_per_day')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='day_period']" position="attributes">
+                <attribute name="attrs">{'column_invisible': [('parent.attendance_mode', '!=', 'shift_per_day')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
