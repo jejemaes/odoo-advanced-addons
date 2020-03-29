@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_template_view_search_rental" model="ir.ui.view">
+        <field name="name">product.template.rental.search</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_to_purchase']" position="after">
+                <filter string="Can be Rented" name="filter_to_rent" domain="[('can_be_rented','=',True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_product_view_form_rental" model="ir.ui.view">
+        <field name="name">product.template.rental.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <div>
+                    <field name="can_be_rented"/>
+                    <label for="can_be_rented"/>
+                </div>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Rental" name="rental" attrs="{'invisible': [('can_be_rented', '=', False)]}">
+                    <group>
+                        <group string="Reservations">
+                            <field name="rental_tenure_type" attrs="{'required': [('can_be_rented', '=', True)]}"/>
+                            <field name="rental_tracking" widget="radio" attrs="{'required': [('can_be_rented', '=', True)]}"/>
+                            <field name="rental_padding_before" widget="float_time"/>
+                            <field name="rental_padding_after" widget="float_time"/>
+                            <field name="rental_agreement_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Rental Pricing" attrs="{'invisible': [('rental_tenure_type', '!=', 'duration')]}">
+                            <field name="rental_tenure_duration_ids" attrs="{'required': [('can_be_rented', '=', True)]}"  nolabel="1">
+                                <tree editable="top">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="tenure_value"/>
+                                    <field name="rental_uom"/>
+                                    <field name="rent_price"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group string="Rental Pricing" attrs="{'invisible': [('rental_tenure_type', '!=', 'day')]}">
+                            <field name="rental_tenure_day_ids" attrs="{'required': [('can_be_rented', '=', True)]}"  nolabel="1">
+                                <tree editable="top">
+                                    <field name="monday"/>
+                                    <field name="tuesday"/>
+                                    <field name="wednesday"/>
+                                    <field name="thursday"/>
+                                    <field name="friday"/>
+                                    <field name="saturday"/>
+                                    <field name="sunday"/>
+                                    <field name="rent_price"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                    <group string="Resources" attrs="{'invisible': [('rental_tracking', '!=', 'use_resource')]}">
+                        <field name="resource_ids" attrs="{'required': ['rental_tracking', '=', 'use_resource']}" nolabel="1">
+                            <tree editable="top">
+                                <field name="name"/>
+                                <field name="calendar_id"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group string="Additionnal Services">
+                        <field name="rental_product_ids" nolabel="1">
+                            <tree>
+                                <field name="name"/>
+                                <field name="lst_price"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

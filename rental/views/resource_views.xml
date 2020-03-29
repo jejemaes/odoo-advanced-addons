@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="resource_resource_view_tree_rental" model="ir.ui.view">
+        <field name="name">resource.resource.tree</field>
+        <field name="model">resource.resource</field>
+        <field name="arch" type="xml">
+            <tree string="Resources">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="calendar_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="resource_resource_view_form_rental" model="ir.ui.view">
+        <field name="name">resource.resouce.form.rental</field>
+        <field name="model">resource.resource</field>
+        <field name="inherit_id" eval="False"/>
+        <field name="arch" type="xml">
+            <form string="Resource">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title pr-0">
+                        <h1 class="d-flex flex-row justify-content-between">
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="infos">
+                            <field name="user_id"/>
+                            <field name="color"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group name="calendar_details">
+                            <field name="calendar_id" required="1"/>
+                            <field name="tz" required="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

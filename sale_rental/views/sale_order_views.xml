@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.sale.rental</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_invoice']" position="before">
+                <button type="object"
+                   name="action_view_rental"
+                   class="oe_stat_button"
+                   icon="fa-folder-open-o"
+                   attrs="{'invisible': [('rental_count', '=', 0)]}">
+                   <field name="rental_count" widget="statinfo" string="Rental Bookings"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="after">
+                <field name="is_rental"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="after">
+                <field name="is_rental" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']" position="before">
+                <div class="oe_right">
+                    <button string="Add rental" type="object" name="action_add_rental_line" class="btn btn-secondary oe_inline" attrs="{'invisible': [('state', 'in', ['done', 'cancel'])]}" context="{'default_partner_shipping_id': partner_shipping_id}"/>
+                </div>
+            </xpath>
+       </field>
+    </record>
+
+</odoo>

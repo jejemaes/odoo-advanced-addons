@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ir_attachment_rental_basic" model="ir.attachment">
+        <field name="name">rental-agreement-1.pdf</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="datas_fname">contract_location.pdf</field>
+        <field name="datas" type="base64" file="rental/data/rental_agreement_sample.pdf"></field>
+    </record>
+
+    <record id="rental_agreement_basic" model="rental.agreement">
+        <field name="name">Rental Contract</field>
+        <field name="attachment_id" ref="rental.ir_attachment_rental_basic"/>
+    </record>
+
+    <!--
+        Rental bookings
+    -->
+    <record id="rental_booking_11" model="rental.booking">
+        <field name="name">Caravane Rental 1</field>
+        <field name="resource_id" ref="resource_resource_caravane"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-01 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-04 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_18"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_12" model="rental.booking">
+        <field name="name">Caravane Rental 2</field>
+        <field name="resource_id" ref="resource_resource_caravane"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-05 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-06 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_12"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_13" model="rental.booking">
+        <field name="name">Caravane Rental 3</field>
+        <field name="resource_id" ref="resource_resource_caravane"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-08 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-09 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_4"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_14" model="rental.booking">
+        <field name="name">Caravane Rental 4</field>
+        <field name="resource_id" ref="resource_resource_caravane"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-11 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-12 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_12"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_15" model="rental.booking">
+        <field name="name">Caravane Rental 5</field>
+        <field name="resource_id" ref="resource_resource_caravane"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-16 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-17 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_4"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+
+    <record id="rental_booking_21" model="rental.booking">
+        <field name="name">Remorque1 Rental 1</field>
+        <field name="resource_id" ref="resource_resource_remorque1"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-04 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-05 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_18"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_22" model="rental.booking">
+        <field name="name">Remorque1 Rental 2</field>
+        <field name="resource_id" ref="resource_resource_remorque1"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-08 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-09 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_12"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_23" model="rental.booking">
+        <field name="name">Remorque1 Rental 3</field>
+        <field name="resource_id" ref="resource_resource_remorque1"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-11 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-14 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_4"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_24" model="rental.booking">
+        <field name="name">Remorque1 Rental 4</field>
+        <field name="resource_id" ref="resource_resource_remorque1"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-20 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-22 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_12"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_25" model="rental.booking">
+        <field name="name">Remorque1 Rental 5</field>
+        <field name="resource_id" ref="resource_resource_remorque1"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-28 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-29 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_18"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+
+    <record id="rental_booking_31" model="rental.booking">
+        <field name="name">Remorque2 Rental 1</field>
+        <field name="resource_id" ref="resource_resource_remorque2"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-02 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-03 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_12"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_32" model="rental.booking">
+        <field name="name">Remorque2 Rental 2</field>
+        <field name="resource_id" ref="resource_resource_remorque2"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-07 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-08 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_3"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_33" model="rental.booking">
+        <field name="name">Remorque2 Rental 3</field>
+        <field name="resource_id" ref="resource_resource_remorque2"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-10 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-13 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_4"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_34" model="rental.booking">
+        <field name="name">Remorque2 Rental 4</field>
+        <field name="resource_id" ref="resource_resource_remorque2"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-19 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-23 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_12"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+    <record id="rental_booking_35" model="rental.booking">
+        <field name="name">Remorque2 Rental 5</field>
+        <field name="resource_id" ref="resource_resource_remorque2"/>
+        <field name="date_from" eval="time.strftime('%Y-%m-27 00:00:00')"/>
+        <field name="date_to" eval="time.strftime('%Y-%m-28 00:00:00')"/>
+        <field name="partner_id" ref="base.res_partner_18"/>
+        <field name="user_id" eval="False"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="rental.resource_resource_caravane" model="resource.resource">
+        <field name="product_template_id" ref="product_product_rental_caravane"/>
+    </record>
+
+    <record id="rental.resource_resource_remorque1" model="resource.resource">
+        <field name="product_template_id" ref="product_product_rental_remorque"/>
+    </record>
+
+    <record id="rental.resource_resource_remorque2" model="resource.resource">
+        <field name="product_template_id" ref="product_product_rental_remorque"/>
+    </record>
+
+</odoo>

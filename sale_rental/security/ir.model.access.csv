@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rental_tenure_duration_tenure,rental.tenure.duration.all,model_rental_tenure_duration,base.group_user,1,0,0,0
+access_rental_tenure_duration_user,rental.tenure.duration.user,model_rental_tenure_duration,sales_team.group_sale_salesman,1,1,0,0
+access_rental_tenure_duration_manager,rental.tenure.duration.manager,model_rental_tenure_duration,sales_team.group_sale_manager,1,1,1,1
+access_rental_tenure_day_tenure,rental.tenure.duration.all,model_rental_tenure_day,base.group_user,1,0,0,0
+access_rental_tenure_day_user,rental.tenure.duration.user,model_rental_tenure_day,sales_team.group_sale_salesman,1,1,0,0
+access_rental_tenure_day_manager,rental.tenure.duration.manager,model_rental_tenure_day,sales_team.group_sale_manager,1,1,1,1

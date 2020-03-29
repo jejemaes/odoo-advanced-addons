@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="resource_resource_caravane" model="resource.resource">
+        <field name="name">Caravane</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="calendar_id" ref="rental.resource_calendar_rental_24_7"/>
+        <field name="resource_type">material</field>
+        <field name="color">3</field>
+    </record>
+
+    <record id="resource_resource_remorque1" model="resource.resource">
+        <field name="name">Remorque 1</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="calendar_id" ref="rental.resource_calendar_rental_24_7"/>
+        <field name="resource_type">material</field>
+        <field name="color">4</field>
+    </record>
+
+    <record id="resource_resource_remorque2" model="resource.resource">
+        <field name="name">Remorque 2</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="calendar_id" ref="rental.resource_calendar_rental_work_week"/>
+        <field name="resource_type">material</field>
+        <field name="color">4</field>
+    </record>
+
+</odoo>

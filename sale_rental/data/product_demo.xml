@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="1">
+
+    <record id="product_product_rental_caravane" model="product.template">
+        <field name="name">Caravane</field>
+        <field name="can_be_rented" eval="True"/>
+        <field name="default_code">RENT</field>
+        <field name="type">service</field>
+        <field name="list_price">0.00</field>
+        <field name="standard_price">0.00</field>
+        <field name="uom_id" ref="uom.product_uom_hour"/>
+        <field name="uom_po_id" ref="uom.product_uom_hour"/>
+        <field name="rental_tenure_type">day</field>
+        <field name="rental_tenure_day_ids"
+        	eval="[
+                (5, 0),
+                (0, 0, {'monday': True, 'rent_price': 50}),
+                (0, 0, {'tuesday': True, 'rent_price': 50}),
+                (0, 0, {'wednesday': True, 'rent_price': 50}),
+                (0, 0, {'thursday': True, 'rent_price': 50}),
+                (0, 0, {'friday': True, 'rent_price': 50}),
+                (0, 0, {'saturday': True, 'rent_price': 50}),
+                (0, 0, {'sunday': True, 'rent_price': 50}),
+                (0, 0, {'saturday': True, 'sunday': True, 'rent_price': 75}),
+            ]"/>
+        <field name="rental_tracking">use_resource</field>
+    </record>
+
+    <record id="product_product_rental_remorque" model="product.template">
+        <field name="name">Remorque</field>
+        <field name="can_be_rented" eval="True"/>
+        <field name="default_code">RENT</field>
+        <field name="type">service</field>
+        <field name="list_price">0.00</field>
+        <field name="standard_price">0.00</field>
+        <field name="uom_id" ref="uom.product_uom_hour"/>
+        <field name="uom_po_id" ref="uom.product_uom_hour"/>
+        <field name="rental_tenure_type">day</field>
+        <field name="rental_tenure_day_ids"
+        	eval="[
+                (5, 0),
+                (0, 0, {'monday': True, 'rent_price': 50}),
+                (0, 0, {'tuesday': True, 'rent_price': 50}),
+                (0, 0, {'wednesday': True, 'rent_price': 50}),
+                (0, 0, {'thursday': True, 'rent_price': 50}),
+                (0, 0, {'friday': True, 'rent_price': 50}),
+                (0, 0, {'saturday': True, 'rent_price': 50}),
+                (0, 0, {'sunday': True, 'rent_price': 50}),
+                (0, 0, {'saturday': True, 'sunday': True, 'rent_price': 75}),
+            ]"/>
+        <field name="rental_tracking">use_resource</field>
+    </record>
+
+</data>
+</odoo>
