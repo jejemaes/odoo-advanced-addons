@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="Website Sale Rental Front-end assets">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/scss" href="/website_sale_rental/static/src/scss/website_sale_rental.scss"/>
+
+            <script type="text/javascript" src="/website_sale_rental/static/src/js/website_sale_rental_modal.js"></script>
+            <script type="text/javascript" src="/website_sale_rental/static/src/js/website_sale_rental.js"></script>
+            <script type="text/javascript" src="/website_sale_rental/static/src/js/website_sale.js"></script>
+
+            <t t-call="website_sale_rental.assets_fullcalendar"/>
+        </xpath>
+    </template>
+
+    <template id="assets_fullcalendar" name="Fullcalendar Assets">
+        <link rel="stylesheet" href="/website_sale_rental/static/lib/fullcalendar/core/main.css"/>
+        <link rel="stylesheet" href="/website_sale_rental/static/lib/fullcalendar/daygrid/main.css"/>
+        <link rel="stylesheet" href="/website_sale_rental/static/lib/fullcalendar/daygrid/main.css"/>
+        <link rel="stylesheet" href="/website_sale_rental/static/lib/fullcalendar/timegrid/main.css"/>
+        <link rel="stylesheet" href="/website_sale_rental/static/lib/fullcalendar/list/main.css"/>
+
+        <script type="text/javascript" src="/website_sale_rental/static/lib/fullcalendar/core/main.js"></script>
+        <script type="text/javascript" src="/website_sale_rental/static/lib/fullcalendar/interaction/main.js"></script>
+        <script type="text/javascript" src="/website_sale_rental/static/lib/fullcalendar/daygrid/main.js"></script>
+        <script type="text/javascript" src="/website_sale_rental/static/lib/fullcalendar/timegrid/main.js"></script>
+        <script type="text/javascript" src="/website_sale_rental/static/lib/fullcalendar/list/main.js"></script>
+    </template>
+
+</odoo>

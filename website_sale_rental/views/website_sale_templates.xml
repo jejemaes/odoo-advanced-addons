@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="page_product" inherit_id="website_sale.product" name="eShop: product page with rental options">
+        <xpath expr="//div[@id='product_details']" position="replace">
+            <div class="col-md-6 col-xl-4 offset-xl-2" id="product_global_details">$0</div>
+        </xpath>
+        <xpath expr="//div[@id='product_details']" position="attributes">
+            <attribute name="class"></attribute>
+            <attribute name="t-if">product.sale_ok</attribute>
+        </xpath>
+        <xpath expr="//div[@id='product_global_details']" position="inside">
+            <div t-if="product.can_be_rented" id="o_product_rental_details">
+                <hr t-if="product.sale_ok" class="o_rental_separator text-muted"/>
+                <h1 t-if="not product.sale_ok" itemprop="name" t-field="product.name">Product Name</h1>
+                <div class="o_product_rental_details_tenure">
+                    <h5>Rental Prices</h5>
+                    <t t-if="product.rental_tenure_type == 'duration'">
+                        <ul>
+                            <t t-foreach="rental_tenures" t-as="tenure">
+                                <li><strong><t t-esc="tenure.display_name"/></strong> : <span t-field="tenure.website_rent_price" t-options="{'widget': 'monetary', 'display_currency': website.currency_id, 'from_currency': tenure.currency_id}"/></li>
+                            </t>
+                        </ul>
+                    </t>
+                    <t t-if="product.rental_tenure_type == 'day'">
+                        <ul>
+                            <t t-foreach="rental_tenures" t-as="tenure">
+                                <li><strong><t t-esc="tenure.display_name"/></strong> : <span t-field="tenure.website_rent_price" t-options="{'widget': 'monetary', 'display_currency': website.currency_id, 'from_currency': tenure.currency_id}"/></li>
+                            </t>
+                        </ul>
+                    </t>
+                </div>
+                <t t-if="product.rental_tracking == 'no' or (product.rental_tracking == 'use_resource' and product.resource_count)" >
+                    <button type="button" class="btn btn-lg btn-primary o_rental_order_btn" t-att-data-product-id="product.product_variant_id.id" t-att-data-rental-tracking="product.rental_tracking" t-att-data-resource-count="product.resource_count" t-att-data-rental-tenure-mode="product.rental_tenure_type" t-att-data-product-rental-min-duration="product.rental_min_duration" t-att-data-rental-timezone="product.website_rental_timezone" t-att-data-rental-timezone-offset="product.website_rental_timezone_offset">
+                        Rent it
+                    </button>
+                </t>
+                <hr t-if="product.description_rental"/>
+                <div class="o_not_editable">
+                    <p t-field="product.description_rental" class="text-muted"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="cart_lines" inherit_id="website_sale.cart_lines" name="eShop: extend for rental">
+        <xpath expr="//div[@t-if='not line.linked_line_id']" position="attributes">
+            <attribute name="t-if">not line.linked_line_id and not line.is_rental</attribute>
+        </xpath>
+        <xpath expr="//t[@t-if='line.linked_line_id']" position="attributes">
+            <attribute name="t-if">line.linked_line_id or line.is_rental</attribute>
+        </xpath>
+        <xpath expr="//a[hasclass('js_delete_product')]" position="replace">
+            <t t-if="line.is_rental">
+                <a href='#' aria-label="Remove from cart" title="Remove from cart" class='js_delete_rental_product no-decoration'> <small><i class='fa fa-trash'></i></small></a>
+            </t>
+            <t t-if="not line.is_rental">
+                <a href='#' aria-label="Remove from cart" title="Remove from cart" class='js_delete_product no-decoration'> <small><i class='fa fa-trash-o'></i></small></a>
+            </t>
+        </xpath>
+    </template>
+</odoo>

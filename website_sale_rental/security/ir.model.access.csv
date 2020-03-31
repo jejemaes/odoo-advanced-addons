@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rental_tenure_duration_public,rental.tenure.duration.public,sale_rental.model_rental_tenure_duration,base.group_public,1,0,0,0
+access_rental_tenure_duration_portal,rental.tenure.duration.portal,sale_rental.model_rental_tenure_duration,base.group_portal,1,0,0,0
+access_rental_tenure_day_public,rental.tenure.day.public,sale_rental.model_rental_tenure_day,base.group_public,1,0,0,0
+access_rental_tenure_day_portal,rental.tenure.day.portal,sale_rental.model_rental_tenure_day,base.group_portal,1,0,0,0

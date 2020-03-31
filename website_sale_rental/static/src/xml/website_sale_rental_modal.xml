@@ -1,0 +1,90 @@
+<templates>
+
+    <t t-name="website_sale_rental.CalendarModal">
+        <form>
+            <div class="form-group o_rental_form_calendar">
+                <div t-attf-id="rental-calendar-#{widget.modalId}"/>
+                <p>This calendar is expressed in <strong class="o_rental_calendar_tz"><t t-esc="widget.timezone"/></strong> timezone.</p>
+            </div>
+        </form>
+    </t>
+
+
+
+
+    <t t-name="website_sale_rental.Modal">
+        <form>
+            <div class="form-group o_rental_form_calendar">
+                <div id="rental-calendar"/>
+            </div>
+            <div class="form-group o_rental_form_period">
+                <label for="datetimepickerstart">Period</label>
+                <div class="form-row">
+                    <div class="col">
+                        <div class="input-group date" id="datetimepicker-start" data-target-input="nearest">
+                            <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker-start"/>
+                            <div class="input-group-append" data-target="#datetimepicker-start" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group date" id="datetimepicker-stop" data-target-input="nearest">
+                            <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker-stop"/>
+                            <div class="input-group-append" data-target="#datetimepicker-stop" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <small id="dates-help" class="form-text text-muted">Select the period you want to rent our product.</small>
+            </div>
+            <div t-if="widget.rentalTracking == 'no'" class="form-group o_rental_form_qty">
+                <label for="resource_count">Quantity</label>
+                <input type="text" class="form-control" id="rental_quantity"/>
+            </div>
+            <t t-call="website_sale_rental.Modal.resources"/>
+        </form>
+    </t>
+
+    <t t-name="website_sale_rental.Modal.resources">
+        <div t-if="widget.rentalTracking == 'use_resource'" class="form-group o_rental_form_resources">
+            <t t-if="widget.get('resources').length">
+                <t t-if="widget.get('resources').length !== 1">
+                    <label for="resource_id">Available Resources</label>
+                    <div class="ml-4">
+                        <t t-foreach="widget.get('resources')" t-as="resource">
+                            <t t-if="resource.is_available">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" t-att-id="resource.id"/>
+                                    <label class="form-check-label" t-att-for="resource.id"><t t-esc="resource.name"/></label>
+                                </div>
+                            </t>
+                            <t t-if="!resource.is_available">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" t-att-id="resource.id" disabled="disabled"/>
+                                    <label class="form-check-label text-warning" t-att-for="resource.id"><t t-esc="resource.name"/></label>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                </t>
+                <t t-if="widget.get('resources').length === 1">
+                    <div t-if="!widget.get('resources')[0].is_available" class="alert alert-danger" role="alert">
+                        The product is not available for the rental period.
+                    </div>
+                </t>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="website_sale_rental.ModalFooterPrice">
+        <div class="p-2 o_rental_modal_footer_price">
+            <t t-if="_.keys(widget.get('priceInfos')).length">
+                <strong>Price:</strong> <t t-esc="widget.get('priceInfos').price"/><br/>
+                <span class="text-muted"><strong>Explanation:</strong> <t t-esc="widget.get('priceInfos').pricing_explanation"/></span>
+            </t>
+        </div>
+    </t>
+
+</templates>
