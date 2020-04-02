@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_website_blog" model="ir.module.category">
+        <field name="name">Website Blog</field>
+        <field name="sequence">23</field>
+    </record>
+
+    <!-- Blog Groups -->
+    <record id="group_website_blog_publisher_own" model="res.groups">
+        <field name="name">Author of Own Posts</field>
+        <field name="comment">Author of their own article in blog they are member of.</field>
+        <field name="category_id" ref="module_category_website_blog"/>
+    </record>
+    <record id="group_website_blog_publisher_all" model="res.groups">
+        <field name="name">Blog Author</field>
+        <field name="comment">Author of all article in blog they are member of.</field>
+        <field name="implied_ids" eval="[(4, ref('group_website_blog_publisher_own'))]"/>
+        <field name="category_id" ref="module_category_website_blog"/>
+    </record>
+    <record id="group_website_blog_publisher_global" model="res.groups">
+        <field name="name">Author of All Blogs</field>
+        <field name="comment">Author of all article in blog they are member of.</field>
+        <field name="implied_ids" eval="[(4, ref('group_website_blog_publisher_all'))]"/>
+        <field name="category_id" ref="module_category_website_blog"/>
+    </record>
+
+    <!-- Blog Rules -->
+    <record id="website_blog_post_rule_author_own" model="ir.rule">
+        <field name="name">Blog Post: Author of Own</field>
+        <field name="model_id" ref="website_blog.model_blog_post"/>
+        <field name="domain_force">[('author_id', '=', user.partner_id.id), ('blog_id.user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_website_blog_publisher_own'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+    <record id="website_blog_blog_rule_author_own" model="ir.rule">
+        <field name="name">Blog: write on blog when member (to post message)</field>
+        <field name="model_id" ref="website_blog.model_blog_blog"/>
+        <field name="domain_force">[('user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_website_blog_publisher_own'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="website_blog_post_rule_author_all" model="ir.rule">
+        <field name="name">Blog Post: Author of posts of member blogs</field>
+        <field name="model_id" ref="website_blog.model_blog_post"/>
+        <field name="domain_force">[('blog_id.user_ids', 'in', [user.id])]</field>
+        <field name="groups" eval="[(4, ref('group_website_blog_publisher_all'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+    <record id="website_blog_post_rule_author_global" model="ir.rule">
+        <field name="name">Blog Post: Author of all Posts</field>
+        <field name="model_id" ref="website_blog.model_blog_post"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_website_blog_publisher_global'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <template id="FieldTextHtmlInline" name="Editor layout">
+        <t t-call="web_editor.layout">
+            <div t-if="not edit_translations" id="editable_area" class="o_editable o_mail_area" t-att-data-oe-model="model" t-att-data-oe-field="field" t-att-data-oe-id="res_id" data-oe-type="html"><t t-raw="content"/></div>
+            <div t-if="edit_translations" id="editable_area" class="o_mail_area"><t t-raw="content"/></div>
+        </t>
+    </template>
+
+</odoo>
