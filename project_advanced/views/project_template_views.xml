@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="project_task_template_action_from_template" model="ir.actions.act_window">
+        <field name="name">Task Templates</field>
+        <field name="res_model">project.task.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">
+            {'default_project_template_id': active_id, 'search_default_project_template_id': active_id}
+        </field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create your task template to ease project setup.
+            </p>
+        </field>
+    </record>
+
+    <!--
+        Project Template Views
+    -->
+    <record id="project_template_view_tree" model="ir.ui.view">
+        <field name="name">project.template.tree</field>
+        <field name="model">project.template</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="task_template_count"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="project_template_view_form" model="ir.ui.view">
+        <field name="name">project.template.form</field>
+        <field name="model">project.template</field>
+        <field name="arch" type="xml">
+            <form string="Project">
+                <sheet string="Project">
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="action" name="%(project_task_template_action_from_template)d" icon="fa-tasks">
+                            <field string="Task Templates" name="task_template_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Template Name"/>
+                        </h1>
+                    </div>
+                    <notebook>
+                        <page name="settings" string="Settings">
+                            <group>
+                                <field name="user_id" string="Project Manager"/>
+                                <field name="privacy_visibility" widget="radio"/>
+                                <field name="deadline_policy" widget="radio"/>
+                            </group>
+                            <group name="misc">
+                                <group string="Configuration" name="configuration">
+                                    <field name="sequence" groups="base.group_no_one"/>
+                                    <field name="color"/>
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                </group>
+                                <group string="Time Scheduling" groups="base.group_no_one">
+                                    <field name="resource_calendar_id" groups="base.group_no_one"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="stages" string="Stages">
+                            <group>
+                                <field name="stage_shared"/>
+                            </group>
+                            <group>
+                                <field name="stage_ids" >
+                                    <tree>
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                </form>
+        </field>
+    </record>
+
+    <!--
+        Task Template Views
+    -->
+
+    <record id="project_task_template_view_tree" model="ir.ui.view">
+        <field name="name">project.task.template.tree</field>
+        <field name="model">project.task.template</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="priority"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="project_task_template_view_form" model="ir.ui.view">
+        <field name="name">project.task.template.form</field>
+        <field name="model">project.task.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet string="Task">
+                    <div class="oe_title pr-0">
+                        <h1 class="d-flex flex-row">
+                            <field name="priority" widget="priority" class="mr-3"/>
+                            <field name="name" class="o_task_name text-truncate" placeholder="Task Template Title..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_template_id" domain="[('active', '=', True)]"/>
+                            <field name="user_id" options='{"no_open": True}'/>
+                        </group>
+                        <group>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="description_page" string="Description">
+                            <field name="description" type="html"/>
+                            <div class="oe_clear"/>
+                        </page>
+                        <page name="extra_info" string="Settings">
+                            <group>
+                                <group string="Deadline">
+                                    <field name="deadline_policy"/>
+                                    <field name="deadline_days" attrs="{'invisible': [('deadline_policy', '=', 'no')]}"/>
+                                    <field name="deadline_hours" attrs="{'invisible': [('deadline_policy', '=', 'no')]}"/>
+                                </group>
+                                <group string="Extra Infos">
+                                    <field name="sequence"/>
+                                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="project_task_template_view_search" model="ir.ui.view">
+        <field name="name">project.task.template.form</field>
+        <field name="model">project.task.template</field>
+        <field name="arch" type="xml">
+            <search string="Task Template Search">
+                <field name="name" string="Title" filter_domain="['|', ('name','ilike',self), ('description','ilike',self)]"/>
+                <field name="project_template_id"/>
+                <field name="user_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!--
+        Actions and Menus
+    -->
+
+    <record id="project_template_action" model="ir.actions.act_window">
+        <field name="name">Project Templates</field>
+        <field name="res_model">project.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create your project template to ease project setup.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="project_menu_config_template"
+        name="Templates"
+        parent="project.menu_project_config"
+        action="project_template_action"
+        groups="project_advanced.group_project_template"
+        sequence="15"/>
+
+</odoo>
