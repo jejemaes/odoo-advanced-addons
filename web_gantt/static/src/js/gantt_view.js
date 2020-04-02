@@ -127,7 +127,7 @@ var GanttView = BasicView.extend({
         });
 
         // Initial date and scale
-        var scale = arch.attrs.default_scale || params.context.gantt_scale || 'month';
+        var scale = params.context.gantt_scale || arch.attrs.default_scale || 'month';
         var initialDate = moment(params.initialDate || params.context.gantt_initial_date || new Date());
         var offset = arch.attrs.offset;
         if (offset && scale) {

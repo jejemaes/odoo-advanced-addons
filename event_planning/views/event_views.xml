@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="event_event_view_form" model="ir.ui.view">
+        <field name="name">event.event.form</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event_analytic.event_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_planning" type="object" class="oe_stat_button" icon="fa-calendar-check-o" help="Planning of the event" string="Planning" attrs="{'invisible': [('planning_id', '=', False)]}">
+                </button>
+            </xpath>
+            <xpath expr="//group[@name='advanced_settings_general']" position="inside">
+				<group name="planning_settings" string="Planning">
+                    <label for="planning_id" string="Planning"/>
+                    <div>
+                        <field name="planning_id" class="oe_inline" nolabel="1"/>
+                        <button name="action_generate_planning" type="object" class="oe_inline btn btn-primary" string="Generate Planning" attrs="{'invisible': [('planning_id', '!=', False)]}"/>
+                    </div>
+                    <field name="planning_date_start"/>
+                    <field name="planning_date_stop"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

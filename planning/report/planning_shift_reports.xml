@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="planning_shift_action_report" model="ir.actions.report">
+        <field name="name">Planning Sheets</field>
+        <field name="model">planning.shift</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">planning.report_planning_shift</field>
+        <field name="report_file">planning.report_planning_shift</field>
+        <field name="print_report_name">object.name or object.display_name</field>
+        <field name="binding_model_id" ref="planning.model_planning_shift"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>
