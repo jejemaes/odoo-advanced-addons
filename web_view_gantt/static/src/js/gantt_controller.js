@@ -239,11 +239,14 @@ var GanttController = AbstractController.extend({
      * @param {OdooEvent} ev
      */
     _onTaskDatesChanged: function (ev) {
+        var self = this;
         var state = this.model.get();
         var recordIds = ev.data.resId;
         var startDate = ev.data.start;
         var stopDate = ev.data.stop;
-        return this.model.reschedule(recordIds, _.object([state.dateStartField, state.dateStopField], [startDate, stopDate]));
+        return this.model.reschedule(recordIds, _.object([state.dateStartField, state.dateStopField], [startDate, stopDate])).fail(function(ev){
+            self.reload();
+        });
     },
     /**
      * Gantt row has been dragged on the timeline.
