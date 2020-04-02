@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="report_planning_shift">
+    <t t-call="web.html_container">
+        <t t-if="docs">
+            <t t-foreach="docs._report_get_ranges(date_start, date_stop, scale)" t-as="_range">
+                <t t-call="web.internal_layout">
+                    <t t-call="planning.report_planning_shift_page"/>
+                </t>
+            </t>
+        </t>
+    </t>
+</template>
+
+
+<template id="report_planning_shift_page">
+    <t t-set="shift_data" t-value="docs._report_get_shift_in_range(_range[0], _range[1], groupby_role=bool(group_by_mode == 'role'))"/>
+    <div t-if="shift_data" class="page">
+        <h3 class="text-center"><t t-esc="report_title or 'Schedule'"/></h3>
+        <h5 class="text-center">Shifts from <t t-esc="format_datetime(_range[0], 'medium')"/> to <t t-esc="format_datetime(_range[1], 'medium')"/></h5>
+
+            <t t-foreach="shift_data" t-as="group">
+                <div class="row mt-3">
+                    <div class="col-2">
+                        <t t-if="group">
+                            <p class="font-weight-bolder" t-esc="group.display_name"/>
+                        </t>
+                        <t t-else="">
+                            <p class="font-weight-bolder">No <t t-esc="group._description"/></p>
+                        </t>
+                    </div>
+                    <div class="col-10">
+                        <div class="row">
+                            <div class="col-12">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <t t-foreach="shift_data[group]" t-as="shift_slice">
+                                            <tr>
+                                                <td>
+                                                    <t t-esc="format_datetime(shift_slice.start, dt_format)"/> to <t t-esc="format_datetime(shift_slice.stop, dt_format)"/>
+                                                </td>
+                                                <td>
+                                                    <t t-if="shift_slice.label">
+                                                        <t t-esc="shift_slice.label"/>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+
+    </div>
+</template>
+
+</odoo>

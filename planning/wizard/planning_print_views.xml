@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="planning_print_view_form" model="ir.ui.view">
+            <field name="name">planning.print.form</field>
+            <field name="model">planning.print</field>
+            <field name="arch" type="xml">
+                <form string="Print Planning">
+                    <group>
+                        <field name="display_scale"/>
+                        <field name="group_by_mode" widget="radio"/>
+                    </group>
+                    <footer>
+                        <button name="action_print" string="Print" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="planning_planning_action_print" model="ir.actions.act_window">
+            <field name="name">Print Planning Sheets</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">planning.print</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="planning.model_planning_planning"/>
+            <field name="binding_type">report</field>
+        </record>
+
+</odoo>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="email_template_planning_planning" model="mail.template">
+            <field name="name">Planning: new schedule (multiple shifts)</field>
+            <field name="email_from">${object.company_id.email_formatted | safe}</field>
+            <field name="subject">Your planning from ${format_date(ctx.get('start_datetime'))} to ${format_date(ctx.get('end_datetime'))}</field>
+            <field name="email_to"></field><!-- Set in the code  -->
+            <field name="model_id" ref="model_planning_planning"/>
+            <field name="auto_delete" eval="True"/><!-- TODO JEM  change this as we are testing -->
+            <field name="body_html" type="html">
+                <div>
+                    <p>
+                    % if ctx.get('employee'):
+                        Dear ${ctx['employee'].name},
+                    % else:
+                        Hello,
+                    % endif
+                        <br/><br/>
+
+                    Please, find your planning for the following period:
+
+                    </p>
+                    <br/>
+
+                    <table style="table-layout: fixed; width: 80%; margin: auto;">
+                        <tr>
+                            <th style="padding: 5px;text-align: left; width: 15%;">From</th>
+                            <td style="padding: 5px;">${format_date(ctx.get('start_datetime'))}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding: 5px;text-align: left; width: 15%;">To</th>
+                            <td style="padding: 5px;">${format_date(ctx.get('end_datetime'))}</td>
+                        </tr>
+                    </table>
+
+                    % if ctx.get('planning_url'):
+                        <div style="margin: 15px;">
+                            <a href="${ctx.get('planning_url')}" target="_blank"
+                                style="padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px">View Your Planning</a>
+                        </div>
+                    % endif
+
+                    % if ctx.get('shift_unassigned_count'):
+                    <div>
+                        <p>There are new open shifts available. Please, assign yourself if you are available.</p>
+                    </div>
+                    % endif
+
+                    % if ctx.get('message'):
+                        <p>${ctx['message']}</p>
+                    % endif
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>
