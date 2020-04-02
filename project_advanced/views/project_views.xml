@@ -1,6 +1,55 @@
 <?xml version="1.0"?>
 <odoo>
 
+    <!-- 
+        Stage Views
+    -->
+    <record id="project_task_type_view_form" model="ir.ui.view">
+        <field name="name">project.task.type.form</field>
+        <field name="model">project.task.type</field>
+        <field name="inherit_id" ref="project.task_type_edit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='fold']" position="after">
+                <field name="is_closed"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 
+        Project Views
+    -->    
+    <record id="project_project_view_form_simplified" model="ir.ui.view">
+        <field name="name">project.project.view.form.simplified</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.project_project_view_form_simplified"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="project_template_id" groups="project_advanced.group_project_template"/>
+                <field name="project_template_deadline_policy" invisible="1"/>
+                <field name="date_start" attrs="{'invisible': [('project_template_deadline_policy', '!=', 'after_project_begin')], 'required': [('project_template_deadline_policy', '=', 'after_project_begin')]}"/>
+                <field name="date" attrs="{'invisible': [('project_template_deadline_policy', '!=', 'before_project_end')], 'required': [('project_template_deadline_policy', '=', 'before_project_end')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="project_project_view_form" model="ir.ui.view">
+        <field name="name">project.project.form</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='misc']/group[2]" position="attributes">
+                <attribute name='groups'></attribute>
+            </xpath>
+            <xpath expr="//field[@name='resource_calendar_id']" position="after">
+                <field name="date_start"/>
+                <field name="date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 
+        Task Views
+    -->
     <record id="project_task_view_form" model="ir.ui.view">
         <field name="name">project.task.form</field>
         <field name="model">project.task</field>
