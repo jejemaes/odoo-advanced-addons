@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_planning_role_user,access_planning_role,model_planning_role,planning.group_planning_user,1,0,0,0
+access_planning_planning_user,access_planning_planning,model_planning_planning,planning.group_planning_user,1,0,0,0
+access_planning_shift_user,access_planning_shift,model_planning_shift,planning.group_planning_user,1,0,0,0
+access_planning_role_manager,access_planning_role,model_planning_role,planning.group_planning_manager,1,1,1,1
+access_planning_planning_manager,access_planning_planning,model_planning_planning,planning.group_planning_manager,1,1,1,1
+access_planning_shift_manager,access_planning_shift,model_planning_shift,planning.group_planning_manager,1,1,1,1
