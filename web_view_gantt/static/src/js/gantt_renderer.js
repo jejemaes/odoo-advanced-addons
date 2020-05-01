@@ -271,6 +271,10 @@ return AbstractRenderer.extend({
                     var startDate = rec[self.state.dateStartField];
                     var stopDate = rec[self.state.dateStopField];
 
+                    // convert in user tz
+                    startDate = moment(startDate).subtract(startDate.toDate().getTimezoneOffset(), 'minutes');
+                    stopDate = moment(stopDate).subtract(stopDate.toDate().getTimezoneOffset(), 'minutes');
+
                     tasks.push({
                         id: rec.id,
                         text: rec.display_name,
