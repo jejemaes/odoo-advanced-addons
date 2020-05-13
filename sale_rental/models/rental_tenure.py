@@ -28,7 +28,6 @@ class AbstractRentalTenure(models.AbstractModel):
 
     def display_price(self, price, from_currency, to_currency=False):
         currency = to_currency or from_currency
-        print(currency.display_name)
         return tools.format_amount(self.env, price, currency, self.env.context.get('lang'))
 
 
@@ -40,7 +39,6 @@ class RentalTenureDuration(models.Model):
 
     tenure_value = fields.Integer("Tenue", required=True, default=1)
     rental_uom = fields.Selection([
-        ('hour', 'Hour(s)'),
         ('day', 'Day(s)'),
         ('week', 'Week(s)'),
         ('month', 'Month(s)'),
@@ -132,7 +130,6 @@ class RentalTenureDuration(models.Model):
     def _get_ordering_map(self):
         """ get the map responsible for the order to apply when computing rental price """
         return {
-            'hour': 10,
             'day': 20,
             'week': 30,
             'month': 40,
@@ -270,13 +267,13 @@ class RentalTenureDay(models.Model):
     @api.model
     def _get_day_abbreviation(self):
         return {
-            'monday': _('Mon.'),
-            'tuesday': _('Tue.'),
-            'wednesday': _('Wes.'),
-            'thursday': _('Thu.'),
-            'friday': _('Fri.'),
-            'saturday': _('Sat.'),
-            'sunday': _('Sun.'),
+            'monday': _('Monday'),
+            'tuesday': _('Tuesday'),
+            'wednesday': _('Wednesday'),
+            'thursday': _('Thursday'),
+            'friday': _('Friday'),
+            'saturday': _('Saturday'),
+            'sunday': _('Sunday'),
         }
 
     @api.model

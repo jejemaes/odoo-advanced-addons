@@ -154,7 +154,7 @@
                 string="Schedule"
                 date_start="date_from"
                 date_stop="date_to"
-                color="resource_color"
+                color="state_color"
                 scales="day,week,month,year"
                 precision="{'day': 'hour:half', 'week': 'day:full', 'month': 'day:full', 'year': 'month:full'}"
                 default_scale="month"
@@ -169,7 +169,7 @@
             <search>
                 <filter string="My Bookings" name="my" domain="[('user_id','=', uid)]"/>
                 <separator/>
-                <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                <filter string="Future Bookings" name="future" domain="[('date_from', '&gt;=', context_today().strftime('%%Y-%%m-%%d 00:00:00'))]"/>
                 <separator/>
                 <filter name="to_deliver" string="To Deliver" domain="[('state', '=', 'reserved'), ('date_from','&lt;', (context_today() + datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d') )]"/>
                 <filter name="to_be_returned" string="To Be Returned" domain="[('state', '=', 'picked_up'), ('date_to','&lt;', (context_today() + datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d') )]"/>

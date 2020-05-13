@@ -3,7 +3,7 @@
 from datetime import date, datetime, timedelta
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class RentalBooking(models.Model):
@@ -46,12 +46,26 @@ class RentalBooking(models.Model):
         ('done', 'Done'),
         ('cancel', 'Cancel'),
     ], string='Status', default='draft', required=True, copy=False)
+    state_color = fields.Integer("Color State", compute='_compute_state_color')
     duration_hours = fields.Float('Duration in Hours', compute='_compute_durations')
     duration_days = fields.Float('Duration in Days', compute='_compute_durations')
     overlap_count = fields.Integer("Number of rental overlapping", compute='_compute_overlap_count')
 
     note = fields.Text('Internal Notes', copy=False)
     agreement_id = fields.Many2one('rental.agreement', string="Agreement", default=_default_agreement_id, copy=False)
+
+    @api.depends('state')
+    def _compute_state_color(self):
+        color_map = {
+            'draft': 8, # grey
+            'reserved': 4, # blue
+            'picked_up': 3, # yellow
+            'returned': 10,  # green
+            'done': 10,  # green
+            'cancel': 8, # grey
+        }
+        for rental in self:
+            rental.state_color = color_map.get(rental.state, 1)  # red for no known state
 
     @api.depends('resource_time_id.resource_id', 'resource_time_id.date_from', 'resource_time_id.date_to')
     def _compute_durations(self):
@@ -132,6 +146,15 @@ class RentalBooking(models.Model):
                 raise UserError(_('You can not change the dates of a none draft booking'))
         return super(RentalBooking, self).write(values)
 
+    def unlink(self):
+        if any(rental.state not in ['draft', 'cancel'] for rental in self):
+            raise UserError(_("Only draft or cancelled bookings can be removed."))
+
+        resource_times = self.mapped('resource_time_id')
+        result = super(RentalBooking, self).unlink()
+        resource_times.sudo().unlink()
+        return result
+
     # ---------------------------------------------------------
     # Actions
     # ---------------------------------------------------------
@@ -149,6 +172,8 @@ class RentalBooking(models.Model):
         self.write({'state': 'done'})
 
     def action_cancel(self):
+        if any(booking.state in ['picked_up'] for booking in self):
+            raise ValidationError(_("You can not cancel a picked up booking. It needs to be returned first."))
         self.write({'state': 'cancel'})
 
     def action_reset(self):

@@ -17,7 +17,6 @@ Rent your machines and other resources, manage your calendar and confirm the ren
         'security/rental_security.xml',
         'security/ir.model.access.csv',
         'views/res_config_settings_views.xml',
-        'views/resource_views.xml',
         'views/rental_views.xml',
         'views/rental_menus.xml',
         'views/assets.xml',

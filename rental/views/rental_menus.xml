@@ -30,14 +30,14 @@
     <record id="resource_resource_action_rental_tree" model="ir.actions.act_window.view">
         <field name="sequence" eval="5"/>
         <field name="view_mode">tree</field>
-        <field name="view_id" ref="resource_resource_view_tree_rental"/>
+        <field name="view_id" ref="resource_advanced.resource_resource_view_tree"/>
         <field name="act_window_id" ref="resource_resource_action_rental"/>
     </record>
 
     <record id="resource_resource_action_rental_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="5"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="resource_resource_view_form_rental"/>
+        <field name="view_id" ref="resource_advanced.resource_resource_view_form"/>
         <field name="act_window_id" ref="resource_resource_action_rental"/>
     </record>
 

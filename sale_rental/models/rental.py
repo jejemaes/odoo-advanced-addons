@@ -13,11 +13,6 @@ class RentalBooking(models.Model):
     sale_line_id = fields.Many2one('sale.order.line', 'Sale Item', readonly=True)
     sale_order_id = fields.Many2one('sale.order', 'Sale Order', related='sale_line_id.order_id', readonly=True, store=True)
 
-    def unlink(self):
-        if any(rental.sale_line_id for rental in self):
-            raise UserError(_("You can not remove rental linked to sale item."))
-        return super(RentalBooking, self).unlink()
-
     # ---------------------------------------------------
     # Actions
     # ---------------------------------------------------

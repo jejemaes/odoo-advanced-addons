@@ -31,10 +31,11 @@
                             <field name="rental_tracking" widget="radio" attrs="{'required': [('can_be_rented', '=', True)]}"/>
                             <field name="rental_padding_before" widget="float_time"/>
                             <field name="rental_padding_after" widget="float_time"/>
+                            <field name="rental_calendar_id" attrs="{'required': [('can_be_rented', '=', True)]}"/>
                             <field name="rental_agreement_id" options="{'no_create': True}"/>
                         </group>
                         <group string="Rental Pricing" attrs="{'invisible': [('rental_tenure_type', '!=', 'duration')]}">
-                            <field name="rental_tenure_duration_ids" attrs="{'required': [('can_be_rented', '=', True)]}"  nolabel="1">
+                            <field name="rental_tenure_duration_ids" attrs="{'required': [('rental_tenure_type', '=', 'duration')]}" nolabel="1">
                                 <tree editable="top">
                                     <field name="sequence" widget="handle"/>
                                     <field name="tenure_value"/>
@@ -44,7 +45,7 @@
                             </field>
                         </group>
                         <group string="Rental Pricing" attrs="{'invisible': [('rental_tenure_type', '!=', 'day')]}">
-                            <field name="rental_tenure_day_ids" attrs="{'required': [('can_be_rented', '=', True)]}"  nolabel="1">
+                            <field name="rental_tenure_day_ids" attrs="{'required': [('rental_tenure_type', '=', 'day')]}" nolabel="1">
                                 <tree editable="top">
                                     <field name="monday"/>
                                     <field name="tuesday"/>
@@ -59,12 +60,16 @@
                         </group>
                     </group>
                     <group string="Resources" attrs="{'invisible': [('rental_tracking', '!=', 'use_resource')]}">
-                        <field name="resource_ids" attrs="{'required': ['rental_tracking', '=', 'use_resource']}" nolabel="1">
+                        <field name="resource_ids" attrs="{'required': ['rental_tracking', '=', 'use_resource']}" nolabel="1" context="{'default_resource_type': 'material'}">
                             <tree editable="top">
                                 <field name="name"/>
                                 <field name="calendar_id"/>
+                                <field name="user_id"/>
                             </tree>
                         </field>
+                    </group>
+                    <group string="Description">
+                        <field name="description_rental" nolabel="1"/>
                     </group>
                     <group string="Additionnal Services">
                         <field name="rental_product_ids" nolabel="1">
