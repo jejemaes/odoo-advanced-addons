@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="budget_report_template_page">
+        <t t-call="web.external_layout">
+            <div class="page o_budget_report">
+                <h2 class="text-center">
+                    <span t-field="o.name"/>
+                </h2>
+                <h4 class="text-center">
+                    <span t-field="o.date_from"/> - <span t-field="o.date_to"/>
+                </h4>
+
+                <div class="row mt-5">
+                    <div class="col-6">
+                        <h4 class="text-center">Expenses</h4>
+                        <t t-set="lines_by_category" t-value="o.budget_line_ids.filtered(lambda l: l.planned_amount &lt; 0.0)._get_lines_grouped_by_category()"/>
+                        <t t-call="budget.budget_report_template_table_lines"/>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-center">Incomes</h4>
+                        <t t-set="lines_by_category" t-value="o.budget_line_ids.filtered(lambda l: l.planned_amount &gt;= 0.0)._get_lines_grouped_by_category()"/>
+                        <t t-call="budget.budget_report_template_table_lines"/>
+                    </div>
+                </div>
+
+                <div class="row mt-5">
+                    <div class="col-6">
+                        <table class="table h5">
+                            <tr>
+                                <td>Total Expenses</td>
+                                <td><span t-field="o.planned_debit_amount"/></td>
+                                <td><span t-field="o.practical_debit_amount"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="table h5">
+                            <tr>
+                                <td>Total Incomes</td>
+                                <td><span t-field="o.planned_credit_amount"/></td>
+                                <td><span t-field="o.practical_credit_amount"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col-6 offset-6">
+                        <table class="table h4">
+                            <tr>
+                                <td>Planned Total</td>
+                                <td><span t-esc="o.planned_credit_amount + o.planned_debit_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                            </tr>
+                            <tr>
+                                <td>Practical Total</td>
+                                <td><span t-esc="o.practical_credit_amount + o.practical_debit_amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="budget_report_template_table_lines">
+        <t t-foreach="sorted(lines_by_category)" t-as="category">
+            <table class="table">
+                <thead t-attf-class="table">
+                    <tr t-attf-class="o_budget_report_header_color_#{str(category.color)}">
+                        <th scope="col" class="col-md-4 align-middle text-uppercase">
+                            <t t-esc="category.name"/>
+                        </th>
+                        <th scope="col" class="align-middle">Planned</th>
+                        <th scope="col" class="align-middle">Practical</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="lines_by_category[category]" t-as="line">
+                        <tr t-attf-class="text o_budget_report_text_color_#{str(category.color)}">
+                            <td><t t-esc="line.name"/></td>
+                            <td><span t-field="line.planned_amount"/></td>
+                            <td><span t-field="line.practical_amount"/></td>
+                        </tr>
+                    </t>
+                    <tr t-attf-class="text o_budget_report_text_color_#{str(category.color)}">
+                        <td><b>Total</b></td>
+                        <td><b t-esc="sum(lines_by_category[category].mapped('planned_amount'))" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                        <td><b t-esc="sum(lines_by_category[category].mapped('practical_amount'))" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+                    </tr>
+                </tbody>
+            </table>
+        </t>
+    </template>
+
+    <template id="budget_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="budget.budget_report_template_page" t-lang="lang"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>
