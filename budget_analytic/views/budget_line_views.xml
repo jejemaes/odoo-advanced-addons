@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Budget Lines
+    -->
+
+    <record id="budget_budget_line_view_form" model="ir.ui.view">
+        <field name="name">budget.budget.line.form</field>
+        <field name="model">budget.budget.line</field>
+        <field name="inherit_id" ref="budget.budget_budget_line_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='mode']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//group[@name='mode_computation']" position="inside">
+                <field name="analytic_account_id" attrs="{'invisible': [('mode', '!=', 'analytic')], 'required': [('mode', '=', 'analytic')]}"/>
+                <field name="analytic_budget_tag_ids" attrs="{'invisible': [('mode', '!=', 'analytic')], 'required': [('mode', '=', 'analytic')]}" widget="many2many_tags" options="{'color_field': 'color'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

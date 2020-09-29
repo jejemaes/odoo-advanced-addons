@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem
+        id="budget_analytic_menu"
+        name="Analytic Accounting"
+        parent="budget.budget_menu_root"
+        action="analytic.action_account_analytic_account_form"
+        groups="analytic.group_analytic_accounting"
+        sequence="10"/>
+
+    <menuitem
+        id="budget_configuration_menu_analytic"
+        name="Analytic Accounting"
+        parent="budget.budget_menu_settings"
+        groups="analytic.group_analytic_accounting"
+        sequence="10"/>
+
+            <menuitem
+                id="budget_configuration_menu_account_analytic"
+                name="Analytic Accounts"
+                parent="budget_configuration_menu_analytic"
+                action="analytic.action_account_analytic_account_form"
+                groups="analytic.group_analytic_accounting"
+                sequence="5"/>
+
+            <menuitem
+                id="budget_configuration_menu_analytic_plan"
+                name="Analytic Plans"
+                action="analytic.account_analytic_plan_action"
+                parent="budget_configuration_menu_analytic"
+                groups="analytic.group_analytic_accounting"
+                sequence="10"/>
+
+            <menuitem
+                id="budget_configuration_menu_group"
+                name="Analytic Distribution Models"
+                parent="budget_configuration_menu_analytic"
+                action="analytic.action_analytic_distribution_model"
+                groups="analytic.group_analytic_accounting"
+                sequence="15"/>
+
+    <menuitem
+        id="budget_configuration_menu_budget_tag"
+        name="Budget Analytic Tags"
+        parent="budget.budget_menu_settings"
+        action="budget_analytic_tag_action"
+        sequence="15"/>
+
+</odoo>

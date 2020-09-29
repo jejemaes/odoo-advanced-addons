@@ -1,0 +1,46 @@
+.o_budget_report {
+
+    @for $size from 1 through length($o-colors) {
+        .o_budget_report_header_color_#{$size - 1} {
+            @if $size == 1 {
+                & {
+                    background-color: $o-view-background-color;
+                    color: nth($o-colors, $size);
+                    box-shadow: inset 0 0 0 1px;
+                }
+                &:focus-within {
+                    color: darken(nth($o-colors, $size), 40%) ;
+                }
+                &::after {
+                    background-color: nth($o-colors, $size);
+                }
+            } @else {
+                &, &::after {
+                    background-color: nth($o-colors, $size);
+                    color: color-contrast(nth($o-colors, $size));
+                }
+            }
+        }
+    }
+
+    @for $size from 1 through length($o-colors) {
+        .o_budget_report_text_color_#{$size - 1} {
+            @if $size == 1 {
+                & {
+                    color: nth($o-colors, $size);
+                }
+                &:focus-within {
+                    color: darken(nth($o-colors, $size), 40%) ;
+                }
+                &::after {
+                    color: nth($o-colors, $size);
+                }
+            } @else {
+                &, &::after {
+                    color: nth($o-colors, $size);
+                }
+            }
+        }
+    }
+
+}

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Budget Lines
+    -->
+
+    <record id="budget_budget_line_view_form" model="ir.ui.view">
+        <field name="name">budget.budget.line.form</field>
+        <field name="model">budget.budget.line</field>
+        <field name="arch" type="xml">
+            <form string="Budget Lines">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h2>
+                            <field name="name"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="budget_state" invisible="1"/>
+                            <field name="budget_id" invisible="1"/>
+                            <field name="category_id"/>
+                            <field name="mode" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                        </group>
+                        <group name="mode_computation" string="Practical Informations" attrs="{'invisible': [('mode', '==', 'manual')]}">
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Theorical">
+                            <field name="planned_amount"/>
+                        </group>
+                        <group string="Practical">
+                            <field name="practical_amount_readonly" invisible="1"/>
+                            <field name="practical_amount" attrs="{'readonly': [('practical_amount_readonly', '=', True)]}"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" colspan="2" placeholder="Note ..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="budget_budget_line_view_search" model="ir.ui.view">
+        <field name="name">account.budget.line.search</field>
+        <field name="model">budget.budget.line</field>
+        <field name="arch" type="xml">
+            <search string="Budget Lines">
+                <field name="budget_id"/>
+                <field name="category_id"/>
+                <filter name="filter_not_cancelled" string="Not Cancelled" domain="[('budget_state','!=','cancel')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_budget_id" string="Budgets" domain="[]" context="{'group_by':'budget_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

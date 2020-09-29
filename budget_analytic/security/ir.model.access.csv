@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+budget_analytic.access_budget_analytic_tag,access_budget_analytic_tag,budget_analytic.model_budget_analytic_tag,base.group_user,1,0,0,0
+budget_analytic.access_budget_analytic_tag_manager,access_budget_analytic_tag_manager,budget_analytic.model_budget_analytic_tag,budget.group_budget_manager,1,1,1,1
+budget_analytic.access_budget_analytic_account_user,access_account_analytic_account,analytic.model_account_analytic_account,budget.group_budget_user,1,0,0,0
+budget_analytic.access_budget_analytic_line_user,access_account_analytic_line,analytic.model_account_analytic_line,budget.group_budget_user,1,0,0,0
