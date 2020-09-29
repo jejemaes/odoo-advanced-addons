@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_budget_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="implied_ids" eval="[(4, ref('analytic.group_analytic_accounting'))]"/>
+        <field name="category_id" ref="base.module_category_budget"/>
+    </record>
+
+    <record id="group_budget_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="implied_ids" eval="[(4, ref('group_budget_user'))]"/>
+        <field name="category_id" ref="base.module_category_budget"/>
+    </record>
+
+    <record id="base.user_root" model="res.users">
+        <field name="groups_id" eval="[(4, ref('group_budget_manager'))]"/>
+    </record>
+
+    <record id="base.user_admin" model="res.users">
+        <field name="groups_id" eval="[(4, ref('group_budget_manager'))]"/>
+    </record>
+
+
+    <data noupdate="1">
+
+        <record id="budget_category_rule_multi_company" model="ir.rule">
+            <field name="name">Budget category multi-company</field>
+            <field name="model_id" ref="model_budget_category"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        </record>
+
+        <record id="budget_position_rule_multi_company" model="ir.rule">
+            <field name="name">Budget position multi-company</field>
+            <field name="model_id" ref="model_budget_position"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        </record>
+
+        <record id="budget_budget_rule_multi_company" model="ir.rule">
+            <field name="name">Budget multi-company</field>
+            <field name="model_id" ref="model_budget_budget"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        </record>
+
+        <record id="budget_budget_line_rule_multi_company" model="ir.rule">
+            <field name="name">Budget lines multi-company</field>
+            <field name="model_id" ref="model_budget_budget_line"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        </record>
+
+
+        <record id="budget_budget_rule_user" model="ir.rule">
+            <field name="name">Budget user: own budget</field>
+            <field name="model_id" ref="model_budget_budget"/>
+            <field name="groups" eval="[(4, ref('group_budget_user'))]"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="budget_budget_line_rule_user" model="ir.rule">
+            <field name="name">Budget user : own budget line</field>
+            <field name="model_id" ref="model_budget_budget_line"/>
+            <field name="groups" eval="[(4, ref('group_budget_user'))]"/>
+            <field name="domain_force">[('budget_id.user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+
+        <record id="budget_budget_rule_manager" model="ir.rule">
+            <field name="name">Budget manager: all budget</field>
+            <field name="model_id" ref="model_budget_budget"/>
+            <field name="groups" eval="[(4, ref('group_budget_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="budget_budget_line_rule_manager" model="ir.rule">
+            <field name="name">Budget manager : all budget line</field>
+            <field name="model_id" ref="model_budget_budget_line"/>
+            <field name="groups" eval="[(4, ref('group_budget_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+    </data>
+</odoo>

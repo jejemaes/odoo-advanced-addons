@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="budget_report_template_page">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2 class="text-center">
+                        <span t-field="o.name"/>
+                    </h2>
+                    <h4 class="text-center">
+                        <span t-field="o.date_from"/> - <span t-field="o.date_to"/>
+                    </h4>
+                    <div class="row">
+                        <t t-set="total_planned" t-value="0.0"/>
+                        <t t-set="total_practical" t-value="0.0"/>
+
+                        <t t-foreach="['debit', 'credit']" t-as="display_mode">
+                            <div class="col-6">
+
+                                <h3 class="text-center">
+                                    <t t-if="display_mode == 'credit'">
+                                        Credit
+                                    </t>
+                                    <t t-if="display_mode == 'debit'">
+                                        Debit
+                                    </t>
+                                </h3>
+
+                                <t t-foreach="budget_report[o][display_mode]" t-as="budget_section">
+                                    <t t-set="color_possible" t-value="['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark']"/>
+                                    <t t-set="bs_color" t-value="color_possible[budget_section['category'].color or -1]"/>
+                                    <table class="table">
+                                        <thead>
+                                            <tr t-attf-class="table-#{bs_color}">
+                                                <th scope="col" class="col-md-4 align-middle">
+                                                    <t t-esc="budget_section['category'].name"/>
+                                                </th>
+                                              <th scope="col" class="align-middle">Planned</th>
+                                              <th scope="col" class="align-middle">Practical</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="budget_section['subsections']" t-as="budget_subsection">
+                                                <tr t-attf-class="text-#{bs_color}">
+                                                    <td class="col-md-4">
+                                                        <t t-esc="budget_subsection.name"/>
+                                                        <small t-if="budget_subsection.note"><br/><t t-esc="budget_subsection.note"/></small>
+                                                    </td>
+                                                    <td><t t-esc="budget_subsection.total_planned" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                    <td><t t-esc="budget_subsection.total_practical" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                </tr>
+                                                <t t-set="total_planned" t-value="total_planned + budget_subsection.total_planned"/>
+                                                <t t-set="total_practical" t-value="total_practical + budget_subsection.total_practical"/>
+                                            </t>
+                                            <tr t-attf-class="text-#{bs_color}">
+                                              <td><p class="text-right font-weight-bold">Total:</p></td>
+                                              <td class="col-md-4"><strong t-esc="budget_section['total_planned']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                              <td><strong t-esc="budget_section['total_practical']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-dark">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">Planned</th>
+                                        <th scope="col">Practical</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="col-md-4">Total</th>
+                                        <td><t t-esc="total_planned" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td><t t-esc="total_practical" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </t>
+        </template>
+
+        <template id="budget_report_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="budget.budget_report_template_page" t-lang="lang"/>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

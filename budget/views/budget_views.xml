@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Budget Category
+    -->
+
+    <record id="budget_category_view_list" model="ir.ui.view">
+        <field name="name">budget.category.tree</field>
+        <field name="model">budget.category</field>
+        <field name="arch" type="xml">
+            <tree string="Budget Category">
+                <field name="display_name"/>
+                <field name="color"/>
+                <field name="display_type"/>
+                <field name="children_count"/>
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="budget_category_view_form" model="ir.ui.view">
+        <field name="name">budget.category.form</field>
+        <field name="model">budget.category</field>
+        <field name="arch" type="xml">
+            <form string="Budgery Category">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="color" attrs="{'invisible': [('parent_id', '!=', False)]}"/>
+                        <field name="display_type" attrs="{'invisible': [('parent_id', '!=', False)]}"/>
+                        <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="parent_id" attrs="{'invisible': [('children_ids', '!=', [])]}"/>
+                        <field name="children_ids" attrs="{'invisible': [('parent_id', '!=', False)]}">
+                            <tree editable="bottom">
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--
+        Budget Position
+    -->
+
+    <record id="budget_position_view_list" model="ir.ui.view">
+        <field name="name">budget.position.tree</field>
+        <field name="model">budget.position</field>
+        <field name="arch" type="xml">
+            <tree string="Budgetary Position">
+                <field name="name"/>
+                <field name="position_type"/>
+                <field name="use_budget_category"/>
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="budget_position_view_form" model="ir.ui.view">
+        <field name="name">budget.position.form</field>
+        <field name="model">budget.position</field>
+        <field name="arch" type="xml">
+            <form string="Budgetary Position">
+                <sheet>
+                    <group col="4">
+                        <field name="name"/>
+                        <field name="position_type"/>
+                        <field name="use_budget_category" attrs="{'invisible': [('position_type', '!=', 'analytic')]}"/>
+                        <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="budget_position_view_search" model="ir.ui.view">
+        <field name="name">budget.position.search</field>
+        <field name="model">budget.position</field>
+        <field name="arch" type="xml">
+            <search string="Budgetary Position">
+                <field name="name" filter_domain="[('name','ilike',self)]" string="Budgetary Position"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_position_type" string="Type" domain="[]" context="{'group_by':'position_type'}"/>
+                    <filter name="group_by_budget_category" string="Budget Category" domain="[]" context="{'group_by':'use_budget_category'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--
+        Budget
+    -->
+
+    <record id="budget_budget_view_list" model="ir.ui.view">
+        <field name="name">budget.budget.view.tree</field>
+        <field name="model">budget.budget</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'" decoration-muted="state in ('done','cancel')" string="Budget">
+                <field name="name" colspan="1"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                <field name="user_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="budget_budget_view_form" model="ir.ui.view">
+        <field name="name">budget.budget.view.form</field>
+        <field name="model">budget.budget</field>
+        <field name="arch" type="xml">
+            <form string="Budget">
+                <header>
+                    <button string="Confirm" name="action_budget_confirm" states="draft" type="object" class="oe_highlight"/>
+                    <button string="Done" name="action_budget_done" states="confirm" type="object" class="oe_highlight"/>
+                    <button string="Reset to Draft" name="action_budget_draft" states="cancel" type="object"/>
+                    <button string="Cancel Budget" name="action_budget_cancel" states="confirm" type="object"/>
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet string="Budget">
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" attrs="{'readonly':[('state','!=','draft')]}" placeholder="Budget Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="user_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        </group>
+                        <group>
+                            <label for="date_from" string="Period"/>
+                            <div>
+                                <field name="date_from" class="oe_inline" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                -
+                                <field name="date_to" class="oe_inline" attrs="{'readonly':[('state','!=','draft')]}" nolabel="1"/>
+                            </div>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Budget Lines">
+                            <field name="budget_line_ids"
+                                   context="{'default_date_from': date_from,'default_date_to': date_to}" colspan="4"
+                                   nolabel="1" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree string="Budget Lines" decoration-success="is_above_budget and planned_amount &gt; 0" decoration-danger="is_above_budget and planned_amount &lt; 0">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="budget_category_id"/>
+                                    <field name="budget_position_id"/>
+                                    <field name="budget_position_type" invisible="1"/>
+                                    <field name="analytic_account_id" groups="analytic.group_analytic_accounting" attrs="{'required': [('budget_position_type', '=', 'analytic')]}"/>
+                                    <field name="date_from"/>
+                                    <field name="date_to"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="planned_amount" sum="Planned Amount"/>
+                                    <field name="practical_amount" sum="Practical Amount"/>
+                                    <field name="percentage"  widget="percentage" />
+                                    <button type="object" name="action_view_analytic_entries" string="Entries..." icon="fa-arrow-circle-o-right"/>
+                                    <field name="is_above_budget" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="budget_budget_view_kanban" model="ir.ui.view">
+        <field name="name">budget.budget.kanban</field>
+        <field name="model">budget.budget</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="user_id"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="row mb4">
+                                <div class="col-8">
+                                    <strong>
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                                <div class="col-4">
+                                    <span class="float-right">
+                                        <field name="state" widget="label_selection"
+                                               options="{'classes': {'draft': 'default', 'done': 'success'}}"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-10">
+                                    <i class="fa fa-clock-o" role="img" aria-label="Period" title="Period"/>
+                                    <t t-esc="record.date_from.value"/>-
+                                    <t t-esc="record.date_to.value"/>
+                                </div>
+                                <div class="col-2">
+                                    <span class="float-right">
+                                        <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)"
+                                             t-att-title="record.user_id.value" t-att-alt="record.user_id.value" width="24" height="24"
+                                             class="oe_kanban_avatar float-right"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="budget_budget_view_search" model="ir.ui.view">
+        <field name="name">budget.budget.search</field>
+        <field name="model">budget.budget</field>
+        <field name="arch" type="xml">
+            <search string="Budget">
+                <field name="name" filter_domain="[('name','ilike',self)]" string="Budget"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="state"/>
+                <filter string="My Budget" name="assigned_to_me" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]" help="Draft Budgets"/>
+                <filter string="To Approve" name="to_approve" domain="[('state','=','confirm')]" help="To Approve Budgets"/>
+                <filter string="Open Budgets" name="open" domain="[('state','not in',['cancel', 'done'])]"/>
+            </search>
+        </field>
+    </record>
+
+    <!--
+        Budget Lines
+    -->
+
+    <record id="budget_budget_line_view_list" model="ir.ui.view">
+        <field name="name">budget.budget.line.tree</field>
+        <field name="model">budget.budget.line</field>
+        <field name="arch" type="xml">
+            <tree string="Budget Lines" create="0">
+                <field name="currency_id" invisible="1"/>
+                <field name="budget_id" invisible="1"/>
+                <field name="budget_category_id"/>
+                <field name="budget_position_id"/>
+                <field name="analytic_account_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="planned_amount"/>
+                <field name="practical_amount"/>
+                <field name="percentage" widget="percentage"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="budget_budget_line_view_form" model="ir.ui.view">
+        <field name="name">budget.budget.line.form</field>
+        <field name="model">budget.budget.line</field>
+        <field name="arch" type="xml">
+            <form string="Budget Lines">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="budget_position_id"/>
+                            <field name="budget_state" invisible="1"/>
+                            <field name="budget_position_type" invisible="1"/>
+                            <field name="analytic_account_id" groups="analytic.group_analytic_accounting" attrs="{'readonly':[('budget_state','!=','draft')], 'required': [('budget_position_type', '=', 'analytic')], 'invisible': [('budget_position_type', '=', 'analytic')]}"/>
+                            <field name="budget_category_id"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <label for="date_from" string="Period"/>
+                            <div>
+                                <field name="date_from" class="oe_inline"/>
+                                -
+                                <field name="date_to" class="oe_inline"/>
+                            </div>
+                            <field name="planned_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" nolabel="1" placeholder="Note ..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="budget_budget_line_view_search" model="ir.ui.view">
+        <field name="name">account.budget.line.search</field>
+        <field name="model">budget.budget.line</field>
+        <field name="arch" type="xml">
+            <search string="Budget Lines">
+                <field name="analytic_account_id"/>
+                <field name="budget_id"/>
+                <field name="budget_category_id"/>
+                <filter name="filter_not_cancelled" string="Not Cancelled" domain="[('budget_state','!=','cancel')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_budget_id" string="Budgets" domain="[]" context="{'group_by':'budget_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+<!--
+    <record model="ir.ui.view" id="view_budget_budget_line_pivot">
+        <field name="name">budget.budget.line.pivot</field>
+        <field name="model">budget.budget.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Budget Lines">
+                <field name="budget_id" type="row"/>
+                <field name="planned_amount"  type="measure" string="Planned amount"/>
+                <field name="theoritical_amount"  type="measure" string="Theoritical amount"/>
+                <field name="practical_amount" type="measure" string="Practical amount"/>
+                <field name="percentage" type="measure" widget="percentage"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_budget_budget_line_graph">
+        <field name="name">budget.budget.line.graph</field>
+        <field name="model">budget.budget.line</field>
+        <field name="arch" type="xml">
+            <graph string="Budget Lines">
+                <field name="budget_id" type="row"/>
+                <field name="planned_amount"  type="measure" string="Planned amount"/>
+                <field name="theoritical_amount"  type="measure" string="Theoritical amount"/>
+                <field name="practical_amount" type="measure" string="Practical amount"/>
+            </graph>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="act_budget_budget_lines_view">
+        <field name="name">Budgets Analysis</field>
+        <field name="res_model">budget.budget.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="view_id" eval="False"/>
+        <field name="context">{'search_default_group_crossevered_budgdet_id': True, 'search_default_filter_not_cancelled':True}</field>
+    </record>
+    <menuitem parent="account.account_reports_management_menu"
+              id="menu_act_budget_budget_lines_view"
+              action="act_budget_budget_lines_view" sequence="20"
+              groups="account.group_account_user"/>
+ -->
+
+    <!--
+        Actions
+    -->
+
+    <record id="budget_category_action" model="ir.actions.act_window">
+        <field name="name">Budget Category</field>
+        <field name="res_model">budget.category</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="budget_category_view_list"/>
+    </record>
+
+    <record id="budget_position_action" model="ir.actions.act_window">
+        <field name="name">Budget Position</field>
+        <field name="res_model">budget.position</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="budget_position_view_list"/>
+        <field name="search_view_id" ref="budget_position_view_search"/>
+    </record>
+
+    <record id="budget_budget_action" model="ir.actions.act_window">
+        <field name="name">Budgets</field>
+        <field name="res_model">budget.budget</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_id" ref="budget_budget_view_list"/>
+        <field name="search_view_id" ref="budget_budget_view_search"/>
+         <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Click to create a new budget.
+            </p>
+            <p>
+                Use budgets to compare actual with expected revenues and costs
+            </p>
+        </field>
+    </record>
+
+    <!--
+        Menus
+    -->
+    <menuitem
+        id="cost_revenue_menu"
+        name="Budget"
+        groups="base.group_user"
+        web_icon="project,static/description/icon.png"
+        sequence="50"/>
+
+    <menuitem
+        id="budget_budget_menu"
+        name="Budgets"
+        parent="cost_revenue_menu"
+        action="budget_budget_action"
+        sequence="5"/>
+
+    <menuitem
+        id="budget_analytic_menu"
+        name="Analytic Accounting"
+        parent="cost_revenue_menu"
+        action="analytic.action_account_analytic_account_form"
+        groups="analytic.group_analytic_accounting"
+        sequence="10"/>
+
+    <menuitem
+        id="budget_configuration_menu"
+        name="Configuration"
+        parent="cost_revenue_menu"
+        sequence="15"/>
+
+        <menuitem
+            id="budget_configuration_menu_budget"
+            name="Budgets"
+            parent="budget_configuration_menu"
+            sequence="5"/>
+
+            <menuitem
+                id="budget_configuration_menu_budget_position"
+                name="Budget Positions"
+                parent="budget_configuration_menu_budget"
+                action="budget_position_action"
+                sequence="5"/>
+
+            <menuitem
+                id="budget_configuration_menu_budget_category"
+                name="Budget Categories"
+                parent="budget_configuration_menu_budget"
+                action="budget_category_action"
+                sequence="10"/>
+
+            <menuitem
+                id="budget_configuration_menu_budget_budget"
+                name="Budgets"
+                parent="budget_configuration_menu_budget"
+                action="budget_budget_action"
+                sequence="15"/>
+
+        <menuitem
+            id="budget_configuration_menu_analytic"
+            name="Analytic Accounting"
+            parent="budget_configuration_menu"
+            groups="analytic.group_analytic_accounting,analytic.group_analytic_tags"
+            sequence="10"/>
+
+                <menuitem
+                    id="budget_configuration_menu_account_analytic"
+                    name="Analytic Accounts"
+                    parent="budget_configuration_menu_analytic"
+                    action="analytic.action_account_analytic_account_form"
+                    groups="analytic.group_analytic_accounting"
+                    sequence="5"/>
+
+                <menuitem
+                    id="budget_configuration_menu_analytic_tag"
+                    name="Analytic Tags"
+                    parent="budget_configuration_menu_analytic"
+                    action="analytic.account_analytic_tag_action"
+                    groups="analytic.group_analytic_tags"
+                    sequence="10"/>
+
+                <menuitem
+                    id="budget_configuration_menu_group"
+                    name="Analytic Account Groups"
+                    parent="budget_configuration_menu_analytic"
+                    action="analytic.account_analytic_group_action"
+                    groups="analytic.group_analytic_accounting"
+                    sequence="15"/>
+
+</odoo>
