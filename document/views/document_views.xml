@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Views
+    -->
+    <record id="document_document_view_list" model="ir.ui.view">
+        <field name="name">document.document.list</field>
+        <field name="model">document.document</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="folder_id"/>
+                <field name="type"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="create_date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="document_document_view_form" model="ir.ui.view">
+        <field name="name">document.document.form</field>
+        <field name="model">document.document</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button type="object" name="action_download" string="Access" class="oe_highlight" attrs="{'invisible': [('url', '=', False)]}"/>
+                    <button type="object" name="action_download" string="Download" class="oe_highlight" attrs="{'invisible': [('type', '!=', 'binary')]}"/>
+                    <button type="object" name="action_share" string="Share"/>
+                    <button type="object" name="action_toggle_lock" string="Lock" attrs="{'invisible': [('lock_uid', '!=', False)]}"/>
+                    <button type="object" name="action_toggle_lock" string="Unlock" attrs="{'invisible': [('lock_uid', '=', False)]}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_related_record" type="object" class="oe_stat_button" icon="fa-external-link" attrs="{'invisible': ['|', ('res_id', '=', False), ('res_model', 'in', [False, 'documents.document'])]}">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Related <br/> Record</span>
+                            </div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="thumbnail" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
+                    <div class="oe_title" aria-label="Name">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="oe_inline" attrs="{'readonly': [('is_locked', '=', True)]}" required="True"/>&amp;nbsp;
+                            <i class="fa fa-lock oe_inline" title="Locked" attrs="{'invisible': [('lock_uid', '=', False)]}"/>
+                        </h1>
+                    </div>
+                    <field name="is_locked" invisible="1"/>
+                    <field name="active" invisible="1"/>
+                    <field name="res_id" invisible="1"/>
+                    <field name="res_model" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="raw_type" invisible="1"/>
+                            <field name="type"/>
+                            <field name="datas" string="File" filename="name" attrs="{'invisible':[('type','=','url')], 'readonly': [('is_locked', '=', True)], 'required': [('type', '=', 'binary')]}"/>
+                            <field name="url" attrs="{ 'invisible' : [('type', '!=', 'url')], 'readonly': [('is_locked', '=', True)], 'required': [('type', '=', 'url')]}"/>
+                            <field name="folder_id" attrs="{'readonly': [('is_locked', '=', True)]}"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                        <group>
+                            <field name="owner_id" attrs="{'readonly': [('is_locked', '=', True)]}"/>
+                            <field name="partner_id"/>
+                            <field name="lock_uid" readonly="1" attrs="{'invisible': [('lock_uid', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Extra Infos">
+                            <group>
+                                <group>
+                                    <field name="create_date"/>
+                                    <field name="create_uid"/>
+                                </group>
+                                <group groups="base.group_no_one">
+                                    <field name="company_id" groups="base.group_multi_company"/>
+                                    <field name="file_size" attrs="{ 'invisible' : [('type', '!=', 'binary')]}"/>
+                                    <field name="mimetype"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="document_document_view_kanban" model="ir.ui.view">
+        <field name="name">document.document.kanban</field>
+        <field name="model">document.document</field>
+        <field name="arch" type="xml">
+            <kanban js_class="document_kanban" sample="1" class="o_documents_kanban">
+                <field name="id"/>
+                <field name="mimetype"/>
+                <field name="favorite_user_ids"/>
+                <field name="owner_id"/>
+                <field name="lock_uid"/>
+                <field name="attachment_id"/><!-- Needed for the document view-->
+                <field name="type"/>
+                <field name="create_uid"/>
+                <field name="url"/>
+                <field name="create_date"/>
+                <field name="active"/>
+                <field name="checksum"/>
+                <field name="thumbnail_url"/>
+                <field name="is_previewable"/>
+                <field name="name"/>
+                <field name="res_model_name"/>
+                <field name="res_model"/>
+                <field name="res_name"/>
+                <field name="activity_ids"/>
+                <field name="activity_state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_area oe_kanban_global_click o_kanban_attachment">
+                            <div class="row">
+                                <div class="offset-10">
+                                    <div class="o_dropdown_kanban dropdown" groups="base.group_user">
+                                        <a role="button" class="dropdown-toggle o-no-caret btn" data-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                            <span class="fa fa-ellipsis-v"/>
+                                        </a>
+                                        <div class="dropdown-menu" role="menu">
+                                            <a role="menuitem" type="object" name="action_share" class="dropdown-item">Share</a>
+                                            <a t-if="widget.deletable" role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_image h-100">
+                                <div t-attf-class="o_kanban_image_wrapper h-100 #{record.is_previewable.raw_value ? 'oe_kanban_previewer' : ''}">
+                                    <t t-if="record.thumbnail_url.raw_value">
+                                        <img t-att-src="record.thumbnail_url.raw_value" alt="Thumbnail" class="o_attachment_image"/>
+                                    </t>
+                                    <t t-elif="record.type.raw_value == 'url'">
+                                        <div class="o_url_image fa fa-link fa-3x text-muted" aria-label="Image is a link"/>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="o_image o_image_thumbnail" t-att-data-mimetype="record.mimetype.value"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="o_kanban_details">
+                                <div class="o_kanban_details_wrapper">
+                                    <div t-att-title="record.name.raw_value" class="o_kanban_record_title">
+                                        <t t-if="record.lock_uid.raw_value">
+                                            <i class="fa fa-lock" t-att-title="record.lock_uid.value"/>
+                                        </t>
+                                        <field name="name" class="o_text_overflow"/>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <t t-if="record.type.raw_value == 'url'">
+                                            <span class="o_document_url">
+                                                <i class="fa fa-globe" aria-label="Document url"/>
+                                                <a t-att-href="record.url.raw_value" target="blank"><t t-esc="record.url.raw_value"/></a>
+                                            </span>
+                                        </t>
+                                        <samp t-else="" class="text-muted"> </samp>
+                                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+
+                                        <t t-if="record.res_model_name.raw_value &amp;&amp; record.res_model.raw_value !== 'document.document'">
+                                            <strong><t t-esc="record.res_model_name.raw_value"/></strong>
+                                            <t t-if="record.res_name.raw_value">
+                                                : <span t-att-title="record.res_name.raw_value"><field name="res_name"/></span>
+                                            </t>
+                                        </t>
+
+                                    </div>
+                                    <div class="o_kanban_record_bottom">
+                                        <time class="oe_kanban_bottom_left">
+                                            <field name="create_date" widget="date"/>
+                                        </time>
+                                        <div class="oe_kanban_bottom_right">
+                                            <div class="oe_kanban_bottom_right">
+                                                <field name="activity_ids" widget="kanban_activity"/>
+                                                <a type="object" name="action_toggle_favorite" t-attf-class="fa fa-lg fa-star#{(record.favorite_user_ids.raw_value.indexOf(user_context.uid) &lt; 0)? '-o' : ''} o_favorite" title="toggle favorite"/>
+                                                <field name="owner_id" widget="many2one_avatar_user"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="document_document_view_search" model="ir.ui.view">
+        <field name="name">document.document.search</field>
+        <field name="model">document.document</field>
+        <field name="arch" type="xml">
+            <search string="Documents">
+                <field name="name" filter_domain="[('name','ilike',self)]" string="Document"/>
+                <field name="create_date"/>
+
+                <field name="tag_ids"/>
+                <field name="index_content"/>
+                <field name="owner_id"/>
+                <field name="partner_id" string="Contact"/>
+                <field name="create_uid" string="Created by"/>
+                <field name="type"/>
+
+                <filter name="my_documents_filter" string="My Document(s)" domain="[('create_uid','=',uid)]"/>
+                <filter name="url_filter" string="URL" domain="[('type', '=', 'url')]"/>
+                <filter name="binary_filter" string="Stored" domain="[('type', '=', 'binary')]"/>
+                <separator/>
+                <filter name="activities_my" string="My Activities" domain="[('activity_ids.user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="activities_overdue" string="Late Activities" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" help="Show all records which has next action date is before today"/>
+                <filter name="activities_today" string="Today Activities" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="activities_upcoming"  string="Future Activities" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="pdf" string="PDF" domain="[('mimetype', 'ilike', 'pdf')]"/>
+                <filter name="img" string="Image" domain="[('mimetype', 'ilike', 'image')]"/>
+                <filter name="video" string="Video" domain="[('mimetype', 'ilike', 'video')]"/>
+                <filter name="doc" string="Doc" domain="[('mimetype', 'ilike', '.doc')]"/>
+                <separator/>
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="owner_groupby" string="Owner" domain="[]" context="{'group_by':'create_uid'}"/>
+                    <filter name="type_groupby" string="Type" domain="[]" context="{'group_by':'type'}" groups="base.group_no_one"/>
+                    <filter name="company_groupby" string="Company" domain="[]" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    <filter name="create_date_groupby" string="Creation Date" domain="[]" context="{'group_by':'create_date'}"/>
+                </group>
+                <searchpanel>
+                    <field name="folder_id"/>
+                    <field name="tag_ids" select="multi" groupby="facet_id" icon="fa-tag" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!--
+        Actions
+    -->
+    <record id="document_document_action" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">document.document</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Upload <span class="font-weight-normal">a file or</span> drag <span class="font-weight-normal">it here.</span></p>
+        </field>
+    </record>
+
+    <record id="document_document_action_download" model="ir.actions.server">
+        <field name="name">Download</field>
+        <field name="model_id" ref="model_document_document"/>
+        <field name="binding_model_id" ref="model_document_document"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_download()
+        </field>
+    </record>
+
+</odoo>
