@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<!--
+		Facets Views
+	-->
+    <record id="document_facet_view_tree" model="ir.ui.view">
+        <field name="name">document.facet.tree</field>
+        <field name="model">document.facet</field>
+        <field name="arch" type="xml">
+            <tree default_order="sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="folder_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="document_facet_view_tree_simplified" model="ir.ui.view">
+        <field name="name">document.facet.tree</field>
+        <field name="model">document.facet</field>
+        <field name="arch" type="xml">
+            <tree default_order="sequence">
+                <field name="name"/>
+                <field name="folder_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="document_facet_view_form" model="ir.ui.view">
+        <field name="name">document.facet.form</field>
+        <field name="model">document.facet</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="E.g. Status"/></h1>
+                    </div>
+                    <group invisible="context.get('default_folder_id')">
+                        <field name="folder_id" required="not context.get('default_folder_id')" options="{'no_create': True}"/>
+                    </group>
+                    <notebook>
+                        <page string="Tags" name="tags">
+                            <field name="tag_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="color" widget="color_picker"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Tooltip" name="tooltip">
+                            <field name="tooltip"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="document_facet_view_form_simplified" model="ir.ui.view">
+        <field name="name">document.facet.form</field>
+        <field name="model">document.facet</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="tooltip"/>
+                    </group>
+                    <group>
+                        <field name="tag_ids"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="document_facet_view_search" model="ir.ui.view">
+        <field name="name">document.facet.search</field>
+        <field name="model">document.facet</field>
+        <field name="arch" type="xml">
+        	<search>
+            	<field name="name"/>
+            	<field name="tag_ids"/>
+            	<field name="folder_id"/>
+         	</search>
+        </field>
+    </record>
+
+    <!--
+    	Facet Actions
+    -->
+    <record id="document_facet_action" model="ir.actions.act_window">
+      	<field name="name">Facets</field>
+      	<field name="res_model">document.facet</field>
+      	<field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!--
+    	Tags Views
+    -->
+    <record id="document_tag_view_tree" model="ir.ui.view">
+        <field name="name">document.tag.tree</field>
+        <field name="model">document.tag</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name" placeholder="Create a tag"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="document_tag_view_form" model="ir.ui.view">
+        <field name="name">document.tag.form</field>
+        <field name="model">document.tag</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="facet_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="document_tag_view_search" model="ir.ui.view">
+        <field name="name">document.tag.search</field>
+        <field name="model">document.tag</field>
+        <field name="arch" type="xml">
+        <search>
+            <field name="name" string="Tag"/>
+            <field name="facet_id"/>
+         </search>
+        </field>
+    </record>
+
+</odoo>

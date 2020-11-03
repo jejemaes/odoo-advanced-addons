@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_action_general" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context" eval="{'module': 'general_settings'}"/>
+    </record>
+
+    <!--
+        Views
+    -->
+    <record id="document_share_view_tree" model="ir.ui.view">
+        <field name="name">document.share.tree</field>
+        <field name="model">document.share</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="content_type" groups="base.group_no_one"/>
+                <field name="action"/>
+                <field name="state"/>
+                <field name="create_uid" widget="many2one_avatar_user"/>
+                <field name="create_date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="document_share_view_form" model="ir.ui.view">
+        <field name="name">document.share.form</field>
+        <field name="model">document.share</field>
+        <field name="arch" type="xml">
+            <form class="o_share_form">
+                <sheet class="o_share_sheet">
+                    <group class="o_url_group" attrs="{'invisible': [('id', '=', False)]}">
+                        <field name="full_url" widget="CopyClipboardChar" readonly="1"/>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="name" placeholder="Name of the share link"/>
+                            <field name="content_type" groups="base.group_no_one"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="document_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit': True}" attrs="{'invisible': [('content_type', '!=', 'ids')]}"/>
+                            <field name="domain" widget="domain" options="{'in_dialog': True, 'model': 'document.document'}" attrs="{'invisible': [('content_type', '!=', 'domain')]}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="action" widget="radio"/>
+                            <field name="date_deadline" widget="date"/>
+                        </group>
+                    </group>
+                    <group string="Default values for uploaded documents" attrs="{'invisible' : [('action', 'in', ['download'])] }">
+                        <group>
+                            <field name="folder_id" attrs="{'required': [('action', '=', 'downloadupload')]}"/>
+                            <field name="owner_id"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                            <field name="activity_option"/>
+                        </group>
+                    </group>
+                    <group string="Activity" name="next_activity" autofocus="autofocus" attrs="{'invisible': [('activity_option', '=', False)]}">
+                        <group>
+                            <field name="activity_type_id" options="{'no_create': True, 'no_open': True}" attrs="{'required': [('activity_option', '=', True)]}"/>
+                            <field name="activity_summary" placeholder="e.g. Discuss proposal"/>
+                        </group>
+                        <group>
+                            <label for="activity_date_deadline_range"/>
+                            <div class="o_row">
+                                <field name="activity_date_deadline_range"/>
+                                <field name="activity_date_deadline_range_type"/>
+                            </div>
+                            <field name="activity_user_id"/>
+                        </group>
+                        <field name="activity_note" placeholder="Log a note..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="document_share_view_form_popup" model="ir.ui.view">
+        <field name="name">document.share.form.popup</field>
+        <field name="model">document.share</field>
+        <field name="inherit_id" ref="document_share_view_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <footer>
+                    <button name="action_get_share_link" type="object" string="Share" class="btn btn-primary"/>
+                </footer>
+            </xpath>
+            <xpath expr="//field[@name='content_type']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="document_share_view_form_popup_link_only" model="ir.ui.view">
+        <field name="name">document.share.form.popup.link.only</field>
+        <field name="model">document.share</field>
+        <field name="arch" type="xml">
+            <form class="o_share_form">
+                <sheet class="o_share_sheet">
+                    <group class="o_url_group" attrs="{'invisible': [('id', '=', False)]}">
+                        <field name="full_url" widget="CopyClipboardChar" readonly="1"/>
+                    </group>
+                    <footer>
+                        <button special="cancel" string="Ok"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="document_share_view_search" model="ir.ui.view">
+        <field name="name">document.share.search</field>
+        <field name="model">document.share</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="folder_id"/>
+                <field name="owner_id"/>
+                <field name="partner_id"/>
+                <filter name="mine_filter" string="My Sharing Links" domain="[('create_uid','=', uid)]"/>
+                <separator/>
+                <filter name="download_filter" string="Download" domain="[('action','=', 'download')]"/>
+                <filter name="download_upload_filter" string="Download and Upload" domain="[('action','=', 'downloadupload')]"/>
+                <separator/>
+                <filter name="alive_filter" string="Live" domain="['|', ('date_deadline', '=', False), ('date_deadline', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="expired_filter" string="Expired" domain="[('date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+    <!--
+        Actions
+    -->
+    <record id="document_share_action" model="ir.actions.act_window">
+        <field name="name">Share links</field>
+        <field name="res_model">document.share</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="document_share_action_view_list" model="ir.actions.act_window.view">
+        <field name="view_mode">tree</field>
+        <field name="sequence" eval="1"/>
+        <field name="view_id" ref="document_share_view_tree"/>
+        <field name="act_window_id" ref="document_share_action"/>
+    </record>
+
+    <record id="document_share_action_view_form" model="ir.actions.act_window.view">
+        <field name="view_mode">form</field>
+        <field name="sequence" eval="1"/>
+        <field name="view_id" ref="document_share_view_form"/>
+        <field name="act_window_id" ref="document_share_action"/>
+    </record>
+
+    <record id="document_share_action_select_document" model="ir.actions.act_window">
+        <field name="name">Share Documents</field>
+        <field name="res_model">document.share</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="document_share_view_form_popup"/>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+        <field name="binding_model_id" ref="model_document_document"/>
+        <field name="binding_view_types">list,kanban,form</field>
+    </record>
+
+    <record id="document_share_action_popup_link_only" model="ir.actions.act_window">
+        <field name="name">Share Documents</field>
+        <field name="res_model">document.share</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="document_share_view_form_popup_link_only"/>
+    </record>
+
+</odoo>

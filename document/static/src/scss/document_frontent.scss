@@ -1,0 +1,108 @@
+// Variables
+$o-card-space: 8px;
+
+// Body bg
+.o_document_body {
+    background: url(/document/static/src/img/bg-overlay.svg), linear-gradient(to right bottom, #77717e, #c9a8a9);
+    background-size: cover;
+}
+
+// Layout part (Header, Content, Footer, Document Cards, ...)
+.o_document_share_header {
+    color: $component-active-color;
+}
+
+.o_document_share_container {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: $gray-300;
+
+    .o_document_card {
+        margin-bottom: $o-card-space;
+        padding: $o-card-space $o-card-space + 2 $o-card-space $o-card-space;
+        background: transparentize(white, 0.1);
+        box-shadow: 0 0 20px transparentize(black, 0.75);
+        color: $o-main-text-color;
+        flex-flow: row nowrap;
+
+        > div > figure {
+            max-width: 100%;
+        }
+
+        > .o_document_card_content {
+            margin: 0 $o-card-space*0.5 0 $o-card-space;
+            overflow: hidden;
+
+            small {
+                font-size: small-font-size;
+            }
+        }
+
+        .o_document_card_title {
+            @include o-text-overflow();
+            font-weight: 500;
+
+            a {
+                @include o-hover-text-color($headings-color, $link-color);
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+        }
+
+        a {
+            @include o-hover-text-color($hover-color: $link-color);
+        }
+
+        .o_image {
+            margin-top: 2px;
+            @include size(43px);
+        }
+
+        .o_image_preview {
+            @include o-position-absolute(0,0,0,0);
+            margin: -$o-card-space 0 (-$o-card-space) (-$o-card-space);
+            background-size: cover;
+            background-position: center;
+        }
+    }
+}
+
+.o_document_share_footer {
+    color: $component-active-color;
+}
+
+
+// Utils (avatar, button, ...)
+.o_document_avatar {
+    white-space: nowrap;
+
+    img {
+        height: $h3-font-size;
+    }
+}
+
+.o_document_upload_wrapper {
+    overflow: hidden;
+
+    input {
+        font-size: 100px;
+        opacity: 0;
+        @include o-position-absolute(0, $left:0);
+        cursor:pointer;
+    }
+}
+
+.o_document_download_btn {
+    font-weight: 500;
+    border: 1px solid transparent;
+    @include o-hover-text-color(transparentize(white, 0.1), white);
+
+    &:hover, &:focus {
+        border-color: transparentize(white, 0.5);
+    }
+
+    &.btn-lg {
+        font-size: 14px;
+    }
+}
