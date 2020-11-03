@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Page Layout
+    -->
+    <template id="page_document_layout" name="Documents: Page Main Layout">
+        <t t-call="portal.frontend_layout">
+
+            <t t-set="head">
+                <t t-call-assets="document.document_assets_frontend"/>
+            </t>
+
+            <t t-set="body_classname" t-value="'o_document_body'"/>
+
+            <div class="container">
+                <t t-raw="0"/>
+            </div>
+        </t>
+    </template>
+
+    <!--
+        Specific Pages
+    -->
+    <template id="page_document_share" name="Documents: Page Multiple Documents Share">
+        <t t-call="document.page_document_layout">
+
+            <div class="row mt64 mb24 text-white o_document_share_header">
+                <div class="col-sm-6 mb16">
+                    <b class="h2">
+                        <t t-esc="len(documents)"></t>
+                    </b>
+                    <span class="h4"> documents shared by </span>
+                    <span class="o_document_avatar mt8 h4">
+                        <img class="rounded-circle" t-att-src="share._get_owner_avatar_url()" t-att-alt="share.create_uid.name" t-att-title="share.create_uid.name"/>
+                        <t t-esc="share.create_uid.name"/>
+                    </span>
+                </div>
+                <div class="col-sm-6 text-right">
+                    <div class="row no-gutters justify-content-end">
+                        <div class="col mr-3">
+                            <form class="o_document_upload_wrapper position-relative d-inline-block" t-if="share.action == 'downloadupload'" enctype="multipart/form-data" t-attf-action="/document/upload/#{share.id}/#{share_access_token}" method="POST">
+                                <button title="Upload" class="btn btn-primary"><i class="fa fa-upload"/> Upload</button>
+                                <input name="files" multiple="multiple" type="file" onchange="form.submit()"/>
+                            </form>
+                        </div>
+                        <div>
+                            <a t-if="at_least_binary" t-att-href="share._get_download_all_documents_url()" title="Downlaod all files" t-attf-class="btn #{share.action == 'downloadupload' and 'o_document_download_btn' or 'btn-primary'}"><i class="fa fa-download fa-fw"/> Download All</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb32 o_document_share_container">
+                <t t-foreach="documents" t-as="attachment">
+                    <div class="col-sm-6 col-lg-3">
+                        <article class="o_document_card d-flex mb16">
+                            <figure class="d-flex position-relative flex-column flex-nowrap justify-content-between m-0">
+                                <div class="o_image" t-att-data-mimetype="attachment.mimetype" t-attf-style="#{'image/' in attachment.mimetype and 'background-image:None;' ''}"/>
+                                <div t-if="'image/' in attachment.mimetype" class="o_image_preview" t-attf-style="background-image:url(#{share._get_download_document_thumbnail_url(attachment.id)}?field=thumbnail)"/>
+                            </figure>
+                            <div class="o_document_card_content d-flex flex-column flex-nowrap flex-grow-1 flex-shrink-1 justify-content-between">
+                                <header>
+                                    <h6 class="o_document_card_title mt0 mb4"><a t-att-href="share._get_download_document_url(attachment.id)" target="new" t-att-title="'Download ' + attachment.name" t-esc="attachment.name"/></h6>
+                                </header>
+                                <div>
+                                    <time><b t-field="attachment.write_date" t-options="{'format':'MMM d, yyyy'}"/></time> •
+                                    <small class="mb0">
+                                        <b>
+                                            <t t-if="'url' not in attachment.type">
+                                                <t t-call="document.format_file_size"/>
+                                            </t>
+                                            <t t-else="">URL</t>
+                                        </b>
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column flex-nowrap justify-content-between text-right">
+                                <a t-att-href="share._get_download_document_url(attachment.id)" target="new" t-att-title="'Download ' + attachment.name"><i t-attf-class="fa #{'url' not in attachment.type and 'fa-download' or 'fa-link'}"/></a>
+                            </div>
+                        </article>
+                    </div>
+                </t>
+            </div>
+            <div class="text-center col-sm-12 visible-xs o_document_share_footer">
+                <div class="row no-gutters justify-content-center">
+                    <div class="mr-3">
+                        <form class="o_document_upload_wrapper position-relative d-inline-block" t-if="share.action == 'downloadupload'" enctype="multipart/form-data" t-att-action="share._get_upload_documents_url()" method="POST">
+                            <button title="Upload" class="btn btn-primary"><i class="fa fa-upload"/>  Upload</button>
+                            <input name="files" multiple="multiple" type="file" onchange="form.submit()"/>
+                        </form>
+                    </div>
+                    <div>
+                        <a t-if="at_least_binary" t-att-href="share._get_download_all_documents_url()" title="Downlaod all files" t-attf-class="btn #{share.action == 'downloadupload' and 'o_document_download_btn' or 'btn-primary'}"><i class="fa fa-download fa-fw"/>  Download All</a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="page_document_expired">
+        <t t-call="document.page_document_layout">
+            <h2 class="o_documents_portal_central_message text-center mt160 text-white">This link has expired</h2>
+        </t>
+    </template>
+
+    <!-- Utils -->
+    <template id="format_file_size" name="Format file size">
+        <t t-set="G" t-value="int(attachment.file_size/1000000000)"/>
+        <t t-set="M" t-value="int(attachment.file_size/1000000) - G*1000"/>
+        <t t-set="K" t-value="int(attachment.file_size/1000) - M*1000 - G*1000000"/>
+        <t t-set="B" t-value="attachment.file_size - K*1000 - M*1000000 - G*1000000000"/>
+
+        <b t-if="G"><t t-esc="G"/> <b>Gb</b></b>
+        <b t-elif="M"><t t-esc="M"/> <b>Mb</b></b>
+        <b t-elif="K"><t t-esc="K"/> <b>Kb</b></b>
+        <b t-else=""><t t-esc="B"/> <b>Bytes</b></b>
+    </template>
+</odoo>

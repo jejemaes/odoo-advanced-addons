@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem
+        id="document_menu_root"
+        name="Documents"
+        web_icon="document,static/description/icon.png"/>
+
+        <menuitem
+            id="document_menu_dashboard"
+            name="Documents"
+            parent="document_menu_root"
+            action="document_document_action"
+            sequence="5"/>
+
+        <menuitem
+            id="document_menu_share"
+            name="Shared and Emails"
+            parent="document_menu_root"
+            action="document_share_action"
+            sequence="10"/>
+
+        <menuitem
+            id="document_menu_config"
+            name="Configuration"
+            parent="document_menu_root"
+            groups="document.group_document_manager"
+            sequence="15"/>
+
+            <menuitem
+                name="Folders"
+                id="document_menu_config_folder"
+                parent="document_menu_config"
+                action="document_folder_action"
+                sequence="5"/>
+
+            <menuitem
+                id="document_menu_config_facet"
+                name="Tags"
+                parent="document_menu_config"
+                action="document_facet_action"
+                sequence="10"/>
+
+</odoo>
