@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="survey_question_form" model="ir.ui.view">
+        <field name="name">Form view for survey question</field>
+        <field name="model">survey.question</field>
+        <field name="inherit_id" ref="survey.survey_question_form"/>
+        <field name="arch" type="xml">
+        	<xpath expr="//page[@name='answers']//div[hasclass('col-6')][2]" position="attributes">
+        		<attribute name="attrs">{'invisible': ['|', ('scoring_type', '=', 'no_scoring'), ('question_type', 'not in', ['char_box', 'text_box', 'numerical_box', 'date', 'datetime'])]}</attribute>
+        	</xpath>
+        	<xpath expr="//field[@name='answer_numerical_box']" position="before">
+        		<field name="free_text_manual_scoring" invisible="1"/>
+                <field name="answer_char_box" string="Correct Answer" attrs="{'invisible': ['|', ('free_text_manual_scoring', '=', False), ('question_type', '!=', 'char_box')]}"/>
+        	</xpath>
+            <xpath expr="//page[@name='options']" position="after">
+                <page name="media" string="Media">
+                    <group>
+                        <field name="audio_attachment_id"/>
+                        <field name="audio_autoplay" attrs="{'invisible': [('audio_attachment_id', '=', False)]}"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="survey_question_view_tree_editable" model="ir.ui.view">
+        <field name="name">survey.question.tree</field>
+        <field name="model">survey.question</field>
+        <field name="arch" type="xml">
+            <tree  editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="title"/>
+                <field name="is_scored_question"/>
+                <field name="answer_score"/>
+                <field name="answer_char_box"/>
+                <field name="audio_attachment_id"/>
+                <field name="audio_autoplay"/>
+                <field name="question_type" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="survey_question_action_editable" model="ir.actions.act_window">
+        <field name="name">Questions</field>
+        <field name="res_model">survey.question</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[('is_page', '=', False)]</field>
+        <field name="context">{
+            'search_default_survey_id': active_id,
+            'default_question_type': 'char_box'
+        }</field>
+    </record>
+
+
+    <record id="survey_question_action_editable_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="survey_question_view_tree_editable"/>
+        <field name="act_window_id" ref="survey_question_action_editable"/>
+    </record>
+
+</odoo>

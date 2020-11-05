@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="survey_view_form" model="ir.ui.view">
+        <field name="name">Form view for survey</field>
+        <field name="model">survey.survey</field>
+        <field name="inherit_id" ref="survey.survey_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='certification']" position="after">
+                <field name="free_text_manual_scoring" attrs="{'invisible': [('scoring_type', '=', 'no_scoring')]}"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="%(survey_userinput_action_to_correct)d"
+                    type="action"
+                    class="oe_stat_button"
+                    attrs="{'invisible': [('free_text_manual_scoring', '=', 'False')]}"
+                    icon="fa-pencil-square">
+                    <field name="anwser_to_review_count" widget="statinfo" string="Answers to Review"/>
+                </button>
+                <button name="%(survey_question_action_editable)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="fa-pencil-square"
+                    string="Questions">
+                </button>
+            </xpath>
+            <xpath expr="//button[@name='action_close']" position="after">
+                <button name="make_blindtest" type="object" string="Make Blind Test"/>
+            </xpath>
+            <xpath expr="//field[@name='question_and_page_ids']/tree/field[@name='question_type']" position="after">
+                <field name="audio_attachment_id" optional="hide"/>
+                <field name="audio_autoplay" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
