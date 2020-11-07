@@ -17,7 +17,7 @@ class Gallery(models.Model):
     google_last_sync_date = fields.Datetime("Last Synchronization", readonly=True)
     gallery_type = fields.Selection(selection_add=[
         ('google', 'Google Photos API')
-    ])
+    ], ondelete={'google': 'cascade'})
 
     _sql_constraints = [
         ('google_album_id_required', "CHECK((gallery_type='google' AND google_identifier IS NOT NULL) or (gallery_type != 'google'))", 'Google album needs a Google API identifier.'),

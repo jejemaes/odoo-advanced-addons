@@ -18,11 +18,11 @@ class Gallery(models.Model):
     tag_ids = fields.Many2many('website.gallery.tag', 'website_gallery_tag_rel', string='Tags')
     gallery_type = fields.Selection([
         ('manual', 'Manual')
-    ], string="Gallery Type", default='manual', required=True, readonly=True)
+    ], string="Gallery Type", default='manual', required=True, readonly=True, ondelete={'manual': 'cascade'})
     display_type = fields.Selection([
         ('page', 'Page'),
         ('modal', 'Modal')
-    ], string="Display Type", default='modal', required=True, help="""TODO""")
+    ], string="Display Type", default='modal', required=True, ondelete={'page': 'cascade', 'modal': 'cascade'})
     image_per_page = fields.Integer("Images per page", default=DEFAULT_IMG_PER_PAGE)
 
     image_id = fields.Many2one('website.gallery.image', "Cover Image", domain="[('gallery_id', '=', id)]")

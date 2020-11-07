@@ -42,7 +42,6 @@
         <field name="name">Import Gallery from Google</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">website.gallery.import.google</field>
-        <field name="view_type">form</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="website_gallery_import_google_view_form"/>
         <field name="target">new</field>
