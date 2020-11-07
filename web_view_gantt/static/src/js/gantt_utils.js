@@ -40,9 +40,16 @@ var formatFieldValue = function (value, field) {
     return formattedValue || _.str.sprintf(_t('Undefined %s'), field.string);
 };
 
+
+var dateToServer = function (date, useDateOnly) {
+    var date_format = useDateOnly ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm:ss';
+    return date.clone().utc().locale('en').format(date_format);
+}
+
 return {
 	convertToServerDatetime: convertToServerDatetime,
 	formatFieldValue: formatFieldValue,
+    dateToServer: dateToServer,
 };
 
 });

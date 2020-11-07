@@ -33,6 +33,7 @@ var GanttController = AbstractController.extend({
         this.cellPrecisions = params.cellPrecisions;
         this.canPlan = params.canPlan;
         this.SCALES = params.SCALES;
+        this.useDateOnly = params.useDateOnly;
         this.allowedScales = params.allowedScales;
         this.dialogViews = params.dialogViews;
     },
@@ -46,7 +47,25 @@ var GanttController = AbstractController.extend({
      * @returns {string}
      */
     getTitle: function () {
-        return this.get('title');
+        var state = this.model.get();
+        var startDate = state.startDate;
+
+        var subtitle = false;
+        switch (state.scale) {
+            case 'day':
+                subtitle = state.startDate.format('L')
+                break;
+            case 'week':
+                subtitle = state.startDate.format('LL')
+                break;
+            case 'month':
+                subtitle = state.startDate.format('MMMM YYYY')
+                break;
+            case 'year':
+                subtitle = state.startDate.format('[Year] YYYY')
+                break;
+        }
+        return this._title + ' (' + subtitle + ')';
     },
     /**
      * Render the buttons according to the GanttView.buttons template and add
@@ -58,7 +77,7 @@ var GanttController = AbstractController.extend({
      */
     renderButtons: function ($node) {
         var self = this;
-        if ($node) {
+        if (!$node) {
             var state = this.model.get();
             this.$buttons = $(qweb.render('GanttView.buttons', {
                 groupedBy: state.groupedBy,
@@ -108,10 +127,10 @@ var GanttController = AbstractController.extend({
         var startContextKey = 'default_' + state.dateStartField;
         var stopContextKey = 'default_' + state.dateStopField;
         if (!(startContextKey in context)) {
-            context[startContextKey] = GanttUtils.convertToServerDatetime(state.focusDate.clone().startOf(state.scale));
+            context[startContextKey] = GanttUtils.dateToServer(state.focusDate.clone().startOf(state.scale), this.useDateOnly);
         }
         if (!(stopContextKey in context)) {
-            context[stopContextKey] = GanttUtils.convertToServerDatetime(state.focusDate.clone().endOf(state.scale));
+            context[stopContextKey] = GanttUtils.dateToServer(state.focusDate.clone().endOf(state.scale), this.useDateOnly);
         }
         this._openFormDialog(false, context);
     },
@@ -125,7 +144,7 @@ var GanttController = AbstractController.extend({
     _openFormDialog: function (resID, context) {
         var title = resID ? _t("Open") : _t("Create");
 
-        return new dialogs.FormViewDialog(this, {
+        var dialog = new dialogs.FormViewDialog(this, {
             title: _.str.sprintf(title),
             res_model: this.modelName,
             view_id: this.dialogViews[0][0],
@@ -136,6 +155,7 @@ var GanttController = AbstractController.extend({
             on_saved: this.reload.bind(this, {}),
             on_remove: this._openDeleteDialog.bind(this, resID),
         }).open();
+        return dialog;
     },
     /**
      * Handler called when clicking the
@@ -161,7 +181,7 @@ var GanttController = AbstractController.extend({
         return confirm.then(function (confirmed) {
             if ((!confirmed)) {
                 return Promise.resolve();
-            }// else
+            }
             return controller._rpc({
                 model: controller.modelName,
                 method: 'unlink',
@@ -204,9 +224,7 @@ var GanttController = AbstractController.extend({
     _focusDate: function (focusDate) {
         var self = this;
         this.model.setFocusDate(focusDate);
-        this.reload().then(function () {
-            self.set('title', self.displayName + ' (' + self.model.get().date_display + ')');
-        });
+        this.reload();
     },
     /**
      * @private
@@ -214,10 +232,9 @@ var GanttController = AbstractController.extend({
      */
     _setScale: function (scale) {
         var self = this;
+
         this.model.setScale(scale);
-        this.reload().then(function () {
-            self.set('title', self.displayName + ' (' + self.model.get().date_display + ')');
-        });
+        this.reload();
     },
 
     //--------------------------------------------------------------------------
@@ -244,7 +261,7 @@ var GanttController = AbstractController.extend({
         var recordIds = ev.data.resId;
         var startDate = ev.data.start;
         var stopDate = ev.data.stop;
-        return this.model.reschedule(recordIds, _.object([state.dateStartField, state.dateStopField], [startDate, stopDate])).fail(function(ev){
+        return this.model.reschedule(recordIds, _.object([state.dateStartField, state.dateStopField], [startDate, stopDate])).guardedCatch(function(ev){
             self.reload();
         });
     },
@@ -257,8 +274,6 @@ var GanttController = AbstractController.extend({
     _onTaskDragged: function (ev) {
         var state = this.model.get();
         var values = ev.data.values || {};
-        values[state.dateStartField] = GanttUtils.convertToServerDatetime(ev.data.dates[0]);
-        values[state.dateStopField] = GanttUtils.convertToServerDatetime(ev.data.dates[1]);
 
         var context = {};
         for (var k in values) {

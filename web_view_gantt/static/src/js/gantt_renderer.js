@@ -8,6 +8,7 @@ var time = require('web.time');
 var qweb = require('web.QWeb');
 var session = require('web.session');
 var utils = require('web.utils');
+var GanttUtils = require('web_view_gantt.GanttUtils');
 
 var _lt = core._lt;
 var QWeb = core.qweb;
@@ -27,6 +28,7 @@ return AbstractRenderer.extend({
 
         this.fieldsInfo = params.fieldsInfo;
         this.SCALES = params.SCALES;
+        this.useDateOnly = params.useDateOnly;
         this.string = params.string;
         this.canCreate = params.canCreate;
         this.canEdit = params.canEdit;
@@ -68,10 +70,18 @@ return AbstractRenderer.extend({
         this.dhx_events.push(gantt.attachEvent("onAfterTaskDrag", function(id, mode, e){
             var row = self.dhx_gantt.getTask(id);
             if (_.contains(['resize', 'move'], mode)) {
-                self.trigger_up('update_task_dates', {
+                var startDate = moment(row.start_date);
+                var stopDate = moment(row.end_date);
+
+                if (self.useDateOnly) { // only the date should add the offset in order to be sure to be in the correct day
+                    startDate = startDate.add(startDate.utcOffset(), 'minutes')
+                    stopDate = stopDate.add(stopDate.utcOffset(), 'minutes');
+                }
+
+                self.trigger_up('update_task_dates', { // events must send only UTC dates
                     'resId': row.id,
-                    'start': moment(row.start_date),
-                    'stop': moment(row.end_date),
+                    'start': moment.utc(startDate),
+                    'stop': moment.utc(stopDate),
                 });
                 return false; // prevent lightbox to open
             }
@@ -87,10 +97,19 @@ return AbstractRenderer.extend({
     _ganttConfig: function() {
         var self = this;
         // time format
-        this.dhx_gantt.config.xml_date = "%Y-%m-%d %H:%i:%s";
-        this.dhx_gantt.config.date_format = "%Y-%m-%d %H:%i:%s";
-        this.dhx_gantt.config.duration_unit = "minute";
-        this.dhx_gantt.config.duration_step = 60;
+        if (this.useDateOnly) {  // date
+            this.dhx_gantt.config.xml_date = "%Y-%m-%d";
+            this.dhx_gantt.config.date_format = "%Y-%m-%d";
+            this.dhx_gantt.config.duration_unit = "day";
+            this.dhx_gantt.config.duration_step = 1;
+            this.dhx_gantt.config.server_utc = false;
+        } else { // datetime
+            this.dhx_gantt.config.xml_date = "%Y-%m-%d %H:%i:%s";
+            this.dhx_gantt.config.date_format = "%Y-%m-%d %H:%i:%s";
+            this.dhx_gantt.config.duration_unit = "minute";
+            this.dhx_gantt.config.duration_step = 15;
+            this.dhx_gantt.config.server_utc = true; // make the gantt lib use UTC dates as input and output
+        }
 
         // ui
         this.dhx_gantt.config.scale_height = 75;
@@ -262,7 +281,7 @@ return AbstractRenderer.extend({
                     parent: row.parentId,
                     values: row.data,
                     // dummy field to avoid "invalid dates" error. No pill will be displayed.
-                    //start_date: time.datetime_to_str(self.state.focusDate.toDate()),
+                    start_date: time.datetime_to_str(self.state.focusDate.toDate()),
                     duration: 0,
                 });
                 tasks = tasks.concat(self._ganttGenerateTask(row.rows));
@@ -271,14 +290,10 @@ return AbstractRenderer.extend({
                     var startDate = rec[self.state.dateStartField];
                     var stopDate = rec[self.state.dateStopField];
 
-                    // convert in user tz
-                    startDate = moment(startDate).subtract(startDate.toDate().getTimezoneOffset(), 'minutes');
-                    stopDate = moment(stopDate).subtract(stopDate.toDate().getTimezoneOffset(), 'minutes');
-
                     tasks.push({
                         id: rec.id,
                         text: rec.display_name,
-                        start_date: time.datetime_to_str(startDate.toDate()),
+                        start_date: GanttUtils.dateToServer(startDate, self.useDateOnly),
                         duration: self.dhx_gantt.calculateDuration(startDate.toDate(), stopDate.toDate()),
                         type: gantt.config.types.task,
                         progress: rec[self.progressField] ? rec[self.progressField] / 100.0 : 0.0,
@@ -303,7 +318,7 @@ return AbstractRenderer.extend({
      */
     _render: function () {
         // horrible hack to make sure that something is in the dom with the required
-        // id.  The problem is that the action manager renders the view in a document
+        // id. The problem is that the action manager renders the view in a document
         // fragment.
         var temp_div_with_id;
         if (this.$div_with_id){

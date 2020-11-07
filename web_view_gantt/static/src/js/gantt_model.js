@@ -23,6 +23,7 @@ return AbstractModel.extend({
         this.mutex = new concurrency.Mutex();
         this._ganttInfo = {};
         this._ganttRows = {}; // map row id --> row object (see generateRows)
+        this.useDateOnly = null;
     },
 
     //--------------------------------------------------------------------------
@@ -57,6 +58,7 @@ return AbstractModel.extend({
         this.colorField = params.colorField;
         this.progressField = params.progressField;
         this.decorationFields = params.decorationFields;
+        this.useDateOnly = params.useDateOnly;
         // this.displayUnavailability = params.displayUnavailability;
 
         this.defaultGroupBy = params.defaultGroupBy ? [params.defaultGroupBy] : [];
@@ -92,7 +94,7 @@ return AbstractModel.extend({
 
         var data = _.pick(schedule, allowedFields);
         Object.keys(data).forEach(function(key) {
-            data[key] = GanttUtils.convertToServerDatetime(data[key]);
+            data[key] = GanttUtils.dateToServer(data[key], self.useDateOnly);
         });
 
         return this.mutex.exec(function () {
@@ -180,8 +182,8 @@ return AbstractModel.extend({
      */
     _getDomain: function () {
         var domain = [
-            [this._ganttInfo.dateStartField, '<=', GanttUtils.convertToServerDatetime(this._ganttInfo.stopDate)],
-            [this._ganttInfo.dateStopField, '>=', GanttUtils.convertToServerDatetime(this._ganttInfo.startDate)],
+            [this._ganttInfo.dateStartField, '<=', GanttUtils.dateToServer(this._ganttInfo.stopDate, this.useDateOnly)],
+            [this._ganttInfo.dateStopField, '>=', GanttUtils.dateToServer(this._ganttInfo.startDate, this.useDateOnly)],
         ];
         return this.domain.concat(domain);
     },
@@ -319,7 +321,6 @@ return AbstractModel.extend({
                 record[fieldName] = self._parseServerValue(self.fields[fieldName], record[fieldName]);
             });
         });
-
         return data;
     },
     /**

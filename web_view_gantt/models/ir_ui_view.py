@@ -6,10 +6,10 @@ from odoo import models, fields, api
 class View(models.Model):
     _inherit = 'ir.ui.view'
 
-    type = fields.Selection(selection_add=[('ganttdhx', "Gantt")])
+    type = fields.Selection(selection_add=[('ganttdhx', "Gantt")], ondelete={'ganttdhx': 'cascade'})
 
     def _postprocess_access_rights(self, model, node):
-        node = super(View, self)._postprocess_access_rights(model, node)
+        super(View, self)._postprocess_access_rights(model, node)
 
         Model = self.env[model]
         is_base_model = self.env.context.get('base_model_name', model) == model
@@ -27,4 +27,4 @@ class View(models.Model):
 class ActWindowView(models.Model):
     _inherit = 'ir.actions.act_window.view'
 
-    view_mode = fields.Selection(selection_add=[('ganttdhx', "Gantt")])
+    view_mode = fields.Selection(selection_add=[('ganttdhx', "Gantt")], ondelete={'ganttdhx': 'cascade'})
