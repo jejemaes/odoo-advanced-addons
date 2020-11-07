@@ -136,7 +136,6 @@ class GoogleAPI(models.AbstractModel):
         return {
             'gallery_id': gallery_id,
             'name': media_item['filename'],
-            'datas_fname': media_item['filename'],
             'mimetype': media_item['mimeType'],
             'type': 'url',
             'url': media_item['baseUrl'],

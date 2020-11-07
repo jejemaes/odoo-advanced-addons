@@ -5,7 +5,6 @@
         <record id="action_website_gallery_image_from_gallery" model="ir.actions.act_window">
             <field name="name">Pictures</field>
             <field name="res_model">website.gallery.image</field>
-            <field name="view_type">form</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
@@ -145,7 +144,6 @@
                             <h1>
                                 <field name="name" placeholder="Image Name"/>
                             </h1>
-                            <field name="datas_fname"/>
                             <field name="image_url"/>
                             <field name="is_published" invisible="1"/>
                         </div>
@@ -168,8 +166,7 @@
             <field name="model">website.gallery.image</field>
             <field name="arch" type="xml">
                 <search>
-                    <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
-                    <field name="name" string="Title" filter_domain="['|', ('name','ilike',self), ('datas_fname','ilike',self)]"/>
+                    <field name="name" string="Title" filter_domain="[('name','ilike',self)]"/>
                     <field name="description"/>
                     <field name="gallery_id"/>
                     <group expand="0" string="Group By">
@@ -225,7 +222,6 @@
         <record id="action_website_gallery" model="ir.actions.act_window">
             <field name="name">Galleries</field>
             <field name="res_model">website.gallery</field>
-            <field name="view_type">form</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
@@ -237,21 +233,18 @@
         <record id="action_website_gallery_settings" model="ir.actions.act_window">
             <field name="name">Galleries</field>
             <field name="res_model">website.gallery</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
 
         <record id="action_website_gallery_image_settings" model="ir.actions.act_window">
             <field name="name">Pictures</field>
             <field name="res_model">website.gallery.image</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
 
         <record id="action_website_gallery_tag_settings" model="ir.actions.act_window">
             <field name="name">Gallery Tags</field>
             <field name="res_model">website.gallery.tag</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
 

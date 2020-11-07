@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <odoo>
 
-    <!-- 
+    <!--
         Stage Views
     -->
     <record id="project_task_type_view_form" model="ir.ui.view">
@@ -15,9 +15,9 @@
         </field>
     </record>
 
-    <!-- 
+    <!--
         Project Views
-    -->    
+    -->
     <record id="project_project_view_form_simplified" model="ir.ui.view">
         <field name="name">project.project.view.form.simplified</field>
         <field name="model">project.project</field>
@@ -37,17 +37,15 @@
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='misc']/group[2]" position="attributes">
-                <attribute name='groups'></attribute>
-            </xpath>
-            <xpath expr="//field[@name='resource_calendar_id']" position="after">
+            <xpath expr="//group[@name='extra_settings']" position="inside">
+                <field name="resource_calendar_id"/>
                 <field name="date_start"/>
                 <field name="date"/>
             </xpath>
         </field>
     </record>
 
-    <!-- 
+    <!--
         Task Views
     -->
     <record id="project_task_view_form" model="ir.ui.view">

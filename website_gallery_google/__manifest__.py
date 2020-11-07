@@ -10,7 +10,7 @@ The module import photos for Google Photos API
 """,
     'depends': ['website_gallery', 'google'],
     'data': [
-        # 'views/res_config_settings.xml',
+        'security/ir.model.access.csv',
         'views/assets.xml',
         'views/gallery_views.xml',
         'wizard/gallery_import_google_views.xml',
