@@ -2,6 +2,8 @@ odoo.define('web_view_gantt.GanttView', function (require) {
 "use strict";
 
 var AbstractView = require('web.AbstractView');
+var BasicView = require('web.BasicView');
+
 var core = require('web.core');
 var session = require('web.session');
 var GanttModel = require('web_view_gantt.GanttModel');
@@ -32,7 +34,7 @@ var current_short_locale = current_locale.split('_')[0];
 var locale_code = locales_mapping[current_locale] || locales_mapping[current_short_locale];
 var locale_suffix = locale_code !== undefined ? '_' + locale_code : '';
 
-var GanttView = AbstractView.extend({
+var GanttView = BasicView.extend({
     cssLibs: [
         "/web_view_gantt/static/lib/dhtmlxGantt/codebase/dhtmlxgantt.css"
     ],
@@ -43,11 +45,11 @@ var GanttView = AbstractView.extend({
     ],
     display_name: _lt('Gantt'),
     icon: 'fa-tasks',
-    config: {
+    config: _.extend({}, BasicView.prototype.config, {
         Model: GanttModel,
         Controller: GanttController,
         Renderer: GanttRenderer,
-    },
+    }),
     viewType: 'ganttdhx',
     /**
      * @override
@@ -136,6 +138,9 @@ var GanttView = AbstractView.extend({
         }
         var dialogViews = [[formViewId, 'form']];
 
+        // use date or datetime
+        var useDateOnly = viewInfo.fields[arch.attrs.date_start].type == 'date'
+
         this.loadParams.fields = fields;
         this.loadParams.scale = scale;
         this.loadParams.dateStartField = arch.attrs.date_start;
@@ -146,6 +151,7 @@ var GanttView = AbstractView.extend({
         this.loadParams.initialDate = initialDate;
         this.loadParams.fields = this.fields;
         this.loadParams.defaultGroupBy = this.arch.attrs.default_group_by;
+        this.loadParams.useDateOnly = useDateOnly;
 
         this.controllerParams.context = params.context || {};
         this.controllerParams.title = params.action ? params.action.name : _t("Gantt");
@@ -154,6 +160,7 @@ var GanttView = AbstractView.extend({
         this.controllerParams.dialogViews = dialogViews;
         this.controllerParams.cellPrecisions = cellPrecisions;
         this.controllerParams.canPlan = canPlan && this.controllerParams.activeActions.edit;
+        this.controllerParams.useDateOnly = useDateOnly;
 
         this.rendererParams.canCreate = this.controllerParams.activeActions.create;
         this.rendererParams.canEdit = this.controllerParams.activeActions.edit;
@@ -164,6 +171,7 @@ var GanttView = AbstractView.extend({
         this.rendererParams.colorField = colorField;
         this.rendererParams.progressField = progressField;
         this.rendererParams.canPlan = canPlan && this.controllerParams.activeActions.edit;
+        this.rendererParams.useDateOnly = useDateOnly;
     },
 });
 
