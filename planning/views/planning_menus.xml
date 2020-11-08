@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Actions
+    -->
+
+    <record id="planning_shift_action_schedule" model="ir.actions.act_window">
+        <field name="name">Schedule</field>
+        <field name="res_model">planning.shift</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">ganttdhx,tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create a new planning shift for one of your employee.
+            </p>
+        </field>
+    </record>
+
+    <record id="planning_shift_action_my" model="ir.actions.act_window">
+        <field name="name">My Planning</field>
+        <field name="res_model">planning.shift</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">calendar,ganttdhx,tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create a new planning shift for one of your employee.
+            </p>
+        </field>
+        <field name="context">
+            {'search_default_my_shift': 1}
+        </field>
+    </record>
+
+    <record id="planning_role_action" model="ir.actions.act_window">
+        <field name="name">Roles</field>
+        <field name="res_model">planning.role</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="planning_planning_action" model="ir.actions.act_window">
+        <field name="name">Planning</field>
+        <field name="res_model">planning.planning</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+<!--     <record id="resource_resource_action_rental" model="ir.actions.act_window">
+        <field name="name">Resources</field>
+        <field name="res_model">resource.resource</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('resource_type', '=', 'material')]</field>
+        <field name="context">
+            {'default_resource_type': 'material'}
+        </field>
+    </record>
+
+    <record id="resource_resource_action_rental_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="resource_resource_view_tree_rental"/>
+        <field name="act_window_id" ref="resource_resource_action_rental"/>
+    </record>
+
+    <record id="resource_resource_action_rental_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="resource_resource_view_form_rental"/>
+        <field name="act_window_id" ref="resource_resource_action_rental"/>
+    </record>
+ -->
+
+    <!--
+        Menus
+    -->
+
+    <menuitem id="planning_menu_root"
+        name="Planning"
+        sequence="12"
+        web_icon="planning,static/description/icon.png"
+        groups="planning.group_planning_user"/>
+
+        <menuitem id="planning_menu_schedule"
+            name="Schedule"
+            parent="planning_menu_root"
+            action="planning_shift_action_schedule"
+            sequence="5"/>
+
+        <menuitem id="planning_menu_my"
+            name="My Planning"
+            parent="planning_menu_root"
+            action="planning_shift_action_my"
+            sequence="10"/>
+
+        <menuitem id="planning_menu_settings"
+            name="Settings"
+            parent="planning_menu_root"
+            sequence="80"
+            groups="planning.group_planning_manager"/>
+
+            <menuitem id="planning_menu_settings_config"
+                name="Configuration"
+                parent="planning_menu_settings"
+                sequence="20"/>
+
+            <menuitem id="planning_menu_role"
+                name="Roles"
+                parent="planning_menu_settings"
+                action="planning_role_action"
+                sequence="30"/>
+
+            <menuitem id="planning_menu_planning"
+                name="Planning"
+                parent="planning_menu_settings"
+                action="planning_planning_action"
+                sequence="40"/>
+
+</odoo>

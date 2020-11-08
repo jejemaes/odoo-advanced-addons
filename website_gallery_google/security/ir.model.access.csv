@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_website_gallery_import_google,access_website_gallery_import_google,model_website_gallery_import_google,website.group_website_designer,1,1,1,0
+access_website_gallery_import_google_line,access_website_gallery_import_google_line,model_website_gallery_import_google_line,website.group_website_designer,1,1,1,0

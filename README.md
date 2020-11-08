@@ -10,3 +10,6 @@ The repository will contain several addons for different kind of business:
 This will be developped and documented, at each step.
 
 Enjoy :)
+
+
+test

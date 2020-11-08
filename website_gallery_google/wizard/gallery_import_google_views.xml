@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="website_gallery_import_google_view_form" model="ir.ui.view">
+        <field name="name">website.gallery.import.google.view.form</field>
+        <field name="model">website.gallery.import.google</field>
+        <field name="arch" type="xml">
+            <form string="Import Gallery from Google">
+                <field name="user_id" invisible="1"/>
+                <field name="token_status" invisible="1"/>
+                <group attrs="{'invisible': [('token_status', '!=', 'no_token')]}">
+                    <p>You are not yet allowed, please authorize this database to access your Google Photo account with the defined Google Application (Project).</p>
+                    <group>
+                        <field name="website_id"/>
+                    </group>
+                    <group>
+                        <field name="user_id"/>
+                    </group>
+                </group>
+                <group attrs="{'invisible': [('token_status', '=', 'no_token')]}">
+                    <field name="line_ids" nolabel="1">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="album_name"/>
+                            <field name="picture_count"/>
+                            <field name="already_import"/>
+                            <field name="to_import"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button string="Authorize Google Photos API" type="object" name="action_authorize_google" class="oe_highlight" attrs="{'invisible': [('token_status', '!=', 'no_token')]}"/>
+                    <button string="Load Galleries" type="object" name="action_load_google_galleries" class="oe_highlight" attrs="{'invisible': ['|', ('token_status', '=', 'no_token'), ('line_ids', '!=', [])]}"/>
+                    <button string="Load More Galleries" type="object" name="action_load_google_galleries" attrs="{'invisible': ['|', ('token_status', '=', 'no_token'), ('line_ids', '=', [])]}"/>
+                    <button string="Import Galleries" type="object" name="action_import" class="oe_highlight" attrs="{'invisible': ['|', ('token_status', '=', 'no_token'), ('line_ids', '=', [])]}"/>
+                    <button string="Cancel" special="cancel" type="object" class="btn btn-secondary oe_inline"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="website_gallery_import_google_action" model="ir.actions.act_window">
+        <field name="name">Import Gallery from Google</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">website.gallery.import.google</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="website_gallery_import_google_view_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

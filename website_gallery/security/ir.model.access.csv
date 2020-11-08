@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+gallery_all,website.gallery,model_website_gallery,,1,0,0,0
+gallery_designer,website.gallery,model_website_gallery,website.group_website_designer,1,1,1,1
+gallery_image_all,website.gallery.image,model_website_gallery_image,,1,0,0,0
+gallery_image_designer,website.gallery.image,model_website_gallery_image,website.group_website_designer,1,1,1,1
+gallery_tag_all,website.gallery.tag,model_website_gallery_tag,,1,0,0,0
+gallery_tag_desinger,website.gallery.tag,model_website_gallery_tag,website.group_website_designer,1,1,1,1
