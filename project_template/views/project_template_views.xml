@@ -89,7 +89,6 @@
     <!--
         Task Template Views
     -->
-
     <record id="project_task_template_view_tree" model="ir.ui.view">
         <field name="name">project.task.template.tree</field>
         <field name="model">project.task.template</field>
@@ -181,7 +180,7 @@
         name="Templates"
         parent="project.menu_project_config"
         action="project_template_action"
-        groups="project_advanced.group_project_template"
+        groups="project_template.group_project_template"
         sequence="15"/>
 
 </odoo>
