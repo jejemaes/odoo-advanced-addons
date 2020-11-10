@@ -3,22 +3,6 @@
 from odoo import api, fields, models
 
 
-class Stage(models.Model):
-    _inherit = 'project.task.type'
-
-    is_closed = fields.Boolean("Is a closing stage")
-
-    def update_date_end(self, stage_id):
-        result = super(Stage, self).update_date_end(stage_id)
-        # force the correct value since we are in a real closing stage
-        project_task_type = self.env['project.task.type'].browse(stage_id)
-        if project_task_type.is_closed:
-            result['date_end'] = fields.Datetime.now()
-        else:
-            result['date_end'] = False
-        return result
-
-
 class Project(models.Model):
     _inherit = 'project.project'
 
@@ -53,11 +37,3 @@ class Task(models.Model):
     _inherit = 'project.task'
 
     project_task_template_id = fields.Many2one('project.task.template', string='Task Template', readonly=True, ondelete='set null')
-
-    planned_start_date = fields.Date("Planned Start Date", help="Start date for Gantt view")
-    planned_stop_date = fields.Date("Planned Stop Date", help="Stop date for Gantt view")
-
-    _sql_constraints = [
-        ('planned_dates_chronological', "CHECK(planned_start_date <= planned_stop_date)", 'The planned start date must be smaller than its planned stop date.'),
-        ('planned_stop_required', "CHECK((planned_stop_date IS NOT NULL AND planned_start_date IS NOT NULL) OR (planned_stop_date IS NULL))", 'If a task is planned, both start and stop dates are required.'),
-    ]

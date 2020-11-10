@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': "Project Advanced",
-    'summary': """Gantt View for Tasks, ... """,
+    'name': "Project Gantt",
+    'summary': """Gantt View for Tasks""",
     'description': """
 
     """,
@@ -13,10 +13,7 @@
 
     'depends': ['web_view_gantt', 'project'],
     'data': [
-        'security/ir.model.access.csv',
-        'security/project_advanced_security.xml',
         'views/project_views.xml',
-        'views/project_template_views.xml',
-        'views/res_config_settings_views.xml',
     ],
+    'auto_install': True,
 }
