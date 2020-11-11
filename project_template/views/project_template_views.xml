@@ -180,7 +180,6 @@
         name="Templates"
         parent="project.menu_project_config"
         action="project_template_action"
-        groups="project_template.group_project_template"
         sequence="15"/>
 
 </odoo>

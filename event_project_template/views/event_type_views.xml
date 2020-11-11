@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="event_type_view_form" model="ir.ui.view">
+        <field name="name">event.type.form</field>
+        <field name="model">event.type</field>
+        <field name="inherit_id" ref="event_project.event_type_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='event_project_details']" position="inside">
+                 <div class="col-lg-12 col-12">
+                    <label for="project_template_id" string="Template"/>
+                    <field name="project_template_id" class="oe_inline" nolabel="1" options="{'no_create': True}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
