@@ -176,6 +176,7 @@ return AbstractRenderer.extend({
             var currentTask = tasksInRow[0];
             data = currentTask.values;
         }
+
         this.trigger_up('drag_task', {
             dates: [moment(this.dhx_gantt.roundDate(startDate)), moment(this.dhx_gantt.roundDate(endDate))],
             values: data || {},
