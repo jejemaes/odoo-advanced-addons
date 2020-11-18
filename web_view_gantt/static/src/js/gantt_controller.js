@@ -275,6 +275,9 @@ var GanttController = AbstractController.extend({
         var state = this.model.get();
         var values = ev.data.values || {};
 
+        values[state.dateStartField] = GanttUtils.dateToServer(ev.data.dates[0], this.useDateOnly);
+        values[state.dateStopField] = GanttUtils.dateToServer(ev.data.dates[1], this.useDateOnly);
+
         var context = {};
         for (var k in values) {
             context[_.str.sprintf('default_%s', k)] = values[k];

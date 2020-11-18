@@ -40,7 +40,12 @@ var formatFieldValue = function (value, field) {
     return formattedValue || _.str.sprintf(_t('Undefined %s'), field.string);
 };
 
-
+/**
+ * Convert date to server
+ *
+ * @param {Moment} date
+ * @returns {string} date in server format
+ */
 var dateToServer = function (date, useDateOnly) {
     var date_format = useDateOnly ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm:ss';
     return date.clone().utc().locale('en').format(date_format);
