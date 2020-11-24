@@ -13,6 +13,14 @@ var GanttUtils = require('web_view_gantt.GanttUtils');
 var _lt = core._lt;
 var QWeb = core.qweb;
 
+// Allowed decoration on the list's rows: bold, italic and bootstrap semantics classes
+var DECORATIONS = [
+    'decoration-danger',
+    // 'decoration-danger',
+    // 'decoration-success',
+    // 'decoration-warning'
+];
+
 return AbstractRenderer.extend({
     className: "o_gantt_view",
     events: {
@@ -36,6 +44,7 @@ return AbstractRenderer.extend({
         this.cellPrecisions = params.cellPrecisions;
         this.colorField = params.colorField;
         this.progressField = params.progressField;
+        this.decorations = this._extractDecorationAttrs(this.arch);
         // this.collapseFirstLevel = params.collapseFirstLevel;
         // this.thumbnails = params.thumbnails;
 
@@ -59,6 +68,33 @@ return AbstractRenderer.extend({
     //--------------------------------------------------------------------------
     // Private
     //--------------------------------------------------------------------------
+    /**
+     * Extract the decoration attributes (e.g. decoration-danger) of a node. The
+     * condition is processed such that it is ready to be evaluated.
+     *
+     * @private
+     * @param {Object} the <gantt> node
+     * @returns {Object}
+     */
+    _extractDecorationAttrs: function (node) {
+        const decorations = {};
+        for (const [key, expr] of Object.entries(node.attrs)) {
+            if (DECORATIONS.includes(key)) {
+                const cssClass = key.replace('decoration-', 'o_gantt_decoration_');
+                decorations[cssClass] = py.parse(py.tokenize(expr));
+            }
+        }
+        return decorations;
+    },
+    _extractDecorationClasses: function (evalContext) {
+        var classes = ' ';
+        for (const [cssClass, expr] of Object.entries(this.decorations)) {
+            if (py.PY_isTrue(py.evaluate(expr, evalContext))) {
+                classes += cssClass;
+            }
+        }
+        return classes;
+    },
 
     _ganttBindEvents: function () {
         var self = this;
@@ -161,6 +197,10 @@ return AbstractRenderer.extend({
         };
         this.dhx_gantt.templates.task_class = function(start, end, task){
             var classes = _.str.sprintf('o_gantt_color_%s', task.color);
+            // decoration class
+            if (task.record_data){
+                classes += self._extractDecorationClasses(task.record_data);
+            }
             // hide 'consolidate' group row
             if (task.type === self.dhx_gantt.config.types.project) {
                 classes += ' o_hidden';
@@ -284,6 +324,7 @@ return AbstractRenderer.extend({
                     // dummy field to avoid "invalid dates" error. No pill will be displayed.
                     start_date: time.datetime_to_str(self.state.focusDate.toDate()),
                     duration: 0,
+                    record_data: false,
                 });
                 tasks = tasks.concat(self._ganttGenerateTask(row.rows));
             } else {
@@ -301,6 +342,7 @@ return AbstractRenderer.extend({
                         parent: row.parentId,
                         values: row.data,
                         color: rec[self.colorField] || 0,
+                        record_data: rec,
                     });
                 });
             }
