@@ -63,40 +63,39 @@
 }
 
 // Decorations
-.o_gantt_view .gantt_task_line.o_gantt_progress.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_progress.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #71959e 0 10px, #83a3aa 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_1.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_1.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #f6a096 0 10px, #f8bab2 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_2.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_2.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #f8c8a0 0 10px, #fad9bd 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_3.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_3.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #fae179 0 10px, #fbe896 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_4.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_4.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #a7daf4 0 10px, #c2e5f7 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_5.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_5.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #8bcedb 0 10px, #a2d8e2 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_6.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_6.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #f3b2b2 0 10px, #f7cccc 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_7.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_7.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #80b5c1 0 10px, #95c1cb 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_8.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_8.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #9199ad 0 10px, #a3a9ba 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_9.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_9.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #e6729f 0 10px, #eb8cb1 10px 20px);
 }
-.o_gantt_view .gantt_task_line.o_gantt_color_10.decoration-info {
+.o_gantt_view .gantt_task_line.o_gantt_color_10.o_gantt_decoration_danger {
   background-image: repeating-linear-gradient(-45deg, #83dbb3 0 10px, #9be2c2 10px 20px);
 }
-
 
 // Custom version
 .o_gantt_view {
