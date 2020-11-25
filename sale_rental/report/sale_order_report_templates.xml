@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <template id="report_saleorder_document_inherit_sale_stock" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@name='signature']" position="before">
+            <div class="mt32" t-if="doc.rental_booking_ids">
+                <h2>Rental Details</h2>
+
+                <table class="table table-sm o_rental_table">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Code</th>
+                            <th class="text-left">Product</th>
+                            <th class="text-left">Start Date</th>
+                            <th class="text-left">End Date</th>
+                            <th class="text-left">Delivery Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="doc.rental_booking_ids" t-as="booking">
+                            <tr>
+                                <td class="text-left">
+                                    <span t-field="booking.code"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="booking.sale_line_id.product_id.name"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="booking.sale_line_id.rental_start_date"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="booking.sale_line_id.rental_stop_date"/>
+                                </td>
+                                <td class="text-left">
+                                    <div t-field="booking.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True, "phone_icons": True}'/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

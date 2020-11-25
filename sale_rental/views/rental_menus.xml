@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_product_action_rental" model="ir.actions.act_window">
+        <field name="name">Product</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('can_be_rented', '=', True)]</field>
+        <field name="context">
+            {'default_can_be_rented': True}
+        </field>
+    </record>
+
+    <menuitem id="rental_menu_product"
+        name="Rental Products"
+        parent="rental.rental_menu_rental_resource"
+        action="product_product_action_rental"
+        sequence="30"/>
+
+</odoo>
