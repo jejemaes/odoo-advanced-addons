@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Actions
+    -->
+
+    <record id="rental_booking_action_rental" model="ir.actions.act_window">
+        <field name="name">Rental Bookings</field>
+        <field name="res_model">rental.booking</field>
+        <field name="view_mode">ganttdhx,calendar,kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create a rental order for one of your resource material.
+            </p>
+        </field>
+        <field name="context">
+            {'search_default_my': 1}
+        </field>
+    </record>
+
+    <record id="resource_resource_action_rental" model="ir.actions.act_window">
+        <field name="name">Resources</field>
+        <field name="res_model">resource.resource</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('resource_type', '=', 'material')]</field>
+        <field name="context">
+            {'default_resource_type': 'material'}
+        </field>
+    </record>
+
+    <record id="resource_resource_action_rental_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="resource_advanced.resource_resource_view_tree"/>
+        <field name="act_window_id" ref="resource_resource_action_rental"/>
+    </record>
+
+    <record id="resource_resource_action_rental_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="resource_advanced.resource_resource_view_form"/>
+        <field name="act_window_id" ref="resource_resource_action_rental"/>
+    </record>
+
+    <record id="rental_action_config" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_id" ref="res_config_settings_view_form"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'rental'}</field>
+    </record>
+
+    <record id="rental_agreement_action" model="ir.actions.act_window">
+        <field name="name">Agreement</field>
+        <field name="res_model">rental.agreement</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!--
+        Menus
+    -->
+
+    <menuitem id="rental_menu_root"
+        name="Rental"
+        sequence="8"
+        groups="rental.group_rental_user"
+        web_icon="rental,static/description/icon.png"/>
+
+        <menuitem id="rental_menu_booking"
+            name="Schedule"
+            parent="rental_menu_root"
+            action="rental_booking_action_rental"
+            sequence="5"/>
+
+        <menuitem id="rental_menu_rental_resource"
+            name="Resources"
+            parent="rental_menu_root"
+            sequence="5"
+            groups="rental.group_rental_manager"/>
+
+            <menuitem id="rental_menu_resource"
+                name="Resources"
+                parent="rental_menu_rental_resource"
+                action="resource_resource_action_rental"
+                sequence="10"/>
+
+            <menuitem id="rental_menu_resource_calendar"
+                name="Working Calendar"
+                parent="rental_menu_rental_resource"
+                action="resource.action_resource_calendar_form"
+                sequence="20"/>
+
+        <menuitem id="rental_menu_config"
+            name="Configuration"
+            parent="rental_menu_root"
+            sequence="50"
+            groups="rental.group_rental_manager"/>
+
+            <menuitem id="rental_menu_config_settings"
+                name="Settings"
+                parent="rental_menu_config"
+                sequence="5"
+                action="rental_action_config"/>
+
+            <menuitem id="rental_menu_config_agreement"
+                name="Agreements"
+                parent="rental_menu_config"
+                sequence="10"
+                action="rental_agreement_action"/>
+
+</odoo>
