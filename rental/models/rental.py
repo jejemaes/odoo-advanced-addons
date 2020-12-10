@@ -38,8 +38,8 @@ class RentalBooking(models.Model):
     date_to = fields.Datetime(default=_default_date_to, inherited=True, related='resource_time_id.date_from', tracking=True, states={'reserved': [('readonly', True)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]})
 
     code = fields.Char('Reference', readonly=True)
-    partner_id = fields.Many2one('res.partner', string='Customer', required=True, copy=False, tracking=True)
-    partner_shipping_id = fields.Many2one('res.partner', string='Delivery Address', copy=False, help="Delivery address for current booking.")
+    partner_id = fields.Many2one('res.partner', string='Customer', required=True, copy=False, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", tracking=True)
+    partner_shipping_id = fields.Many2one('res.partner', string='Delivery Address', copy=False, domain="[('commercial_partner_id', '=', partner_id), '|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="Delivery address for current booking.")
     user_id = fields.Many2one('res.users', 'Responsible', default=lambda self: self.env.user, index=True, tracking=True)
     state = fields.Selection([
         ('draft', 'Request'),

@@ -161,7 +161,8 @@ class SaleOrderLine(models.Model):
     @api.onchange('product_id', 'rental_start_date', 'rental_stop_date')
     def product_id_change(self):
         result = super(SaleOrderLine, self).product_id_change()
-        self.resource_ids = None
+        if self._origin.product_id != self.product_id:
+            self.resource_ids = None
         return result
 
     @api.constrains('is_rental', 'product_id')
@@ -273,9 +274,12 @@ class SaleOrderLine(models.Model):
     def _rental_booking_generation(self):
         rental_booking_value_list = []
         for line in self.filtered('is_rental'):
-            if line.product_id.rental_tracking == 'use_resource' and not line.rental_booking_ids:
-                for resource in line.resource_ids:
-                    rental_booking_value_list.append(line._rental_booking_prepare_values(resource))
+            if line.product_id.rental_tracking == 'use_resource':
+                already_booked_resource_ids = line.mapped('rental_booking_ids.resource_id').ids
+                for resource in line.resource_ids: # create booking for resource that has not yet a booking generated
+                    if resource.id not in already_booked_resource_ids:
+                        rental_booking_value_list.append(line._rental_booking_prepare_values(resource))
+                    already_booked_resource_ids.append(resource.id)
         return self.env['rental.booking'].create(rental_booking_value_list)
 
     def _rental_booking_prepare_values(self, resource):
