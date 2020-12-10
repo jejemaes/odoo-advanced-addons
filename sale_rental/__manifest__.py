@@ -14,6 +14,7 @@ Rent your machines and other resources for money to your customer through Sales 
     'depends': ['sale_management', 'rental'],
     'data': [
         'security/ir.model.access.csv',
+        'wizard/create_sale_order_views.xml',
         'views/product_views.xml',
         'views/rental_views.xml',
         'views/resource_views.xml',

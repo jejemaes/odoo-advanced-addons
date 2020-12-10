@@ -18,9 +18,6 @@ class RentalBooking(models.Model):
     # Actions
     # ---------------------------------------------------
 
-    def action_create_so(self):
-        return False
-
     def action_view_so(self):
         self.ensure_one()
         return {
