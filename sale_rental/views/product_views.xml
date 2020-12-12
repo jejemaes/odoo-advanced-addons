@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_template_view_search_rental" model="ir.ui.view">
+        <field name="name">product.template.rental.search</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_to_purchase']" position="after">
+                <filter string="Can be Rented" name="filter_to_rent" domain="[('can_be_rented','=',True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_product_view_form_rental" model="ir.ui.view">
+        <field name="name">product.template.rental.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <div>
+                    <field name="can_be_rented"/>
+                    <label for="can_be_rented"/>
+                </div>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Rental" name="rental" attrs="{'invisible': [('can_be_rented', '=', False)]}">
+                    <group>
+                        <group string="Reservation">
+                            <field name="rental_tenure_type" widget="radio" attrs="{'required': [('can_be_rented', '=', True)]}"/>
+                            <field name="rental_tracking" widget="radio" attrs="{'required': [('can_be_rented', '=', True)]}"/>
+                            <field name="rental_padding_before" widget="float_time" attrs="{'invisible': [('rental_tracking', '!=', 'use_resource')]}"/>
+                            <field name="rental_padding_after" widget="float_time" attrs="{'invisible': [('rental_tracking', '!=', 'use_resource')]}"/>
+                            <field name="rental_agreement_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Resources" attrs="{'invisible': [('rental_tracking', '!=', 'use_resource')]}">
+                            <field name="rental_tz" attrs="{'required': [('rental_tracking', '=', 'use_resource')]}"/>
+                            <field name="resource_ids" attrs="{'required': [('rental_tracking', '=', 'use_resource')]}" nolabel="1" context="{'default_resource_type': 'material'}" readonly="1" colspan="2">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="calendar_id"/>
+                                    <field name="user_id"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group string="Calendar" attrs="{'invisible': [('rental_tracking', '!=', 'no')]}">
+                            <field name="rental_calendar_id" attrs="{'required': [('rental_tracking', '=', 'no')], 'invisible': [('rental_tracking', '!=', 'no')]}"/>
+                        </group>
+                        <group string="Invoicing" name="rental_invoicing" attrs="{'invisible': [('sale_ok', '=', True)]}">
+                            <field name="invoice_policy" widget="radio"/>
+                        </group>
+                    </group>
+                    <group string="Rental Pricing">
+                        <field name="rental_tenure_ids" required="1" nolabel="1">
+                            <tree editable="top">
+                                <field name="sequence" widget="handle"/>
+                                <field name="duration_value" attrs="{'column_invisible': [('parent.rental_tenure_type', '!=', 'duration')]}"/>
+                                <field name="duration_uom" attrs="{'column_invisible': [('parent.rental_tenure_type', '!=', 'duration')]}"/>
+                                <field name="weekday_ids" attrs="{'column_invisible': [('parent.rental_tenure_type', '!=', 'weekday')]}" widget="many2many_tags" domain="[('id', 'in', weekday_selectable_ids)]"/>
+                                <field name="base_price"/>
+                                <field name="weekday_selectable_ids" invisible="1"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group string="Description">
+                        <field name="description_rental" nolabel="1" placeholder="This note is added to sales orders and invoices."/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

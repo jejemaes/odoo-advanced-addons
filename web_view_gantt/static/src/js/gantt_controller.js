@@ -212,7 +212,9 @@ var GanttController = AbstractController.extend({
                 if (ids.length) {
                     // Here, the dates are already in server time so we set the
                     // isUTC parameter of reschedule to true to avoid conversion
-                    self._reschedule(ids, dateValues);
+                    self._reschedule(ids, dateValues).then(function(){
+                        self.reload();
+                    });
                 }
             },
         }).open();
@@ -261,7 +263,7 @@ var GanttController = AbstractController.extend({
         var recordIds = ev.data.resId;
         var startDate = ev.data.start;
         var stopDate = ev.data.stop;
-        return this.model.reschedule(recordIds, _.object([state.dateStartField, state.dateStopField], [startDate, stopDate])).guardedCatch(function(ev){
+        return this.model.reschedule(recordIds, _.object([state.dateStartField, state.dateStopField], [startDate, stopDate])).then(function(ev){
             self.reload();
         });
     },
@@ -274,6 +276,9 @@ var GanttController = AbstractController.extend({
     _onTaskDragged: function (ev) {
         var state = this.model.get();
         var values = ev.data.values || {};
+
+        values[state.dateStartField] = GanttUtils.dateToServer(ev.data.dates[0], this.useDateOnly);
+        values[state.dateStopField] = GanttUtils.dateToServer(ev.data.dates[1], this.useDateOnly);
 
         var context = {};
         for (var k in values) {

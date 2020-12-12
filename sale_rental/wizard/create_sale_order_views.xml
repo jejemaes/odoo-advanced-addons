@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="rental_create_sale_order_view_form" model="ir.ui.view">
+        <field name="name">rental.create.sale.order.view.form</field>
+        <field name="model">rental.create.sale.order</field>
+        <field name="arch" type="xml">
+            <form string="Create Sales Order">
+                <group>
+                    <group>
+                        <field name="rental_booking_id"/>
+                        <field name="partner_id"/>
+                        <field name="partner_shipping_id" groups="sale.group_delivery_invoice_address"/>
+                        <field name="company_id" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="pricelist_id" groups="product.group_product_pricelist"/>
+                        <field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+                    </group>
+                </group>
+                <group>
+                    <group>
+                        <field name="product_id"/>
+                        <label for="rental_start_date" string="Date"/>
+                        <div class="o_row">
+                            <field name="rental_start_date" widget="daterange" nolabel="1" class="oe_inline" options="{'related_end_date': 'rental_stop_date'}"/>
+                            <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>
+                            <field name="rental_stop_date" widget="daterange" nolabel="1" class="oe_inline" options="{'related_start_date': 'rental_start_date'}"/>
+                        </div>
+                    </group>
+                    <group>
+                        <label for="price_unit"/>
+                        <div>
+                            <field name="price_unit"/>
+                            <field name="currency_id" invisible="1"/>
+                        </div>
+                        <field name="rental_pricing_explanation" class="text-muted" string=""/>
+                    </group>
+                </group>
+                <group>
+                    <group>
+                        <field name="auto_confirm"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Create Sales Order" type="object" name="action_create_sale_order" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel" type="object" class="btn btn-secondary oe_inline"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="rental_create_sale_order_action_multi" model="ir.actions.act_window">
+        <field name="name">Create Sales Order</field>
+        <field name="res_model">rental.create.sale.order</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="rental_create_sale_order_view_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
