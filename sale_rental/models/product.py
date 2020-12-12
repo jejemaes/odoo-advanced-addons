@@ -62,7 +62,7 @@ class ProductTemplate(models.Model):
     @api.onchange('rental_tenure_type')
     def _onchange_rental_tenure_type(self):
         if self.rental_tenure_type == 'weekday':
-            weekdays = self.env['resource.day'].search([])
+            weekdays = self.env['resource.day'].get_all_days()
             self.rental_tenure_ids = [(5, 0)] + [(0, 0, {'weekday_ids': [(6, 0, [weekday.id])], 'base_price': 1.0}) for weekday in weekdays]
         elif self.rental_tenure_type == 'duration':
             self.rental_tenure_ids = [
