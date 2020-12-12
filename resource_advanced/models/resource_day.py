@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models
+from odoo import api, fields, models, tools
 from odoo.exceptions import ValidationError
 
 
@@ -22,3 +22,11 @@ class ResourceDay(models.Model):
     def _compute_shortname(self):
         for day in self:
             day.shortname = day.name
+
+    @api.model
+    def get_all_days(self):
+        return self.env['resource.day'].browse(self._get_all_ids())
+
+    @tools.ormcache()
+    def _get_all_ids(self):
+        return self.env['resource.day'].search([]).ids

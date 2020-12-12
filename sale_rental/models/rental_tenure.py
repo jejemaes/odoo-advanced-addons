@@ -69,7 +69,7 @@ class ProductRentalTenure(models.Model):
 
     @api.depends('weekday_ids')
     def _compute_weekday_selectable_ids(self):
-        resource_days = self.env['resource.day'].search([])
+        resource_days = self.env['resource.day'].get_all_days()
         for tenure in self:
             tenure_dayofweeks = tenure.weekday_ids.mapped('dayofweek')
             if tenure_dayofweeks:
@@ -89,7 +89,7 @@ class ProductRentalTenure(models.Model):
     @api.depends('weekday_ids')
     def _compute_weekday_start(self):
         # TODO : find a better algorithm
-        dayofweeks = self.env['resource.day'].search([])
+        dayofweeks = self.env['resource.day'].get_all_days()
 
         for tenure in self:
             tenure_weekofdays = tenure.weekday_ids.mapped('dayofweek')

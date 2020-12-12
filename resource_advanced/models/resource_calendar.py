@@ -19,7 +19,7 @@ class ResourceCalendar(models.Model):
 
     @api.model
     def _default_working_day_ids(self):
-        return self.env['resource.day'].search([])
+        return self.env['resource.day'].get_all_days()
 
     attendance_mode = fields.Selection([
         ('shift_per_day', 'Shift per Day'),
