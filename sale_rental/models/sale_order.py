@@ -201,6 +201,14 @@ class SaleOrderLine(models.Model):
                 if line.rental_booking_ids:
                     raise ValidationError(_('The Sale Item should not be linked to rental bookings as the line is not a rental one.'))
 
+    @api.constrains('resource_ids', 'product_uom_qty')
+    def _check_resource_qty(self):
+        for line in self:
+            if line.is_rental:
+                if line.product_id.rental_tracking == 'use_resource':
+                    if len(line.resource_ids) != line.product_uom_qty:
+                        raise ValidationError("The Sale Item must have as much resources selected than rental quantity ordered.")
+
     @api.model_create_multi
     def create(self, vals_list):
         lines = super(SaleOrderLine, self).create(vals_list)

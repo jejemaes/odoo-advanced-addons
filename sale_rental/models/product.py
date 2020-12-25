@@ -59,6 +59,14 @@ class ProductTemplate(models.Model):
             self.rental_tenure_type = 'duration'
             self.rental_tracking = 'no'
 
+    @api.onchange('type')
+    def _onchange_service_for_rental(self):
+        if self.type == 'service':
+            if self.can_be_rented:
+                self.rental_tracking = 'no'
+            else:
+                self.rental_tracking = False
+
     @api.onchange('rental_tenure_type')
     def _onchange_rental_tenure_type(self):
         if self.rental_tenure_type == 'weekday':
@@ -79,6 +87,15 @@ class ProductTemplate(models.Model):
             self.rental_tz = None
             self.rental_padding_before = False
             self.rental_padding_after = False
+
+    @api.constrains('type', 'can_be_rented', 'rental_tracking')
+    def _check_service_for_rental(self):
+        for product in self:
+            if product.type == 'service':
+                if product.can_be_rented and product.rental_tracking != 'no':
+                    raise ValidationError("A rentable service can not be tracked.")
+                if not product.can_be_rented and product.rental_tracking:
+                    raise ValidationError("A non-rentable service can not be tracked.")
 
     # ----------------------------------------------------------------------------
     # Business Methods

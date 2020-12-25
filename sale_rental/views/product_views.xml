@@ -28,7 +28,7 @@
                     <group>
                         <group string="Reservation">
                             <field name="rental_tenure_type" widget="radio" attrs="{'required': [('can_be_rented', '=', True)]}"/>
-                            <field name="rental_tracking" widget="radio" attrs="{'required': [('can_be_rented', '=', True)]}"/>
+                            <field name="rental_tracking" widget="radio" attrs="{'required': [('can_be_rented', '=', True)], 'invisible': [('type', '=', 'service')]}"/>
                             <field name="rental_padding_before" widget="float_time" attrs="{'invisible': [('rental_tracking', '!=', 'use_resource')]}"/>
                             <field name="rental_padding_after" widget="float_time" attrs="{'invisible': [('rental_tracking', '!=', 'use_resource')]}"/>
                             <field name="rental_agreement_id" options="{'no_create': True}"/>
