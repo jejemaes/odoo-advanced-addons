@@ -168,28 +168,10 @@ class ProductRentalTenure(models.Model):
         return res
 
     # ----------------------------------------------------------------------------
-    # Common Methods
+    # Helper Methods
     # ----------------------------------------------------------------------------
 
-    def _rental_price_combinaison(self, start_dt, end_dt, currency_dst=False):
-        if not self:
-            return {}, 0.0
-        # TODO check sart/end are timezoned
-        tenure_type = self.mapped('tenure_type')[0]
-        if hasattr(self, '_tenure_%s_price_combinaison' % (tenure_type,)):
-            return getattr(self, '_tenure_%s_price_combinaison' % (tenure_type,))(start_dt, end_dt, currency_dst=currency_dst)
-        raise NotImplementedError
-
     @api.model
-    def _get_human_pricing_details(self, combinaison_map, currency_dst=False):
-        if not combinaison_map:
-            return _("Free")
-        tenures = self.env['product.rental.tenure'].browse(combinaison_map.keys())  # TODO api.model here is not usefull to find the tenure type to get the method to execute
-        tenure_type = tenures.mapped('tenure_type')[0]
-        if hasattr(self, '_tenure_%s_get_human_pricing_details' % (tenure_type,)):
-            return getattr(self, '_tenure_%s_get_human_pricing_details' % (tenure_type,))(combinaison_map, currency_dst=currency_dst)
-        raise NotImplementedError()
-
     def _display_price(self, price, from_currency, to_currency=False):
         currency = to_currency or from_currency
         return tools.format_amount(self.env, price, currency, self.env.context.get('lang'))
@@ -213,70 +195,6 @@ class ProductRentalTenure(models.Model):
             return None
         raise NotImplementedError()
 
-    # ----------------------------------------------------------------------------
-    # Duration Tenure
-    # ----------------------------------------------------------------------------
-
-    def _tenure_duration_price_combinaison(self, start_dt, end_dt, currency_dst=False):
-        assert start_dt <= end_dt, "Start dates must be before the end date."
-
-        order_map = self._tenure_duration_ordering_map()
-
-        if not self:
-            return {}, 0.0
-
-        tenures = self.sorted(lambda t: (order_map.get(t.duration_uom, 0), t.duration_value), reverse=True)
-
-        cost = 0.0
-        combinaison = []
-        for tenure in tenures:
-
-            if start_dt < end_dt:
-                is_last = tenure == tenures[-1]
-                delta = tenure._get_tenure_timedelta()
-
-                # fill period with current rental uom
-                while start_dt + delta <= end_dt:
-                    combinaison.append(tenure.id)
-                    start_dt += delta
-                    if currency_dst:
-                        cost += tenure.currency_id._convert(tenure.rent_price, currency_dst, tenure.product_template_id.company_id or self.env.company, fields.Date.today())
-                    else:
-                        cost += tenure.rent_price
-
-                # if the last tenure uom period is started, then count it entirely
-                if is_last and start_dt < end_dt:
-                    combinaison.append(tenure.id)
-                    start_dt += delta
-                    if currency_dst:
-                        cost += tenure.currency_id._convert(tenure.rent_price, currency_dst, tenure.product_template_id.company_id or self.env.company, fields.Date.today())
-                    else:
-                        cost += tenure.rent_price
-
-        # transform into a map tenure.id -> number of time it is used
-        tenure_occurence = {}
-        for tenure_id in combinaison:
-            tenure_occurence.setdefault(tenure_id, 0)
-            tenure_occurence[tenure_id] += 1
-
-        return tenure_occurence, cost
-
-    @api.model
-    def _tenure_duration_get_human_pricing_details(self, combinaison_map, currency_dst=False):
-        """ transform the number of occurence of given tenure into a computation readable for human beings. """
-        tenures = self.env['product.rental.tenure'].browse(combinaison_map.keys())
-        tenure_map = {tenure.id: tenure for tenure in tenures}
-
-        computation_members = []
-        for tenure_id, occurence in combinaison_map.items():
-            tenure = tenure_map[tenure_id]
-            if currency_dst:
-                price = tenure.currency_id._convert(tenure.rent_price, currency_dst, tenure.product_template_id.company_id or self.env.company, fields.Date.today())
-            else:
-                price = tenure.rent_price
-            computation_members.append(_("%s * %s (%s)") % (occurence, tenure.tenure_name, self._display_price(price, tenure.currency_id, currency_dst)))
-        return _(' + ').join(computation_members)
-
     @api.model
     def _tenure_duration_ordering_map(self):
         """ get the map responsible for the order to apply when computing rental price """
@@ -286,55 +204,6 @@ class ProductRentalTenure(models.Model):
             'week': 30,
             'month': 40,
         }
-
-    # ----------------------------------------------------------------------------
-    # Day Tenure
-    # ----------------------------------------------------------------------------
-
-    def _tenure_weekday_price_combinaison(self, start_dt, end_dt, currency_dst=False):
-        assert start_dt <= end_dt, "Start dates must be before the end date."
-
-        tzinfo = start_dt.tzinfo
-        start_dt = start_of(start_dt, 'day').replace(tzinfo=tzinfo)
-        end_dt = end_of(end_dt, 'day').replace(tzinfo=tzinfo)
-
-        cost = 0.0
-        combinaison = []
-        while start_dt < end_dt:
-            applicable_tenures = self.filtered(lambda t: t.weekday_start == start_dt.weekday() + 1)
-            if applicable_tenures:
-                tenure = applicable_tenures._tenure_weekday_find_best_tenure(start_dt, end_dt)
-                combinaison.append(tenure.id)
-                if currency_dst:
-                    cost += tenure.currency_id._convert(tenure.rent_price, currency_dst, tenure.product_template_id.company_id or self.env.company, fields.Date.today())
-                else:
-                    cost += tenure.rent_price
-                start_dt += tenure._get_tenure_timedelta()
-            else:
-                start_dt += relativedelta(days=1) # one day free to continue the way to stop dt
-
-        # transform into a map tenure.id -> number of time it is used
-        tenure_occurence = {}
-        for tenure_id in combinaison:
-            tenure_occurence.setdefault(tenure_id, 0)
-            tenure_occurence[tenure_id] += 1
-        return tenure_occurence, cost
-
-    @api.model
-    def _tenure_weekday_get_human_pricing_details(self, combinaison_map, currency_dst=False):
-        """ transform the number of occurence of given tenure into a computation readable for human beings. """
-        tenures = self.env['product.rental.tenure'].browse(combinaison_map.keys())
-        tenure_map = {tenure.id: tenure for tenure in tenures}
-
-        computation_members = []
-        for tenure_id, occurence in combinaison_map.items():
-            tenure = tenure_map[tenure_id]
-            if currency_dst:
-                price = tenure.currency_id._convert(tenure.rent_price, currency_dst, tenure.product_template_id.company_id or self.env.company, fields.Date.today())
-            else:
-                price = tenure.rent_price
-            computation_members.append(_("%s * %s (%s)") % (occurence, tenure.tenure_name, self._display_price(price, tenure.currency_id, currency_dst)))
-        return _(' + ').join(computation_members)
 
     def _tenure_weekday_find_best_tenure(self, start, stop):
         applicable_tenures = self.sorted(lambda t: t.weekday_count, reverse=True)
