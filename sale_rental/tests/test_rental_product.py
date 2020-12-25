@@ -21,13 +21,51 @@ class TestSaleService(TestCommonSaleRentalNoChart):
     # Product Creation
     # --------------------------------------------------------------
 
+    def test_create_services(self):
+        # non rentable services
+        product = self.env['product.product'].create({
+            'name': "Can create a service non-rentable without tracking",
+            'sale_ok': False,
+            'list_price': 0,
+            'type': 'consu',
+            'invoice_policy': 'order',
+            'uom_id': self.uom_unit.id,
+            'uom_po_id': self.uom_unit.id,
+            'default_code': 'RENT-CONSU',
+            'can_be_rented': False,
+            'rental_tracking': False,
+            'rental_calendar_id': False,
+            'rental_tenure_type': False,
+            'rental_tenure_ids': False,
+            'description_rental': False,
+            'property_account_income_id': self.account_sale.id,
+        })
+        with self.assertRaises(IntegrityError), mute_logger('odoo.sql_db'):
+            product = self.env['product.product'].create({
+                'name': "Can not create a service non-rentable without tracking",
+                'sale_ok': False,
+                'list_price': 0,
+                'type': 'consu',
+                'invoice_policy': 'order',
+                'uom_id': self.uom_unit.id,
+                'uom_po_id': self.uom_unit.id,
+                'default_code': 'RENT-CONSU',
+                'can_be_rented': True,
+                'rental_tracking': False,
+                'rental_calendar_id': self.calendar_eur.id,
+                'rental_tenure_type': 'duration',
+                'rental_tenure_ids': False,
+                'description_rental': False,
+                'property_account_income_id': self.account_sale.id,
+            })
+
     def test_create_product_no_tenure(self):
         """ It is allowed to create rental product without tenure price. This means the rent is free. """
         product = self.env['product.product'].create({
             'name': "Service Rental without tenures",
             'sale_ok': False,
             'list_price': 0,
-            'type': 'service',
+            'type': 'consu',
             'invoice_policy': 'order',
             'uom_id': self.uom_unit.id,
             'uom_po_id': self.uom_unit.id,
@@ -63,8 +101,8 @@ class TestSaleService(TestCommonSaleRentalNoChart):
             'uom_po_id': self.uom_unit.id,
             'default_code': 'RENT-SERV1',
             'can_be_rented': True,
-            'rental_tracking': 'use_resource',
-            'rental_calendar_id': False,
+            'rental_tracking': 'no',
+            'rental_calendar_id': self.calendar_eur.id,
             'rental_tenure_type': 'weekday',
             'rental_tenure_ids': [
                 (5, 0),
@@ -102,7 +140,7 @@ class TestSaleService(TestCommonSaleRentalNoChart):
                 'uom_po_id': self.uom_unit.id,
                 'default_code': 'RENT-SERV1',
                 'can_be_rented': True,
-                'rental_tracking': 'use_resource',
+                'rental_tracking': 'no',
                 'rental_calendar_id': False,
                 'rental_tenure_type': 'duration',
                 'rental_tenure_ids': [

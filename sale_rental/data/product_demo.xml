@@ -8,7 +8,7 @@
         <field name="name">Bar Mobile</field>
         <field name="can_be_rented" eval="True"/>
         <field name="default_code">RENT</field>
-        <field name="type">service</field>
+        <field name="type">consu</field>
         <field name="list_price">0.00</field>
         <field name="standard_price">0.00</field>
         <field name="uom_id" ref="uom.product_uom_hour"/>
@@ -122,7 +122,7 @@
         <field name="name">Toilette Mobile</field>
         <field name="can_be_rented" eval="True"/>
         <field name="default_code">RENT</field>
-        <field name="type">service</field>
+        <field name="type">consu</field>
         <field name="list_price">0.00</field>
         <field name="standard_price">0.00</field>
         <field name="uom_id" ref="uom.product_uom_hour"/>
