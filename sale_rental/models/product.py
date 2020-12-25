@@ -42,23 +42,7 @@ class Product(models.Model):
     # ----------------------------------------------------------------------------
 
     def get_rental_price_and_details(self, start_dt, end_dt, pricelist, quantity=1, currency=False, uom_id=False, date_order=False):
-        # timezone given dates and convert them to product rental tz
-        start_dt = timezone_datetime(start_dt)
-        end_dt = timezone_datetime(end_dt)
-
-        # convert into product timezome to compute price
-        tz = timezone(self.product_tmpl_id._get_rental_timezone())
-        start_dt = start_dt.astimezone(tz)
-        end_dt = end_dt.astimezone(tz)
-
-        currency = currency if currency else self.currency_id
-
-        combinaison, price = self.rental_tenure_ids.with_context(
-            quantity=quantity,
-            uom_id=uom_id,
-            date_order=date_order
-        )._rental_price_combinaison(start_dt, end_dt, currency_dst=currency)
-        return price, self.env['product.rental.tenure']._get_human_pricing_details(combinaison, currency_dst=currency)
+        return self.product_tmpl_id.get_rental_price_and_details(start_dt, end_dt, pricelist, quantity=quantity, currency=currency, uom_id=uom_id, date_order=date_order)
 
     def _get_rental_paddings_timedelta(self):
         before_padding = divmod(self.rental_padding_before * 60, 60)
