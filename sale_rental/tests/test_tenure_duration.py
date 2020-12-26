@@ -27,16 +27,21 @@ class TestSaleService(TestCommonSaleRentalNoChart):
         product_id = self.product_rental_day2.id
         uom_id = self.product_rental_day2.uom_id.id
 
-        with self.assertRaises(ValidationError):  # rental duration must be greater than one 1 day
-            rental_start_date = fields.Datetime.to_string(datetime(2020, 5, 7, 3, 0, 0))
-            rental_stop_date = fields.Datetime.to_string(datetime(2020, 5, 7, 14, 0, 0))
-            self.sale_order.create_rental_line(product_id, uom_id, 55, rental_start_date, rental_stop_date, quantity=3, additional_description='blablabla')
-
         start_dt = datetime(2020, 5, 7, 0, 0, 0)
         stop_dt = datetime(2020, 5, 8, 0, 0, 0)
         rental_start_date = fields.Datetime.to_string(start_dt)
         rental_stop_date = fields.Datetime.to_string(stop_dt)
-        self.sale_order.create_rental_line(product_id, uom_id, 55, rental_start_date, rental_stop_date, quantity=3, additional_description='blablabla')
+
+        sale_line = self.env['sale.order.line'].create({
+            'order_id': self.sale_order.id,
+            'is_rental': True,
+            'product_id': product_id,
+            'rental_start_date': rental_start_date,
+            'rental_stop_date': rental_stop_date,
+            'product_uom_qty': 3,
+            'product_uom': uom_id,
+            'price_unit': 55,
+        })
 
         # sale order in draft
         self.assertEqual(self.sale_order.rental_count, 0, "No booking generated since product does not tracked resources")

@@ -61,9 +61,10 @@ class ProjectCreateSalesOrder(models.TransientModel):
         for wizard in self:
             if wizard.product_id and wizard.rental_start_date and wizard.rental_stop_date:
                 if wizard.rental_start_date <= wizard.rental_stop_date:
-                    price, pricing_explanation = wizard.product_id.with_context(lang=self.partner_id.lang or 'en_US').get_rental_price_and_details(wizard.rental_start_date, wizard.rental_stop_date, wizard.pricelist_id, currency=self.currency_id)
+                    pricing_explanation = wizard.product_id.with_context(lang=self.partner_id.lang or 'en_US').get_rental_pricing_explanation(wizard.rental_start_date, wizard.rental_stop_date, currency_id=self.currency_id.id)[wizard.product_id.id]
+                    pricing_data = wizard.product_id.get_rental_price(wizard.rental_start_date, wizard.rental_stop_date, wizard.pricelist_id.id, quantity=1)
                     wizard.rental_pricing_explanation = pricing_explanation
-                    wizard.price_unit = price  # TODO : strange and hacking (profiter d'un compute pour setter d'autres champs, bof bof)
+                    wizard.price_unit = pricing_data[wizard.product_id.id]['price_list']
                 else:
                     wizard.rental_pricing_explanation = False
                     wizard.price_unit = 0.0

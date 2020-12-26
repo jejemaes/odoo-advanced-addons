@@ -35,7 +35,6 @@ class TestCommonSaleRentalNoChart(TestSaleCommon):
                 ]),
             ]
         })
-
         cls.uom_unit = cls.env.ref('uom.product_uom_unit')
 
     @classmethod

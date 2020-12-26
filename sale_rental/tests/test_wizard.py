@@ -48,7 +48,9 @@ class TestSaleRentalWizard(TestCommonSaleRentalNoChart):
         sale_line = sale_order.order_line[0]
         start_dt = datetime(2020, 5, 7, 3, 0, 0)
         stop_dt = datetime(2020, 5, 9, 0, 0, 0)
-        price, pricing_explanation = self.rental_booking.resource_product_id.get_rental_price_and_details(start_dt, stop_dt, sale_order.pricelist_id)
+        product = self.rental_booking.resource_product_id
+        price = product.get_rental_price(start_dt, stop_dt, sale_order.pricelist_id.id)[product.id]['price_list']
+        pricing_explanation = product.get_rental_pricing_explanation(start_dt, stop_dt, currency_id=sale_order.pricelist_id.currency_id.id)[product.id]
 
         self.assertEqual(sale_line.rental_start_date, start_dt)
         self.assertEqual(sale_line.rental_stop_date, stop_dt)
@@ -78,7 +80,9 @@ class TestSaleRentalWizard(TestCommonSaleRentalNoChart):
         sale_line = sale_order.order_line[0]
         start_dt = datetime(2020, 5, 7, 3, 0, 0)
         stop_dt = datetime(2020, 5, 9, 0, 0, 0)
-        price, pricing_explanation = self.rental_booking.resource_product_id.get_rental_price_and_details(start_dt, stop_dt, sale_order.pricelist_id)
+        product = self.rental_booking.resource_product_id
+        price = product.get_rental_price(start_dt, stop_dt, sale_order.pricelist_id.id)[product.id]['price_list']
+        pricing_explanation = product.get_rental_pricing_explanation(start_dt, stop_dt, currency_id=sale_order.pricelist_id.currency_id.id)[product.id]
 
         self.assertEqual(sale_line.rental_start_date, start_dt)
         self.assertEqual(sale_line.rental_stop_date, stop_dt)
