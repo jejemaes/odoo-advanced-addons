@@ -14,6 +14,7 @@ class TestSaleService(TestCommonSaleRentalNoChart):
     @classmethod
     def setUpClass(cls):
         super(TestSaleService, cls).setUpClass()
+        cls.public_pricelist = cls.env.ref('product.list0')
 
         cls.setUpRentalData()
 
@@ -81,7 +82,8 @@ class TestSaleService(TestCommonSaleRentalNoChart):
 
         start_dt = datetime(2020, 5, 7, 0, 0, 0)
         stop_dt = datetime(2020, 5, 8, 0, 0, 0)
-        price, pricing_explanation = product.get_rental_price_and_details(start_dt, stop_dt, False)
+        price = product.get_rental_price(start_dt, stop_dt, self.public_pricelist.id)[product.id]['price_list']
+        pricing_explanation = product.get_rental_pricing_explanation(start_dt, stop_dt, currency_id=product.currency_id.id)[product.id]
 
         self.assertEqual(price, 0.0)
         self.assertEqual(pricing_explanation, 'Free')

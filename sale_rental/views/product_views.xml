@@ -57,7 +57,8 @@
                                 <field name="duration_value" attrs="{'column_invisible': [('parent.rental_tenure_type', '!=', 'duration')]}"/>
                                 <field name="duration_uom" attrs="{'column_invisible': [('parent.rental_tenure_type', '!=', 'duration')]}"/>
                                 <field name="weekday_ids" attrs="{'column_invisible': [('parent.rental_tenure_type', '!=', 'weekday')]}" widget="many2many_tags" domain="[('id', 'in', weekday_selectable_ids)]"/>
-                                <field name="base_price"/>
+                                <field name="base_price" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                                <field name="currency_id" invisible="1"/>
                                 <field name="weekday_selectable_ids" invisible="1"/>
                             </tree>
                         </field>

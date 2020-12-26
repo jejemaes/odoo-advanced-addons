@@ -60,13 +60,14 @@ class TestOnchangeFlow(TestCommonSaleRentalNoChart):
             so_form.save()
 
         start_dt = datetime(2020, 11, 20, 14, 15, 00)
-        stop_dt = datetime(2020, 11, 22, 22, 00, 00)
+        stop_dt = datetime(2020, 11, 22, 21, 00, 00)
 
-        so_form = Form(self.env['sale.order'])
+        so_form = Form(self.env['sale.order'], view='sale.view_order_form')
         so_form.partner_id = self.partner_a
         with so_form.order_line.new() as line:
             line.is_rental = True
             line.product_id = self.product_rental_day1
+            line.product_uom = self.product_rental_day1.uom_id
             line.rental_start_date = start_dt
             line.rental_stop_date = stop_dt
             line.resource_ids.add(self.product_rental_day1_resource1)
