@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="pos_restaurant_menu_qrcode_page">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <div class="row">
+                    <div class="col-12 text-left align-middle">
+                        <t t-if="restaurant_menu">
+                            <img t-att-src="image_data_uri(restaurant_menu.company_id.logo_web)" alt="logo" class="vh-10"/>
+                        </t>
+                        <h5 t-field="restaurant_menu.company_id.name"/>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 text-center text-capitalize">
+                        <h1 t-field="o.name"/>
+                        <h2 t-if="include_seats">
+                            (Max. <t t-esc="o.seats"/> people)
+                        </h2>
+                    </div>
+                </div>
+                <div class="row justify-content-center" t-if="restaurant_menu">
+                    <div class="col-12 text-center vh-15">
+                        <img t-attf-src="data:image/png;base64,#{restaurant_menu.qrcode}" alt="QRCode" class="img-fluid"/>
+                    </div>
+                </div>
+                <div class="row justify-content-center mt-3">
+                    <div class="col-12" t-if="restaurant_menu.badge_extra_content">
+                        <div t-raw="restaurant_menu.badge_extra_content"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="pos_restaurant_menu_qrcode">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="pos_restaurant_menu.pos_restaurant_menu_qrcode_page"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>
