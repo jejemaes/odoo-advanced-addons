@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="restaurant_menu_view_tree" model="ir.ui.view">
+        <field name="name">restaurant.menu.list</field>
+        <field name="model">restaurant.menu</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="is_published"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="restaurant_menu_view_form_qrcode_edit" model="ir.ui.view">
+        <field name="name">restaurant.menu.form</field>
+        <field name="model">restaurant.menu</field>
+         <field name="arch" type="xml">
+            <form string="Restaurant Menu">
+                <header>
+                    <button type="action" name="%(pos_restaurant_menu.restaurant_menu_print_qrcode_action)d" string="Print QRCode Badge"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="is_published"/>
+                            <field name="url" widget="CopyClipboardText"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="pos_category_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="badge_extra_content" nolabel="1"/>
+                    </group>
+                    <group>
+                        <div class="text-muted">
+                            The extra content will appear below the QRCode on the badge you can print to put on your table. It is also visible below the online web page containing the menu.
+                            You can insert sponsors, associations description, ...
+                        </div>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="restaurant_menu_action" model="ir.actions.act_window">
+        <field name="name">Restaurant Menus</field>
+        <field name="res_model">restaurant.menu</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_point_of_sale_online_menu"
+        name="Menus"
+        parent="point_of_sale.menu_point_config_product"
+        action="restaurant_menu_action"
+        groups="point_of_sale.group_pos_manager"
+        sequence="14"/>
+
+</odoo>
