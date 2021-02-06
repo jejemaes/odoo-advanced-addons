@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="restaurant_table_generator_view_form" model="ir.ui.view">
+        <field name="name">restaurant.table.generator.form</field>
+        <field name="model">restaurant.table.generator</field>
+        <field name="arch" type="xml">
+            <form string="Generate Tables">
+                <group>
+                    <group>
+                        <field name="floor_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        <field name="number_start"/>
+                        <field name="number_end"/>
+                    </group>
+                    <group>
+                        <field name="seats"/>
+                        <field name="color" widget="color"/>
+                        <field name="shape"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate" string="Generate" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="restaurant_table_generator_action" model="ir.actions.act_window">
+        <field name="name">Generate Tables</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">restaurant.table.generator</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="pos_restaurant.model_restaurant_floor" />
+    </record>
+
+</odoo>
