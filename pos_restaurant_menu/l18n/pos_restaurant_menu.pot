@@ -1,0 +1,226 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* pos_restaurant_menu
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-13 22:21+0000\n"
+"PO-Revision-Date: 2021-02-13 22:21+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: pos_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.pos_restaurant_menu_qrcode_page
+msgid "(Max."
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.restaurant_menu_print_qrcode_view_form
+msgid "Cancel"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__company_id
+msgid "Company"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__create_uid
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__create_date
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_report_pos_restaurant_menu_pos_restaurant_menu_qrcode__display_name
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__display_name
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__floor_ids
+msgid "Floors"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,help:pos_restaurant_menu.field_restaurant_menu__badge_extra_content
+msgid "Footer on QRCode badges for tables"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_report_pos_restaurant_menu_pos_restaurant_menu_qrcode__id
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__id
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__id
+msgid "ID"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__is_published
+msgid "Is Publisehd"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_report_pos_restaurant_menu_pos_restaurant_menu_qrcode____last_update
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu____last_update
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__write_uid
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__write_date
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__menu_id
+msgid "Menu"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.ui.menu,name:pos_restaurant_menu.menu_point_of_sale_online_menu
+msgid "Menus"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__name
+msgid "Name"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__pos_category_ids
+msgid "Pos Category"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.restaurant_menu_print_qrcode_view_form
+msgid "Print"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.restaurant_menu_print_qrcode_view_form
+msgid "Print QRCode"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.restaurant_menu_view_form_qrcode_edit
+msgid "Print QRCode Badge"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model,name:pos_restaurant_menu.model_restaurant_menu_print_qrcode
+msgid "Print Restaurant Menu QRCode Badge"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__qrcode
+msgid "QR Code"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__badge_extra_content
+msgid "QR Code badge extra content"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.pos_restaurant_menu_qrcode_page
+msgid "QRCode"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.actions.act_window,name:pos_restaurant_menu.restaurant_menu_print_qrcode_action
+msgid "QRCode Bagde"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model,name:pos_restaurant_menu.model_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.restaurant_menu_view_form_qrcode_edit
+msgid "Restaurant Menu"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.actions.report,name:pos_restaurant_menu.restaurant_table_action_report_qrcode
+#: model:ir.model,name:pos_restaurant_menu.model_report_pos_restaurant_menu_pos_restaurant_menu_qrcode
+msgid "Restaurant Menu QRCode"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.actions.act_window,name:pos_restaurant_menu.restaurant_menu_action
+msgid "Restaurant Menus"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields.selection,name:pos_restaurant_menu.selection__restaurant_menu_print_qrcode__table_select_mode__by_floor
+msgid "Select Floor"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields.selection,name:pos_restaurant_menu.selection__restaurant_menu_print_qrcode__table_select_mode__by_table
+msgid "Select Table"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__include_seats
+msgid "Show Max Seats"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,help:pos_restaurant_menu.field_restaurant_menu_print_qrcode__include_seats
+msgid "Show max people allowed around the table, on the QRCode badge"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__table_select_mode
+msgid "Table Selection Mode"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu_print_qrcode__table_ids
+msgid "Tables"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.constraint,message:pos_restaurant_menu.constraint_restaurant_menu_unique_name_per_company
+msgid "That name is already taken."
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.restaurant_menu_view_form_qrcode_edit
+msgid ""
+"The extra content will appear below the QRCode on the badge you can print to put on your table. It is also visible below the online web page containing the menu.\n"
+"                            You can insert sponsors, associations description, ..."
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model:ir.model.fields,field_description:pos_restaurant_menu.field_restaurant_menu__url
+msgid "Url"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.pos_restaurant_menu_qrcode_page
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.pos_restaurant_online_menu
+msgid "logo"
+msgstr ""
+
+#. module: pos_restaurant_menu
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_menu.pos_restaurant_menu_qrcode_page
+msgid "people)"
+msgstr ""
