@@ -14,7 +14,7 @@ class RestaraurantMenuController(http.Controller):
             if menu.pos_category_ids:
                 domain = expression.AND([domain, [('pos_categ_id', 'in', menu.pos_category_ids.ids)]])
 
-            products = request.env['product.product'].sudo().search(domain)
+            products = request.env['product.product'].sudo().search(domain, order='pos_categ_id, sequence ASC')
             categories = products.mapped('pos_categ_id')
 
             product_category_map = {}
@@ -26,5 +26,6 @@ class RestaraurantMenuController(http.Controller):
                 'product_category_map': product_category_map,
                 'menu': menu,
                 'categories': categories.sorted(key=lambda r: r.sequence),
+                'company': menu.sudo().company_id,
             })
         return NotFound()
