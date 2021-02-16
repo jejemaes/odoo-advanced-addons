@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class RestaurantMenuPrintQRCode(models.TransientModel):
@@ -38,6 +39,8 @@ class RestaurantMenuPrintQRCode(models.TransientModel):
             'include_seats': self.include_seats,
         }
         tables = self._get_tables()
+        if not tables:
+            raise UserError(_("At least a table or a floor must be selected."))
         return self.env.ref('pos_restaurant_menu.restaurant_table_action_report_qrcode').report_action(tables, data=datas, config=False)
 
     def _get_tables(self):
