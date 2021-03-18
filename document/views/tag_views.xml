@@ -38,8 +38,11 @@
                         <label for="name" class="oe_edit_only"/>
                         <h1><field name="name" placeholder="E.g. Status"/></h1>
                     </div>
-                    <group invisible="context.get('default_folder_id')">
-                        <field name="folder_id" required="not context.get('default_folder_id')" options="{'no_create': True}"/>
+                    <group>
+                        <field name="color" widget="color_picker"/>
+                    </group>
+                    <group invisible="context.get('document_folder_form')">
+                        <field name="folder_id" options="{'no_create': True}"/>
                     </group>
                     <notebook>
                         <page string="Tags" name="tags">
@@ -47,7 +50,6 @@
                                 <tree editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
-                                    <field name="color" widget="color_picker"/>
                                 </tree>
                             </field>
                         </page>

@@ -60,7 +60,8 @@
                             <field name="datas" string="File" filename="name" attrs="{'invisible':[('type','=','url')], 'readonly': [('is_locked', '=', True)], 'required': [('type', '=', 'binary')]}"/>
                             <field name="url" attrs="{ 'invisible' : [('type', '!=', 'url')], 'readonly': [('is_locked', '=', True)], 'required': [('type', '=', 'url')]}"/>
                             <field name="folder_id" attrs="{'readonly': [('is_locked', '=', True)]}"/>
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}"/>
+                            <field name="selectable_tag_ids" invisible="1"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}" domain="[('id', 'in', selectable_tag_ids)]"/>
                         </group>
                         <group>
                             <field name="owner_id" attrs="{'readonly': [('is_locked', '=', True)]}"/>
@@ -163,7 +164,10 @@
                                             </span>
                                         </t>
                                         <samp t-else="" class="text-muted"> </samp>
-                                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+
+                                        <div>
+                                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                        </div>
 
                                         <t t-if="record.res_model_name.raw_value &amp;&amp; record.res_model.raw_value !== 'document.document'">
                                             <strong><t t-esc="record.res_model_name.raw_value"/></strong>
