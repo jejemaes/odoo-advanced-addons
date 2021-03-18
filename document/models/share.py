@@ -4,7 +4,8 @@ import uuid
 from ast import literal_eval
 from dateutil.relativedelta import relativedelta
 
-from odoo import models, fields, api, exceptions
+from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 from odoo.tools.translate import _
 
 
@@ -38,6 +39,9 @@ class DocumentShare(models.Model):
     tag_ids = fields.Many2many('document.tag', string="Shared Tags")
     owner_id = fields.Many2one('res.users', string="Document Owner")
     partner_id = fields.Many2one('res.partner', string="Contact", check_company=True)
+
+    # ui
+    selectable_tag_ids = fields.Many2many('document.tag', compute='_compute_selectable_tag_ids')
 
     # Validity duration
     date_deadline = fields.Date("Valid Until")
@@ -84,11 +88,6 @@ class DocumentShare(models.Model):
                     state = 'expired'
             record.state = state
 
-    def _compute_alias_domain(self):
-        alias_domain = self.env["ir.config_parameter"].sudo().get_param("mail.catchall.domain")
-        for record in self:
-            record.alias_domain = alias_domain
-
     @api.depends('access_token')
     def _compute_full_url(self):
         base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
@@ -97,6 +96,14 @@ class DocumentShare(models.Model):
                 share.full_url = "%s/document/share/%s/%s" % (base_url, share.id, share.access_token)
             else:
                 share.full_url = False
+
+    @api.depends('folder_id', 'tag_ids')
+    def _compute_selectable_tag_ids(self):
+        for share in self:
+            if share.folder_id:
+                share.selectable_tag_ids = self.env['document.tag'].search(['|', ('folder_id', '=', False), ('folder_id', 'parent_of', share.folder_id.id)])
+            else:
+                share.selectable_tag_ids = None
 
     @api.onchange('content_type')
     def _onchange_content_type(self):
@@ -109,9 +116,12 @@ class DocumentShare(models.Model):
     @api.onchange('folder_id')
     def _onchange_folder_id(self):
         self.tag_ids = None
-        if self.folder_id:
-            return {'domain': {'tag_ids': [('folder_id', 'parent_of', self.folder_id.id)]}}
-        return {'domain': {'tag_ids': []}}
+
+    @api.constrains('folder_id', 'tag_ids')
+    def _check_tag_in_folder(self):
+        for share in self:
+            if any(tag not in share.selectable_tag_ids for tag in share.tag_ids):
+                raise ValidationError(_("The document's tags must be in the folder ones."))
 
     # ----------------------------------------------------
     # Business Methods
@@ -159,7 +169,9 @@ class DocumentShare(models.Model):
         return '/document/upload/%s/%s' % (self.id, self.sudo().access_token)
 
     def _get_owner_avatar_url(self):
-        return '/document/owner_avatar/%s/%s' % (self.id, self.sudo().access_token)
+        if self.author_avatar:
+            return '/document/owner_avatar/%s/%s' % (self.id, self.sudo().access_token)
+        return None
 
     def _postprocess_upload(self, documents):
         """ Generate an activity based on the 'share' document configuration.

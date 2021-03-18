@@ -59,10 +59,10 @@
             <field name="groups" eval="[(4, ref('base.group_user'))]"/>
             <field name="domain_force">[
                 '|',
-                    ('folder_id.group_ids', 'in', [g.id for g in user.groups_id]),
+                    ('folder_id.write_group_ids', 'in', [g.id for g in user.groups_id]),
                     '&amp;',
                         ('folder_id.read_group_ids', '=', False),
-                        ('folder_id.group_ids', '=', False)]
+                        ('folder_id.write_group_ids', '=', False)]
             </field>
             <field name="perm_read" eval="1"/>
             <field name="perm_create" eval="1"/>

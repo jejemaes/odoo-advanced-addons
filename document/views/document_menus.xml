@@ -15,7 +15,7 @@
 
         <menuitem
             id="document_menu_share"
-            name="Shared and Emails"
+            name="Shared"
             parent="document_menu_root"
             action="document_share_action"
             sequence="10"/>
