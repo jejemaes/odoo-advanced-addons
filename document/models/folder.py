@@ -31,12 +31,14 @@ class Folder(models.Model):
 
     facet_ids = fields.One2many('document.facet', 'folder_id', string="Tag Categories", help="Select the tag categories to be used")
     read_group_ids = fields.Many2many('res.groups', 'document_folder_read_group_rel', string="Read Access Groups", help="Groups able to see the workspace and read its documents without create/edit rights.")
-    group_ids = fields.Many2many('res.groups', 'document_folder_write_group_rel', string="Write Access Groups", help="Groups able to see the workspace and read/create/edit its documents.")
+    write_group_ids = fields.Many2many('res.groups', 'document_folder_write_group_rel', string="Write Access Groups", help="Groups able to see the workspace and read/create/edit its documents.")
 
     @api.depends('document_ids')
     def _compute_document_count(self):
+        data = self.env['document.document'].read_group([('folder_id', 'in', self.ids)], fields=['folder_id'], groupby=['folder_id'])
+        document_count_dict = dict((d['folder_id'][0], d['folder_id_count']) for d in data)
         for folder in self:
-            folder.document_count = len(folder.document_ids)  # TODO : use read_group bordel
+            folder.document_count = document_count_dict.get(folder.id, 0)
 
     @api.constrains('parent_id')
     def _check_parent_id(self):

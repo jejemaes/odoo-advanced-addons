@@ -5,12 +5,12 @@ import os
 import mimetypes
 import re
 import uuid
-from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, tools,  _
 from odoo.tools import ImageProcess
 from odoo.tools.safe_eval import safe_eval
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
+from odoo.osv import expression
 
 
 class Document(models.Model):
@@ -49,6 +49,9 @@ class Document(models.Model):
     lock_uid = fields.Many2one('res.users', string="Locked by")
     owner_id = fields.Many2one('res.users', default=lambda self: self.env.user.id, string="Owner", tracking=True)
     active = fields.Boolean("Active", default=True)
+
+    # ui
+    selectable_tag_ids = fields.Many2many('document.tag', compute='_compute_selectable_tag_ids')
 
     _sql_constraints = [
         ('attachment_unique', 'UNIQUE(attachment_id)', "Attachment can only be linked to one document."),
@@ -130,6 +133,13 @@ class Document(models.Model):
             else:
                 document.is_previewable = False
 
+    @api.depends('folder_id', 'tag_ids')
+    def _compute_selectable_tag_ids(self):
+        for document in self:
+            if document.folder_id:
+                document.selectable_tag_ids = self.env['document.tag'].search(['|', ('folder_id', '=', False), ('folder_id', 'parent_of', document.folder_id.id)])
+            else:
+                document.selectable_tag_ids = None
 
     @api.onchange('url')
     def _onchange_url(self):
@@ -140,9 +150,11 @@ class Document(models.Model):
     def _onchange_folder_id(self):
         self.tag_ids = None
 
-        if self.folder_id:
-            return {'domain': {'tag_ids': [('folder_id', 'parent_of', self.folder_id.id)]}}
-        return {'domain': {'tag_ids': []}}
+    @api.constrains('folder_id', 'tag_ids')
+    def _check_tag_in_folder(self):
+        for document in self:
+            if any(tag not in document.selectable_tag_ids for tag in document.tag_ids):
+                raise ValidationError(_("The document's tags must be in the folder ones."))
 
     def unlink(self):
         #  TODO Remove the related attachment
@@ -150,57 +162,6 @@ class Document(models.Model):
             if any(document.lock_uid and document.lock_uid != self.env.user for document in self):
                 raise UserError(_("Locked Document can not be removed"))
         return super(Document, self).unlink()
-
-    # -------------------------------------------------------------
-    # Mail Gateway
-    # -------------------------------------------------------------
-    @api.model
-    def message_new(self, msg, custom_values=None):
-        # copy original custom values for reel document
-        original_custom_values = dict(custom_values)
-
-        # create the empty document as achived
-        custom_values['active'] = False
-        empty_document = super(Document, self).message_new(msg, custom_values=custom_values)
-
-        # process the attachment to create documents
-        email_to = msg.get('to')
-        if email_to:
-            # extract before @ parts
-            email_to_localparts = [
-                e.split('@', 1)[0].lower()
-                for e in (tools.email_split(email_to) or [''])
-            ]
-            # find the sharing object, via its alias name
-            share = self.env['documents.share'].search([
-                ('alias_name', 'in', email_to_localparts),
-                ('alias_model_id.model', '=', self._name)
-            ], limit=1)
-
-            # generate a document record per attachment of the original email
-            if share.email_drop:
-                document_value_list = []
-                if msg.get('attachments'):  # list of nametupled, defined in `self._Attachment` of mail.thread
-                    for attachment_namedtuple in msg.get('attachments', []):
-                        name, content, dummy = attachment_namedtuple
-                        document_values = {
-                            'name': name,
-                            'datas': base64.b64encode(content),
-                            'type': 'binary',
-                            'description': name,
-                        }
-                        document_values.update(original_custom_values)
-                        document_value_list.append(document_values)
-
-                # create document from attachments
-                documents = self.env['docuemnt.document'].create(document_value_list)
-                # log a note to  simulate the create record message
-                for document in documents:
-                    document._message_log(body=_("This document was created from the attachment from an email."))
-                # post process the upload through the sharing (activities, ...)
-                share._postprocess_upload(documents)
-
-        return empty_document
 
     # -------------------------------------------------------------
     # Actions

@@ -32,7 +32,7 @@
                     </b>
                     <span class="h4"> documents shared by </span>
                     <span class="o_document_avatar mt8 h4">
-                        <img class="rounded-circle" t-att-src="share._get_owner_avatar_url()" t-att-alt="share.create_uid.name" t-att-title="share.create_uid.name"/>
+                        <img class="rounded-circle" t-if="share._get_owner_avatar_url()" t-att-src="share._get_owner_avatar_url()" t-att-alt="share.create_uid.name" t-att-title="share.create_uid.name"/>
                         <t t-esc="share.create_uid.name"/>
                     </span>
                 </div>

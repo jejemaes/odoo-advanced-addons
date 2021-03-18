@@ -61,7 +61,8 @@
                             <field name="partner_id"/>
                         </group>
                         <group>
-                            <field name="tag_ids" widget="many2many_tags"/>
+                            <field name="tag_ids" widget="many2many_tags" domain="[('id', 'in', selectable_tag_ids)]"/>
+                            <field name="selectable_tag_ids" invisible="1"/>
                             <field name="activity_option"/>
                         </group>
                     </group>

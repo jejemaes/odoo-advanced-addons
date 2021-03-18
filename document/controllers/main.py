@@ -139,7 +139,7 @@ class ShareRoute(http.Controller):
                 })
                 document_value_list.append(document_values)
 
-            documents = request.env['document.document'].create(document_value_list)
+            documents = request.env['document.document'].sudo().create(document_value_list)
             share._postprocess_upload(documents)
             return """<script type='text/javascript'>
                     window.open("/document/share/%s/%s", "_self");
