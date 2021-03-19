@@ -19,3 +19,6 @@ access_document_tag_manager,document_tag_manager,model_document_tag,document.gro
 access_document_folder_all,document_folder_all,model_document_folder,base.group_user,1,0,0,0
 access_document_folder_user,document_folder_user,model_document_folder,document.group_document_user,1,0,0,0
 access_document_folder_manager,document_folder_manager,model_document_folder,document.group_document_manager,1,1,1,1
+
+access_document_create_record,access_document_create_record,model_document_create_record,base.group_user,1,0,0,0
+access_document_create_record_user,access_document_create_record,model_document_create_record,document.group_document_user,1,1,1,0

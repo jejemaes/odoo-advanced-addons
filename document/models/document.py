@@ -25,6 +25,10 @@ class Document(models.Model):
     def _default_access_token(self):
         return str(uuid.uuid4())
 
+    @api.model
+    def _default_tag_ids(self):
+        return self.env.company.document_default_tag_ids
+
     attachment_id = fields.Many2one('ir.attachment', "Attachment", ondelete='cascade', required=True)
     name = fields.Char(related='attachment_id.name', inherited=True, readonly=True)  # as it now contents the filename (with the extension required to server file properly), better to make it readonly
     url = fields.Char(related='attachment_id.url', inherited=True, readonly=False)
@@ -40,7 +44,7 @@ class Document(models.Model):
     partner_id = fields.Many2one('res.partner', string="Contact", ondelete="restrict", tracking=True, index=True, check_company=True)
     folder_id = fields.Many2one('document.folder', string="Folder", required=True, ondelete="restrict", tracking=True, index=True, check_company=True)
     favorite_user_ids = fields.Many2many('res.users', 'document_document_user_favorite_rel', 'document_id', 'user_id', string="Favorites")
-    tag_ids = fields.Many2many('document.tag', 'document_tag_rel', string="Tags")
+    tag_ids = fields.Many2many('document.tag', 'document_tag_rel', string="Tags", default=_default_tag_ids)
 
     raw_type = fields.Selection([], string="Raw Type", help="Technical field to determine what is store in the 'raw' field.", default=None)
     res_model_name = fields.Char("Related Model Name", compute='_compute_res_model_name')
@@ -224,3 +228,6 @@ class Document(models.Model):
     @api.model
     def _get_thumbnail_mimetypes(self):
         return ['image/gif', 'image/jpe', 'image/jpeg', 'image/jpg', 'image/gif', 'image/png']
+
+    def _generate_record_values(self, model_name, subtype=False):
+        return []

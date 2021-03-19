@@ -15,7 +15,7 @@
 
         <menuitem
             id="document_menu_share"
-            name="Shared"
+            name="Sharing"
             parent="document_menu_root"
             action="document_share_action"
             sequence="10"/>
@@ -26,6 +26,13 @@
             parent="document_menu_root"
             groups="document.group_document_manager"
             sequence="15"/>
+
+            <menuitem
+                name="Settings"
+                id="document_menu_config_settings"
+                parent="document_menu_config"
+                action="document_config_settings_action"
+                sequence="1"/>
 
             <menuitem
                 name="Folders"
