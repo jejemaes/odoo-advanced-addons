@@ -13,7 +13,9 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'wizard/document_create_record_views.xml',
         'views/assets.xml',
+        'views/res_config_settings_views.xml',
         'views/document_views.xml',
         'views/folder_views.xml',
         'views/share_views.xml',
@@ -21,5 +23,4 @@
         'views/document_menus.xml',
         'views/document_share_templates.xml',
     ],
-
 }
