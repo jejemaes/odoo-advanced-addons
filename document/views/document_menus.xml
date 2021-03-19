@@ -14,18 +14,25 @@
             sequence="5"/>
 
         <menuitem
+            name="Folders"
+            id="document_menu_folder"
+            parent="document_menu_root"
+            action="document_folder_action_directories"
+            sequence="10"/>
+
+        <menuitem
             id="document_menu_share"
             name="Sharing"
             parent="document_menu_root"
             action="document_share_action"
-            sequence="10"/>
+            sequence="15"/>
 
         <menuitem
             id="document_menu_config"
             name="Configuration"
             parent="document_menu_root"
             groups="document.group_document_manager"
-            sequence="15"/>
+            sequence="20"/>
 
             <menuitem
                 name="Settings"

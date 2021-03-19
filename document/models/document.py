@@ -27,7 +27,7 @@ class Document(models.Model):
 
     @api.model
     def _default_tag_ids(self):
-        return self.env.company.document_default_tag_ids
+        return self.env.company.document_default_tag_ids.ids
 
     attachment_id = fields.Many2one('ir.attachment', "Attachment", ondelete='cascade', required=True)
     name = fields.Char(related='attachment_id.name', inherited=True, readonly=True)  # as it now contents the filename (with the extension required to server file properly), better to make it readonly
@@ -152,7 +152,10 @@ class Document(models.Model):
 
     @api.onchange('folder_id')
     def _onchange_folder_id(self):
-        self.tag_ids = None
+        if not self.folder_id:
+            self.tag_ids = self._default_tag_ids()
+        else:
+            self.tag_ids = None
 
     @api.constrains('folder_id', 'tag_ids')
     def _check_tag_in_folder(self):

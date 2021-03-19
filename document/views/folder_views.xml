@@ -55,6 +55,59 @@
         </field>
     </record>
 
+    <record id="document_folder_view_kanban" model="ir.ui.view">
+        <field name="name">document.folder.kanban</field>
+        <field name="model">document.folder</field>
+        <field name="arch" type="xml">
+            <kanban string="Folders" class="o_emphasize_colors o_kanban_dashboard o_slide_kanban breadcrumb_item active" edit="false" sample="1">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card">
+                            <div class="o_dropdown_kanban dropdown">
+                                <a role="button" class="dropdown-toggle o-no-caret btn" data-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                    <span class="fa fa-ellipsis-v" aria-hidden="false"/>
+                                </a>
+                                <div class="dropdown-menu" role="menu">
+                                    <t t-if="widget.deletable">
+                                        <a class="dropdown-item" role="menuitem" type="delete">Delete</a>
+                                    </t>
+                                    <a class="dropdown-item" role="menuitem" type="edit">
+                                        Edit
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title mb16">
+                                    <div class="o_primary">
+                                        <a type="edit" class="mr-auto">
+                                            <span><field name="name" class="o_primary"/></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container o_kanban_card_content mt0 mb0">
+                                <div class="row">
+                                    <div class="col-6 border-right">
+                                        <a name="action_view_subfolders" type="object" class="d-flex flex-column align-items-center">
+                                            <span class="font-weight-bold h2"><field name="children_count"/></span>
+                                            <span class="text-muted">Sub-folders</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a name="action_view_documents" type="object" class="d-flex flex-column align-items-center">
+                                            <span class="font-weight-bold h2"><field name="document_count"/></span>
+                                            <span class="text-muted">Documents</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <record id="document_folder_view_search" model="ir.ui.view">
         <field name="name">document.folder.search</field>
         <field name="model">document.folder</field>
@@ -74,6 +127,13 @@
         <field name="name">Folders</field>
         <field name="res_model">document.folder</field>
         <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="document_folder_action_directories" model="ir.actions.act_window">
+        <field name="name">Folders</field>
+        <field name="res_model">document.folder</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[('parent_id', '=', False)]</field>
     </record>
 
 </odoo>
