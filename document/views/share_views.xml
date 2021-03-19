@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="res_config_settings_action_general" model="ir.actions.act_window">
-        <field name="name">Settings</field>
-        <field name="res_model">res.config.settings</field>
-        <field name="view_mode">form</field>
-        <field name="target">inline</field>
-        <field name="context" eval="{'module': 'general_settings'}"/>
-    </record>
-
     <!--
         Views
     -->
