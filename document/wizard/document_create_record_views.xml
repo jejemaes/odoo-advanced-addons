@@ -5,7 +5,7 @@
         <field name="name">document.create.record.view.form</field>
         <field name="model">document.create.record</field>
         <field name="arch" type="xml">
-            <form string="Create Sales Order">
+            <form string="Create Record">
                 <group>
                     <group>
                         <field name="document_ids" widget="many2many_tags" readonly="1"/>

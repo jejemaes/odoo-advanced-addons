@@ -13,6 +13,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'wizard/document_attach_record_views.xml',
         'wizard/document_create_record_views.xml',
         'views/assets.xml',
         'views/res_config_settings_views.xml',
