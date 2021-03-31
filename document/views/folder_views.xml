@@ -43,7 +43,7 @@
                         <field name="description" nolabel="1"/>
                     </group>
                     <group string="Tags">
-                        <field name="facet_ids" nolabel="1" context="{'default_folder_id': id, 'document_folder_form': True, 'document_tag_complete_name': True}">
+                        <field name="facet_ids" nolabel="1" context="{'default_folder_id': id, 'document_folder_form': True, 'hierarchical_naming': True}">
                             <tree>
                                 <field name="name"/>
                                 <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
@@ -115,7 +115,13 @@
             <search>
                 <field name="name"/>
                 <field name="parent_id"/>
-                <filter string="Parent Folder" name="by_parent" domain="[]" context="{'group_by': 'parent_id'}"/>
+                <field name="description"/>
+
+                <filter name="root_folder" string="Root Folders" domain="[('parent_id','=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Parent Folder" name="by_parent" domain="[]" context="{'group_by': 'parent_id'}"/>
+                </group>
             </search>
         </field>
     </record>
@@ -133,7 +139,7 @@
         <field name="name">Folders</field>
         <field name="res_model">document.folder</field>
         <field name="view_mode">kanban,form</field>
-        <field name="domain">[('parent_id', '=', False)]</field>
+        <field name="context">{'search_default_root_folder': 1}</field>
     </record>
 
 </odoo>
