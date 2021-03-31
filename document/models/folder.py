@@ -55,13 +55,15 @@ class Folder(models.Model):
             raise ValidationError(_('You cannot create recursive folders.'))
 
     def name_get(self):
-        result = []
-        for record in self:
-            if record.parent_id:
-                result.append((record.id, "%s / %s" % (record.parent_id.sudo().name, record.name)))
-            else:
-                result.append((record.id, record.name))
-        return result
+        if 'hierarchical_naming' not in self._context or self._context.get('hierarchical_naming'):
+            result = []
+            for record in self:
+                if record.parent_id:
+                    result.append((record.id, "%s / %s" % (record.parent_id.sudo().name, record.name)))
+                else:
+                    result.append((record.id, record.name))
+            return result
+        return super(Folder, self).name_get()
 
     def action_view_subfolders(self):
         action = self.env.ref('document.document_folder_action_directories').read()[0]
@@ -74,7 +76,7 @@ class Folder(models.Model):
         return action
 
     def action_view_documents(self):
-        action = self.env.ref('document.document_document_action').read()[0]
+        action = self.env.ref('document.document_document_action_from_folder').read()[0]
         action['display_name'] = self.name
         action['context'] = {
             'search_default_folder_id': self.id,

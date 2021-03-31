@@ -61,7 +61,7 @@
                             <field name="url" attrs="{ 'invisible' : [('type', '!=', 'url')], 'readonly': [('is_locked', '=', True)], 'required': [('type', '=', 'url')]}"/>
                             <field name="folder_id" attrs="{'readonly': [('is_locked', '=', True)]}"/>
                             <field name="selectable_tag_ids" invisible="1"/>
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}" domain="[('id', 'in', selectable_tag_ids)]"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}" domain="[('id', 'in', selectable_tag_ids)]" context="{'hierarchical_naming': True}"/>
                         </group>
                         <group>
                             <field name="owner_id" attrs="{'readonly': [('is_locked', '=', True)]}"/>
@@ -215,6 +215,8 @@
                 <field name="type"/>
 
                 <filter name="my_documents_filter" string="My Document(s)" domain="[('create_uid','=',uid)]"/>
+                <filter name="my_favorites_filter" string="My Favorite(s)" domain="[('favorite_user_ids', 'in', uid)]"/>
+                <separator/>
                 <filter name="url_filter" string="URL" domain="[('type', '=', 'url')]"/>
                 <filter name="binary_filter" string="Stored" domain="[('type', '=', 'binary')]"/>
                 <separator/>
@@ -245,6 +247,17 @@
         </field>
     </record>
 
+    <record id="document_document_view_search_no_folder" model="ir.ui.view">
+        <field name="name">document.document.search.no.folder</field>
+        <field name="model">document.document</field>
+        <field name="inherit_id" ref="document_document_view_search"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//searchpanel//field[@name='folder_id']" position="replace">
+            </xpath>
+        </field>
+    </record>
+
     <!--
         Actions
     -->
@@ -252,6 +265,14 @@
         <field name="name">Documents</field>
         <field name="res_model">document.document</field>
         <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_panel_expand_folder': 1}</field>
+    </record>
+
+    <record id="document_document_action_from_folder" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">document.document</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="document_document_view_search_no_folder"/>
     </record>
 
     <record id="document_document_action_download" model="ir.actions.server">
