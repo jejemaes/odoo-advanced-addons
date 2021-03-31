@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import base64
+from collections import OrderedDict
 import os
 import mimetypes
 import re
 import uuid
+
 
 from odoo import api, fields, models, tools,  _
 from odoo.tools import ImageProcess
@@ -152,10 +154,7 @@ class Document(models.Model):
 
     @api.onchange('folder_id')
     def _onchange_folder_id(self):
-        if not self.folder_id:
-            self.tag_ids = self._default_tag_ids()
-        else:
-            self.tag_ids = None
+        self.tag_ids = self._default_tag_ids()
 
     @api.constrains('folder_id', 'tag_ids')
     def _check_tag_in_folder(self):
@@ -169,6 +168,30 @@ class Document(models.Model):
             if any(document.lock_uid and document.lock_uid != self.env.user for document in self):
                 raise UserError(_("Locked Document can not be removed"))
         return super(Document, self).unlink()
+
+    @api.model
+    def search_panel_select_range(self, field_name, **kwargs):
+        result = super(Document, self).search_panel_select_range(field_name)
+
+        if self._context.get('search_panel_expand_folder'):  # this does not work as search_panel don't propagate action context
+
+            if field_name == 'folder_id':
+                enable_counters = kwargs.get('enable_counters', False)
+                already_fetch_ids = [item['id'] for item in result.get('values', [])]
+                additionnal_folders = self.env['document.folder'].with_context(hierarchical_naming=False).search([('id', 'not in', already_fetch_ids)])
+                additionnal_result = []
+                for folder in additionnal_folders:
+                    values = {
+                        'id': folder.id,
+                        'display_name': folder.display_name,
+                        'parent_id': folder.parent_id.id
+                    }
+                    if enable_counters:
+                        values['__count'] = 0
+                    additionnal_result.append(values)
+                result['values'] += additionnal_result
+
+        return result
 
     # -------------------------------------------------------------
     # Actions

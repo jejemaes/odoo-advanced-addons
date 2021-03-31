@@ -37,7 +37,7 @@ class Tags(models.Model):
     ]
 
     def name_get(self):
-        if self._context.get('document_tag_complete_name'):
+        if self._context.get('hierarchical_naming'):
             result = []
             for record in self:
                 result.append((record.id, "%s: %s" % (record.facet_id.name, record.name)))
