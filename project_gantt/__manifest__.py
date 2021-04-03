@@ -11,7 +11,7 @@
     'license': "GPL-3",
     'version': '1.1',
 
-    'depends': ['web_view_gantt', 'project'],
+    'depends': ['web_gantt', 'project'],
     'data': [
         'views/project_views.xml',
     ],

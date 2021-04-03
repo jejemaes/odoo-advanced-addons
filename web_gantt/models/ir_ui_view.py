@@ -6,7 +6,7 @@ from odoo import models, fields, api
 class View(models.Model):
     _inherit = 'ir.ui.view'
 
-    type = fields.Selection(selection_add=[('ganttdhx', "Gantt")], ondelete={'ganttdhx': 'cascade'})
+    type = fields.Selection(selection_add=[('gantt', "Gantt")], ondelete={'gantt': 'cascade'})
 
     def _postprocess_access_rights(self, model, node):
         super(View, self)._postprocess_access_rights(model, node)
@@ -14,7 +14,7 @@ class View(models.Model):
         Model = self.env[model]
         is_base_model = self.env.context.get('base_model_name', model) == model
 
-        if node.tag in ('gantt'):
+        if node.tag == 'gantt':
             for action, operation in (('create', 'create'), ('delete', 'unlink'), ('edit', 'write')):
                 if (not node.get(action) and
                         not Model.check_access_rights(operation, raise_exception=False) or
@@ -27,4 +27,4 @@ class View(models.Model):
 class ActWindowView(models.Model):
     _inherit = 'ir.actions.act_window.view'
 
-    view_mode = fields.Selection(selection_add=[('ganttdhx', "Gantt")], ondelete={'ganttdhx': 'cascade'})
+    view_mode = fields.Selection(selection_add=[('gantt', "Gantt")], ondelete={'gantt': 'cascade'})

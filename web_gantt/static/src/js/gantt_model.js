@@ -1,10 +1,10 @@
-odoo.define('web_view_gantt.GanttModel', function (require) {
+odoo.define('web_gantt.GanttModel', function (require) {
 "use strict";
 
 var AbstractModel = require('web.AbstractModel');
 var concurrency = require('web.concurrency');
 var session = require('web.session');
-var GanttUtils = require('web_view_gantt.GanttUtils');
+var GanttUtils = require('web_gantt.GanttUtils');
 var core = require('web.core');
 
 var _t = core._t;

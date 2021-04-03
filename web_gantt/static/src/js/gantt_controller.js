@@ -1,8 +1,8 @@
-odoo.define('web_view_gantt.GanttController', function (require) {
+odoo.define('web_gantt.GanttController', function (require) {
 "use strict";
 
 var AbstractController = require('web.AbstractController');
-var GanttUtils = require('web_view_gantt.GanttUtils');
+var GanttUtils = require('web_gantt.GanttUtils');
 var core = require('web.core');
 var config = require('web.config');
 var Dialog = require('web.Dialog');
