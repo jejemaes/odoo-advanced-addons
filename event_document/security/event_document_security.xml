@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="group_document_specific_event" model="res.groups">
+            <field name="name">Event Specific Document Folder and Tags</field>
+            <field name="comment">Allow user to see specific document folder options on event template and event.</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+    </data>
+</odoo>
