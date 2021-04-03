@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="event_event_view_form" model="ir.ui.view">
+        <field name="name">event.event.form.inherit.event.advanced</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="priority">15</field>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="advanced_settings" invisible="1" string="Advanced Settings">
+                    <group name="advanced_settings_general"></group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
