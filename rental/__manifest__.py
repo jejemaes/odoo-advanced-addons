@@ -10,7 +10,7 @@ Rental Managment
 Rent your machines and other resources, manage your calendar and confirm the rental.
     """,
     'category': 'Rental',
-    'depends': ['web_view_gantt', 'resource_advanced', 'mail'],
+    'depends': ['web_gantt', 'resource_advanced', 'mail'],
     'data': [
         'data/sequence_data.xml',
         'data/resource_data.xml',

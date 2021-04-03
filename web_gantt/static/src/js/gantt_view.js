@@ -1,4 +1,4 @@
-odoo.define('web_view_gantt.GanttView', function (require) {
+odoo.define('web_gantt.GanttView', function (require) {
 "use strict";
 
 var AbstractView = require('web.AbstractView');
@@ -6,9 +6,9 @@ var BasicView = require('web.BasicView');
 
 var core = require('web.core');
 var session = require('web.session');
-var GanttModel = require('web_view_gantt.GanttModel');
-var GanttRenderer = require('web_view_gantt.GanttRenderer');
-var GanttController = require('web_view_gantt.GanttController');
+var GanttModel = require('web_gantt.GanttModel');
+var GanttRenderer = require('web_gantt.GanttRenderer');
+var GanttController = require('web_gantt.GanttController');
 var view_registry = require('web.view_registry');
 var pyUtils = require('web.py_utils');
 
@@ -36,12 +36,12 @@ var locale_suffix = locale_code !== undefined ? '_' + locale_code : '';
 
 var GanttView = BasicView.extend({
     cssLibs: [
-        "/web_view_gantt/static/lib/dhtmlxGantt/codebase/dhtmlxgantt.css"
+        "/web_gantt/static/lib/dhtmlxGantt/codebase/dhtmlxgantt.css",
     ],
     jsLibs: [
-        "/web_view_gantt/static/lib/dhtmlxGantt/codebase/dhtmlxgantt.js",
-        "/web_view_gantt/static/lib/dhtmlxGantt/codebase/ext/dhtmlxgantt_click_drag.js",
-        "/web_view_gantt/static/lib/dhtmlxGantt/codebase/locale/locale" + locale_suffix + ".js"
+        "/web_gantt/static/lib/dhtmlxGantt/codebase/dhtmlxgantt.js",
+        "/web_gantt/static/lib/dhtmlxGantt/codebase/ext/dhtmlxgantt_click_drag.js",
+        "/web_gantt/static/lib/dhtmlxGantt/codebase/locale/locale" + locale_suffix + ".js"
     ],
     display_name: _lt('Gantt'),
     icon: 'fa-tasks',
@@ -50,7 +50,9 @@ var GanttView = BasicView.extend({
         Controller: GanttController,
         Renderer: GanttRenderer,
     }),
-    viewType: 'ganttdhx',
+    viewType: 'gantt',
+    mobile_friendly: false,
+
     /**
      * @override
      */
@@ -175,7 +177,7 @@ var GanttView = BasicView.extend({
     },
 });
 
-view_registry.add('ganttdhx', GanttView);
+view_registry.add('gantt', GanttView);
 
 return GanttView;
 

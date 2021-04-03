@@ -151,8 +151,7 @@
         <field name="name">rental.booking.gantt</field>
         <field name="model">rental.booking</field>
         <field name="arch" type="xml">
-            <ganttdhx
-                type="planning"
+            <gantt
                 string="Schedule"
                 date_start="date_from"
                 date_stop="date_to"
@@ -161,9 +160,10 @@
                 precision="{'day': 'hour:half', 'week': 'day:full', 'month': 'day:full', 'year': 'month:full'}"
                 default_scale="month"
                 default_group_by="resource_id"
+                decoration-warning="overlap_count > 0"
                 decoration-danger="overlap_count > 0">
                     <field name="overlap_count"/>
-            </ganttdhx>
+            </gantt>
         </field>
     </record>
 

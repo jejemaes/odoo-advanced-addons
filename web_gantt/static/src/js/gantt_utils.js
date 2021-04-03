@@ -1,4 +1,4 @@
-odoo.define('web_view_gantt.GanttUtils', function (require) {
+odoo.define('web_gantt.GanttUtils', function (require) {
 "use strict";
 
 var core = require('web.core');
