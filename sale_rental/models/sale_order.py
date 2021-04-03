@@ -37,7 +37,7 @@ class SaleOrder(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Rental Bookings'),
             'domain': [('sale_line_id', 'in', self.order_line.ids)],
-            'views': [(False, 'ganttdhx'), (False, 'kanban'), (False, 'tree'), (False, 'form')],
+            'views': [(False, 'gantt'), (False, 'kanban'), (False, 'tree'), (False, 'form')],
             'view_mode': 'gantt,kanban,tree,form',
             'res_model': 'rental.booking',
         }

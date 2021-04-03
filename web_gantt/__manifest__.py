@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Web View DHX Gantt",
+    'name': "Web DHX Gantt",
     'summary': """Gantt View using dhtmlx""",
     'description': """
 

@@ -1,4 +1,4 @@
-odoo.define('web_view_gantt.GanttRenderer', function (require) {
+odoo.define('web_gantt.GanttRenderer', function (require) {
 "use strict";
 
 var AbstractRenderer = require('web.AbstractRenderer');
@@ -8,7 +8,7 @@ var time = require('web.time');
 var qweb = require('web.QWeb');
 var session = require('web.session');
 var utils = require('web.utils');
-var GanttUtils = require('web_view_gantt.GanttUtils');
+var GanttUtils = require('web_gantt.GanttUtils');
 
 var _lt = core._lt;
 var QWeb = core.qweb;
@@ -16,9 +16,8 @@ var QWeb = core.qweb;
 // Allowed decoration on the list's rows: bold, italic and bootstrap semantics classes
 var DECORATIONS = [
     'decoration-danger',
-    // 'decoration-danger',
     // 'decoration-success',
-    // 'decoration-warning'
+    'decoration-warning'
 ];
 
 return AbstractRenderer.extend({

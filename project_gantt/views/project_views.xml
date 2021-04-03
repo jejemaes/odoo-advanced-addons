@@ -36,9 +36,9 @@
     <record id="project_task_view_gantt" model="ir.ui.view">
         <field name="name">Tasks Gantt</field>
         <field name="model">project.task</field>
-        <field name="type">ganttdhx</field>
+        <field name="type">gantt</field>
         <field name="arch" type="xml">
-            <ganttdhx
+            <gantt
                 type="planning"
                 string="Schedule"
                 date_start="planned_start_date"
@@ -51,7 +51,7 @@
     </record>
 
     <record id="project.act_project_project_2_project_task_all" model="ir.actions.act_window">
-        <field name="view_mode">kanban,tree,form,calendar,pivot,graph,ganttdhx,activity</field>
+        <field name="view_mode">kanban,tree,form,calendar,pivot,graph,gantt,activity</field>
     </record>
 
 </odoo>
