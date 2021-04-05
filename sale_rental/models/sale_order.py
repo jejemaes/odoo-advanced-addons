@@ -288,7 +288,7 @@ class SaleOrderLine(models.Model):
             'sale_line_id': self.id,
             'name': self.order_id.name,
             'resource_id': resource.id,
-            'date_from': self.rental_start_date + paddings['before'],
+            'date_from': self.rental_start_date - paddings['before'],
             'date_to': self.rental_stop_date + paddings['after'],
             'sale_order_id': self.order_id.id,
             'partner_id': self.order_partner_id.id,
