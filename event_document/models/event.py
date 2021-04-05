@@ -6,7 +6,7 @@ from odoo import api, fields, models
 class EventType(models.Model):
     _inherit = 'event.type'
 
-    document_folder_creation = fields.Boolean("Folder for Documents", help="When an event linked to this template is in a stage requiring a document folder, the folder will be generated.")
+    use_document_folder = fields.Boolean("Folder for Documents", help="When an event linked to this template is in a stage requiring a document folder, the folder will be generated.")
     document_tag_ids = fields.Many2many('document.tag', string="Default Document Tags", domain="[('id', 'in', document_selectable_tag_ids)]", store=True)
     document_selectable_tag_ids = fields.Many2many('document.tag', compute='_compute_document_selectable_tag_ids', store=False)
 
@@ -82,7 +82,7 @@ class Event(models.Model):
 
     def _generate_document_folder(self):
         for event in self:
-            if event.event_type_id.document_folder_creation and event.stage_id.document_folder_required and not event.document_folder_id:
+            if event.event_type_id.use_document_folder and event.stage_id.document_folder_required and not event.document_folder_id:
                 folder_values = event._prepare_document_folder_values()
                 folder = self.env['document.folder'].create(folder_values)
                 event.write({'document_folder_id': folder.id})
@@ -98,4 +98,4 @@ class Event(models.Model):
 class EventStage(models.Model):
     _inherit = 'event.stage'
 
-    document_folder_required = fields.Boolean("Required a Document Folder")
+    document_folder_required = fields.Boolean("Requires a Document Folder")
