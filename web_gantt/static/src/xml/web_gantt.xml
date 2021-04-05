@@ -2,7 +2,7 @@
 
     <div t-name="GanttView" class="o_gantt_view">
         <div class="container-fluid p-0">
-            <div t-att-id="widget.dhx_id"/>
+            <div t-att-id="widget.dhx_id" class="o_gantt_view_dhx"/>
         </div>
     </div>
 
