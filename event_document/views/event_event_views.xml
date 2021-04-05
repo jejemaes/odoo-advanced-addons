@@ -36,12 +36,12 @@
             <xpath expr="//sheet" position="inside">
                 <h2>Documents</h2>
                 <div class="row mt16 o_settings_container" name="event_type_document">
-                    <div class="col-12 col-lg-6 o_setting_box" name="document_folder_creation">
+                    <div class="col-12 col-lg-6 o_setting_box" name="use_document_folder">
                         <div class="o_setting_left_pane">
-                            <field name="document_folder_creation"/>
+                            <field name="use_document_folder"/>
                         </div>
                         <div class="o_setting_right_pane">
-                            <label for="document_folder_creation"/>
+                            <label for="use_document_folder"/>
                             <div class="row">
                                 <div class="col-lg-8 text-muted">
                                     Generate a document folder for events of this template when they arrive in a stage that required a folder.
