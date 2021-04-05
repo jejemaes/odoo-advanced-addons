@@ -1,4 +1,10 @@
 
+@media screen and (max-width: 576px) {
+    .o_gantt_view_dhx {
+      overflow: scroll;
+    }
+}
+
 
 .o_gantt_button_dates {
     display: inline-block;

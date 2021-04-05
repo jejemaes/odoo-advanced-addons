@@ -37,6 +37,7 @@ var locale_suffix = locale_code !== undefined ? '_' + locale_code : '';
 var GanttView = BasicView.extend({
     cssLibs: [
         "/web_gantt/static/lib/dhtmlxGantt/codebase/dhtmlxgantt.css",
+        "/web_gantt/static/lib/dhtmlxGantt/codebase/skins/dhtmlxgantt_material.css",
     ],
     jsLibs: [
         "/web_gantt/static/lib/dhtmlxGantt/codebase/dhtmlxgantt.js",
