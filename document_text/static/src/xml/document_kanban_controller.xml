@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-extend="DocumentKanbanView.buttons">
+        <t t-jquery=".o_document_kanban_btn_list_dropdown" t-operation="append">
+            <a class="dropdown-item o-kanban-button-new-document" data-handler="text">Text</a>
+        </t>
+    </t>
+
+</templates>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="document_document_action_report_document_text" model="ir.actions.report">
+            <field name="name">Document Text</field>
+            <field name="model">document.document</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">document_text.report_document_text</field>
+            <field name="report_file">document_text.report_document_text</field>
+            <field name="print_report_name">object.name</field>
+            <field name="binding_model_id" ref="document.model_document_document"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>
