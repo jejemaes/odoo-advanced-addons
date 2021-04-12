@@ -53,12 +53,16 @@
                     <field name="active" invisible="1"/>
                     <field name="res_id" invisible="1"/>
                     <field name="res_model" invisible="1"/>
-                    <group>
+                    <field name="handler" invisible="1"/>
+                    <group name="handler_attachment" attrs="{'invisible': [('handler', '!=', 'attachment')]}">
                         <group>
-                            <field name="raw_type" invisible="1"/>
                             <field name="type"/>
-                            <field name="datas" string="File" filename="name" attrs="{'invisible':[('type','=','url')], 'readonly': [('is_locked', '=', True)], 'required': [('type', '=', 'binary')]}"/>
+                            <field name="datas" string="File" filename="name" attrs="{'invisible':[('type','=','url')], 'readonly': [('is_locked', '=', True)], 'required': [('handler', '=', 'attachment'), ('type', '=', 'binary')]}"/>
                             <field name="url" attrs="{ 'invisible' : [('type', '!=', 'url')], 'readonly': [('is_locked', '=', True)], 'required': [('type', '=', 'url')]}"/>
+                        </group>
+                    </group>
+                    <group name="document_infos">
+                        <group>
                             <field name="folder_id" attrs="{'readonly': [('is_locked', '=', True)]}"/>
                             <field name="selectable_tag_ids" invisible="1"/>
                             <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}" domain="[('id', 'in', selectable_tag_ids)]" context="{'hierarchical_naming': True}"/>
@@ -71,7 +75,7 @@
                     </group>
                     <notebook>
                         <page string="Extra Infos">
-                            <group>
+                            <group name="extra_infos">
                                 <group>
                                     <field name="create_date"/>
                                     <field name="create_uid"/>
