@@ -48,7 +48,7 @@ class Document(models.Model):
     favorite_user_ids = fields.Many2many('res.users', 'document_document_user_favorite_rel', 'document_id', 'user_id', string="Favorites")
     tag_ids = fields.Many2many('document.tag', 'document_tag_rel', string="Tags", default=_default_tag_ids)
 
-    raw_type = fields.Selection([], string="Raw Type", help="Technical field to determine what is store in the 'raw' field.", default=None)
+    handler = fields.Selection([('attachment', 'Attachment')], string="Raw Type", default='attachment', required=True, help="Technical field to determine what is store in the 'raw' field.")
     res_model_name = fields.Char("Related Model Name", compute='_compute_res_model_name')
 
     is_locked = fields.Boolean("Is Locked", compute='_compute_is_locked')

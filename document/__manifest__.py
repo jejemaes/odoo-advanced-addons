@@ -24,4 +24,7 @@
         'views/document_menus.xml',
         'views/document_share_templates.xml',
     ],
+    'qweb': [
+        "static/src/xml/document_kanban_controller.xml",
+    ],
 }
