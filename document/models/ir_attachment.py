@@ -35,6 +35,12 @@ class IrAttachment(models.Model):
             attachments._document_generate()
         return attachments
 
+    def write(self, values):
+        resutl = super(IrAttachment, self).write(values)
+        if not self._context.get('document_no_create'):
+            if 'res_model' in values or 'res_id' in values:
+                self._document_generate()
+
     def _document_generate(self):
         res_model_attachment_map = {}
         for attachment in self:
