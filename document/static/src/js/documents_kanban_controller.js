@@ -40,10 +40,12 @@ var DocumentsKanbanController = KanbanController.extend({
         this._super(...arguments);
 
         // hide dropdown if empty
-        if (this.$buttons.find('.o_document_kanban_btn_list_dropdown > a').length === 1) {
-            this.$buttons.find('#o_document_kanban_btn_list').hide();
-        } else {
-            this.$buttons.on('click', '.o_document_kanban_btn_list_dropdown > a.o-kanban-button-new', this._onButtonNew.bind(this));
+        if (this.$buttons) { // if user has not the 'create' access right, buttons are undefined
+            if (this.$buttons.find('.o_document_kanban_btn_list_dropdown > a').length === 1) {
+                this.$buttons.find('#o_document_kanban_btn_list').hide();
+            } else {
+                this.$buttons.on('click', '.o_document_kanban_btn_list_dropdown > a.o-kanban-button-new', this._onButtonNew.bind(this));
+            }
         }
     },
     /**
