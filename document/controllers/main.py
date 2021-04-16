@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import base64
+import json
 import zipfile
 import io
 import logging
@@ -14,7 +15,7 @@ from werkzeug.exceptions import Forbidden
 
 from ast import literal_eval
 
-from odoo import http, fields, models
+from odoo import http, fields, models, _
 from odoo.http import request, content_disposition
 from odoo.osv import expression
 from odoo.tools import pycompat, consteq
@@ -34,6 +35,59 @@ class ShareRoute(http.Controller):
         zip_name = 'documents-%s' % fields.Date.to_string(fields.Date.today())
         ids_list = [int(x) for x in file_ids.split(',')]
         return self._document_make_zip(zip_name, request.env['document.document'].browse(ids_list).exists())
+
+    @http.route('/document/upload_file', type='http', methods=['POST'], auth="user")
+    def document_upload_file(self, ufile, **kwargs):
+        # default folder
+        default_folder_id = kwargs.get('folder_id', request.env['document.document'].default_get(['folder_id'])['folder_id'])
+        if not default_folder_id:
+            default_folder_id = request.env['document.folder'].search([], limit=1, order='sequence ASC').id
+
+        if not default_folder_id:
+            return json.dumps({'error': "Can not upload files as there is no default folder or no folder at all."})
+
+        try:
+            default_folder_id = int(default_folder_id)
+        except ValueError:
+            return json.dumps({'error': "Given folder is not valid."})
+
+        # default tags
+        candidate_tag_ids = []
+        tag_ids_str = kwargs.get('tag_ids', '')
+        if tag_ids_str:
+            candidate_tag_ids = tag_ids_str.split(',')
+
+        tag_ids = []
+        for tag_id in candidate_tag_ids:
+            try:
+                tag_ids.append(int(tag_id))
+            except ValueError:
+                return json.dumps({'error': _("Some tag does not exist.")})
+
+        # create documents
+        default_folder = request.env['document.folder'].browse(int(default_folder_id))
+        result = {'success': _("All files uploaded in %s") % (default_folder.name,)}
+
+        vals_list = []
+        files = request.httprequest.files.getlist('ufile')
+        for ufile in files:
+            try:
+                mimetype = ufile.content_type
+                datas = base64.encodebytes(ufile.read())
+                vals = {
+                    'name': ufile.filename,
+                    'mimetype': mimetype,
+                    'datas': datas,
+                    'folder_id': default_folder.id,
+                }
+                if tag_ids:
+                    vals['tag_ids'] = [(6, 0, tag_ids)]
+                vals_list.append(vals)
+            except Exception as e:
+                logger.exception("Fail to upload document %s" % ufile.filename)
+                result = {'error': str(e)}
+        documents = request.env['document.document'].create(vals_list)
+        return json.dumps(result)
 
     # ------------------------------------------------------------------
     # Frontend Page

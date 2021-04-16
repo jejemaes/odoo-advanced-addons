@@ -159,12 +159,6 @@ class Document(models.Model):
         else:
             self.tag_ids = self.tag_ids & self.selectable_tag_ids
 
-    @api.constrains('folder_id', 'tag_ids')
-    def _check_tag_in_folder(self):
-        for document in self:
-            if any(tag not in document.selectable_tag_ids for tag in document.tag_ids):
-                raise ValidationError(_("The document's tags must be in the folder ones."))
-
     def unlink(self):
         #  TODO Remove the related attachment
         if not self.user_has_groups('document.group_document_manager'):
