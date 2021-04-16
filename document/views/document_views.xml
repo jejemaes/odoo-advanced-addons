@@ -74,6 +74,11 @@
                         </group>
                     </group>
                     <notebook>
+                        <page string="Description">
+                            <group>
+                                <field name="description" nolabel="1"/>
+                            </group>
+                        </page>
                         <page string="Extra Infos">
                             <group name="extra_infos">
                                 <group>
