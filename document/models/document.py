@@ -154,7 +154,10 @@ class Document(models.Model):
 
     @api.onchange('folder_id')
     def _onchange_folder_id(self):
-        self.tag_ids = self._default_tag_ids()
+        if not self.tag_ids:
+            self.tag_ids = self._default_tag_ids()
+        else:
+            self.tag_ids = self.tag_ids & self.selectable_tag_ids
 
     @api.constrains('folder_id', 'tag_ids')
     def _check_tag_in_folder(self):

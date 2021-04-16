@@ -3,6 +3,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.tools.translate import _
+from odoo.osv import expression
 
 
 class Folder(models.Model):
@@ -48,7 +49,6 @@ class Folder(models.Model):
         for folder in self:
             folder.children_count = children_count_dict.get(folder.id, 0)
 
-
     @api.constrains('parent_id')
     def _check_parent_id(self):
         if not self._check_recursion():
@@ -64,6 +64,17 @@ class Folder(models.Model):
                     result.append((record.id, record.name))
             return result
         return super(Folder, self).name_get()
+
+    @api.model
+    def _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
+        if operator != 'ilike' or not name:
+            return super()._name_search(name=name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
+
+        domain = expression.AND([[('name', 'ilike', name)], args or []])
+        folders = self.env['document.folder'].search(expression.AND([[('name', 'ilike', name)], args or []]))
+        if folders:
+            domain = expression.OR([[('id', 'child_of', folders.ids)], domain])
+        return self._search(domain, limit=limit, access_rights_uid=name_get_uid)
 
     def action_view_subfolders(self):
         action = self.env.ref('document.document_folder_action_directories').read()[0]
