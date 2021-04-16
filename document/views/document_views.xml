@@ -160,11 +160,12 @@
                                         </t>
                                         <field name="name" class="o_text_overflow"/>
                                     </div>
-                                    <div class="o_kanban_record_body">
+                                    <div>
                                         <t t-if="record.type.raw_value == 'url'">
                                             <span class="o_document_url">
-                                                <i class="fa fa-globe" aria-label="Document url"/>
-                                                <a t-att-href="record.url.raw_value" target="blank"><t t-esc="record.url.raw_value"/></a>
+                                                <i class="fa fa-globe" aria-label="Document url">
+                                                    <a t-att-href="record.url.raw_value" target="blank"><t t-esc="record.url.raw_value"/></a>
+                                                </i>
                                             </span>
                                         </t>
                                         <samp t-else="" class="text-muted"> </samp>
