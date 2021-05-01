@@ -25,6 +25,7 @@ class Tags(models.Model):
     _name = "document.tag"
     _description = "Tag"
     _order = "sequence, name"
+    _rec_name = 'name'
 
     name = fields.Char("Name", required=True, translate=True)
     folder_id = fields.Many2one('document.folder', string="Folder", related='facet_id.folder_id', store=True, readonly=False)
@@ -43,3 +44,13 @@ class Tags(models.Model):
                 result.append((record.id, "%s: %s" % (record.facet_id.name, record.name)))
             return result
         return super(Tags, self).name_get()
+
+    @api.model
+    def _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
+        args = list(args or [])
+        domain = []
+        if not (name == '' and operator == 'ilike'):
+            domain = [(self._rec_name, operator, name)]
+        if (name or '').strip() and operator in ['like', 'ilike', 'not like', 'not ilike']:
+            domain = expression.OR([[('facet_id.name', operator, name)], domain])
+        return self._search(expression.AND([domain, args]), limit=limit, access_rights_uid=name_get_uid)
