@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import base64
-from collections import OrderedDict
+from collections import defaultdict
+import itertools
 import os
 import mimetypes
 import re
@@ -31,7 +32,7 @@ class Document(models.Model):
     def _default_tag_ids(self):
         return self.env.company.document_default_tag_ids.ids
 
-    attachment_id = fields.Many2one('ir.attachment', "Attachment", ondelete='cascade', required=True)
+    attachment_id = fields.Many2one('ir.attachment', "Attachment", ondelete='cascade', required=True, auto_join=True)
     name = fields.Char(related='attachment_id.name', inherited=True, readonly=True)  # as it now contents the filename (with the extension required to server file properly), better to make it readonly
     url = fields.Char(related='attachment_id.url', inherited=True, readonly=False)
     description = fields.Text(related='attachment_id.description', inherited=True, readonly=False)
@@ -165,6 +166,80 @@ class Document(models.Model):
             if any(document.lock_uid and document.lock_uid != self.env.user for document in self):
                 raise UserError(_("Locked Document can not be removed"))
         return super(Document, self).unlink()
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        ids = super(Document, self)._search(args, offset=offset, limit=limit, order=order,
+                                                count=False, access_rights_uid=access_rights_uid)
+
+        if self.env.is_superuser():
+            # rules do not apply for the superuser
+            return len(ids) if count else ids
+
+        if not ids:
+            return 0 if count else []
+
+        # Work with a set, as list.remove() is prohibitive for large lists of documents
+        # (takes 20+ seconds on a db with 100k docs during search_count()!)
+        orig_ids = ids
+        ids = set(ids)
+
+        # For attachments, the permissions of the document they are attached to
+        # apply, so we must remove attachments for which the user cannot access
+        # the linked document.
+        # Use pure SQL rather than read() as it is about 50% faster for large dbs (100k+ docs),
+        # and the permissions are checked in super() and below anyway.
+        model_documents = defaultdict(lambda: defaultdict(set))   # {res_model: {res_id: set(ids)}}
+        binary_fields_attachments = set()
+        self._cr.execute("""
+            SELECT D.id, A.res_model, A.res_id, A.public, A.res_field
+            FROM ir_attachment A
+                LEFT JOIN document_document D ON (D.attachment_id = A.id)
+            WHERE D.id IN %s""", [tuple(ids)])
+        for row in self._cr.dictfetchall():
+            if not row['res_model'] or row['public']:
+                continue
+            # model_documents = {res_model: {res_id: set(ids)}}
+            model_documents[row['res_model']][row['res_id']].add(row['id'])
+            # Should not retrieve binary fields attachments
+            if row['res_field']:
+                binary_fields_attachments.add(row['id'])
+
+        if binary_fields_attachments:
+            ids.difference_update(binary_fields_attachments)
+
+        # To avoid multiple queries for each attachment found, checks are
+        # performed in batch as much as possible.
+        for res_model, targets in model_documents.items():
+            if res_model not in self.env:
+                continue
+            if not self.env[res_model].check_access_rights('read', False):
+                # remove all corresponding attachment ids
+                ids.difference_update(itertools.chain(*targets.values()))
+                continue
+            # filter ids according to what access rules permit
+            target_ids = list(targets)
+            allowed = self.env[res_model].with_context(active_test=False).search([('id', 'in', target_ids)])
+            for res_id in set(target_ids).difference(allowed.ids):
+                ids.difference_update(targets[res_id])
+
+        # sort result according to the original sort ordering
+        result = [id for id in orig_ids if id in ids]
+
+        # If the original search reached the limit, it is important the
+        # filtered record set does so too. When a JS view receive a
+        # record set whose length is below the limit, it thinks it
+        # reached the last page. To avoid an infinite recursion due to the
+        # permission checks the sub-call need to be aware of the number of
+        # expected records to retrieve
+        if len(orig_ids) == limit and len(result) < self._context.get('need', limit):
+            need = self._context.get('need', limit) - len(result)
+            result.extend(self.with_context(need=need)._search(args, offset=offset + len(orig_ids),
+                                       limit=limit, order=order, count=count,
+                                       access_rights_uid=access_rights_uid)[:limit - len(result)])
+
+        return len(result) if count else list(result)
+
 
     @api.model
     def search_panel_select_range(self, field_name, **kwargs):
