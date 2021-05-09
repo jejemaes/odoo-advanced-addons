@@ -10,7 +10,15 @@ class EventType(models.Model):
     _inherit = 'event.type'
 
     use_project = fields.Boolean("Organize with a Project", default=False, help="Organize the event with a project and tasks to do.")
+    use_project_mode = fields.Selection([
+        ('new_project', 'Create a New Project'),
+        ('existing_project', 'Existing Project'),
+    ], string="Project Usage Mode")
 
+    # existing project
+    project_id = fields.Many2one('project.project', string="Project", ondelete="set null")
+
+    # new project
     project_start_date_delay = fields.Integer("Project Start Date Delay", default=1)
     project_start_date_unit = fields.Selection([
         ('days', 'Day(s)'),
@@ -35,8 +43,19 @@ class EventType(models.Model):
 
     @api.onchange('use_project')
     def _onchange_use_project(self):
-        if self.use_project:
-            self.use_analytic = True
+        if not self.use_project:
+            self.use_project_mode = False
+        else:
+            self.use_project_mode = 'existing_project'
+
+    @api.onchange('use_project_mode')
+    def _onchange_use_project_mode(self):
+        if self.use_project_mode:
+            if self.use_project_mode == 'existing_project':
+                self.project_id = False
+                self.use_analytic = False
+            else:
+                self.use_analytic = True
 
     @api.constrains('use_analytic', 'use_project')
     def _check_analytic_account(self):
@@ -47,10 +66,15 @@ class EventType(models.Model):
     @api.constrains('use_project', 'project_start_date_delay', 'project_start_date_unit', 'project_start_date_trigger', 'project_stop_date_delay', 'project_stop_date_unit', 'project_stop_date_trigger')
     def _check_use_project_config(self):
         for event_type in self:
-            if event_type.use_project:
+            if event_type.use_project and not event_type.use_project_mode:
+                raise ValidationError(_("A project mode must be chosen as you want to use project."))
+            if event_type.use_project_mode == 'new_project':
                 for fname in ['project_start_date_delay', 'project_start_date_unit', 'project_start_date_trigger', 'project_stop_date_delay', 'project_stop_date_unit', 'project_stop_date_trigger']:
                     if not event_type[fname]:
                         raise ValidationError(_("As the event template is using project, the period fields to setup begin and end dates of the project must be set."))
+            if event_type.use_project_mode == 'existing_project':
+                if not event_type.project_id:
+                    raise ValidationError(_("A project must be chosen as you want to organize your events in an existing project."))
 
 
 class EventEvent(models.Model):
@@ -104,6 +128,9 @@ class EventEvent(models.Model):
             context = safe_eval(action['context'], eval_context)
         action['context'] = context
 
+        action['context']['default_event_id'] = self.id
+        action['context']['search_default_event_id'] = self.id
+
         domain = []
         if action.get('domain'):
             domain = safe_eval(action['domain'], eval_context)
@@ -116,12 +143,15 @@ class EventEvent(models.Model):
     # --------------------------------------------------
 
     def _generate_project(self):
+        projects = self.env['project.project']
         for event in self:
             if event.stage_id.project_required and event.event_type_id.use_project and not event.project_id:
                 event._generate_analytic_account(force_create=True)  # force the project to have an analytic account
                 values = event._prepare_project_values()
                 project = self.env['project.project'].sudo().create(values)
                 event.write({'project_id': project.id})
+                projects |= project
+        return projects
 
     def _prepare_project_values(self):
         event_type = self.event_type_id

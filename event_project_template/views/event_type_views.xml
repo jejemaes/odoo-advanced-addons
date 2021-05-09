@@ -6,7 +6,7 @@
         <field name="model">event.type</field>
         <field name="inherit_id" ref="event_project.event_type_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='event_project_details']" position="inside">
+            <xpath expr="//div[@name='event_new_project_details']" position="inside">
                  <div class="col-lg-12 col-12">
                     <label for="project_template_id" string="Template"/>
                     <field name="project_template_id" class="oe_inline" nolabel="1" options="{'no_create': True}"/>

@@ -19,7 +19,13 @@
                             </div>
                         </div>
                         <div class="row mt16" attrs="{'invisible': [('use_project', '=', False)]}">
-                            <div name="event_project_details">
+                            <div class="col-lg-8">
+                                <label for="use_project_mode" string="Mode"/>
+                                <field name="use_project_mode" attrs="{'required': [('use_project', '=', True)]}"/>
+                            </div>
+                        </div>
+                        <div class="row mt16" attrs="{'invisible': [('use_project_mode', '!=', 'new_project')]}">
+                            <div name="event_new_project_details">
                                 <div class="col-lg-12 col-12">
                                     <label for="project_start_date_delay" string="Start Date"/>
                                     <field name="project_start_date_delay" class="oe_inline col-1" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
@@ -31,6 +37,14 @@
                                     <field name="project_stop_date_delay" class="oe_inline col-1" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
                                     <field name="project_stop_date_unit" class="oe_inline" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
                                     <field name="project_stop_date_trigger" class="oe_inline ml-2" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt16" attrs="{'invisible': [('use_project_mode', '!=', 'existing_project')]}">
+                            <div name="event_existing_project_details">
+                                <div class="col-lg-12 col-12">
+                                    <label for="project_id" string="Project"/>
+                                    <field name="project_id" options="{'no_create': True}"/>
                                 </div>
                             </div>
                         </div>

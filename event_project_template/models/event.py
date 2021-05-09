@@ -15,6 +15,13 @@ class EventType(models.Model):
 class EventEvent(models.Model):
     _inherit = 'event.event'
 
+    def _generate_project(self):
+        projects = super(EventEvent, self)._generate_project()
+        for event in self:
+            if event.project_id:
+                event.project_id.tasks.write({'event_id': event.id})
+        return projects
+
     def _prepare_project_values(self):
         result = super(EventEvent, self)._prepare_project_values()
         if self.event_type_id.project_template_id:
