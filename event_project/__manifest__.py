@@ -11,5 +11,6 @@
     'data': [
         'views/event_type_views.xml',
         'views/event_views.xml',
+        'views/project_views.xml',
     ],
 }
