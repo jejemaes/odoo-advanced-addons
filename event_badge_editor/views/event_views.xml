@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="event_event_view" model="ir.ui.view">
+        <field name="name">event.event.form.badge</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='stage_id']" position="before">
+                <button name="action_edit_editor" type="object" string="Edit Badge"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="event_event_view_form_badge" model="ir.ui.view">
+        <field name="name">event.event.form</field>
+        <field name="model">event.event</field>
+        <field name="arch" type="xml">
+            <form string="Events" class="o_event_form_view">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" string="Event Name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <field name="badge_front"/>
+                        <field name="badge_back"/>
+                    </group>
+                    <group>
+                        <field name="badge_innerleft"/>
+                        <field name="badge_innerright"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
