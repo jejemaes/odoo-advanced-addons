@@ -13,3 +13,17 @@ class EventEvent(models.Model):
     def _compute_use_registration(self):
         for event in self:
             event.use_registration = event.event_type_id.use_registration
+
+    def action_edit_editor(self):
+        self.ensure_one()
+        view_form_id = self.env.ref('event_advanced.event_event_view_form_badge').id
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Edit Badge'),
+            'display_name': _('Edit Badge'),
+            'view_mode': 'form',
+            'views': [(view_form_id, 'form')],
+            'res_model': self._name,
+            'res_id': self.id,
+            'context': self.env.context,
+        }
