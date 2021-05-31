@@ -6,6 +6,7 @@
     'description': """
         Advanced options for Events:
         - Allow to disable registration
+        - Use QRCode on registration
         - ...
     """,
     'author': "jejemaes",
@@ -17,5 +18,7 @@
     'data': [
         'views/event_event_views.xml',
         'views/event_type_views.xml',
+        'views/event_registration_qrcode_templates.xml',
+        'report/event_report_templates.xml',
     ],
 }
