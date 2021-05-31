@@ -8,7 +8,7 @@
         <field name="priority">15</field>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='event_type_attendees_tickets']" position="before">
-                <div class="col-12 o_setting_box" name="event_type_attendees_registration">
+                <div class="col-6 o_setting_box" name="event_type_attendees_registration">
                     <div class="o_setting_left_pane">
                         <field name="use_registration"/>
                     </div>
@@ -17,6 +17,19 @@
                         <div class="row">
                             <div class="col-lg-8 text-muted">
                                 Allow people to register to the event. This activate the attendees managment.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 o_setting_box" name="event_type_attendees_qrcode" attrs="{'invisible': [('use_registration', '=', False)]}">
+                    <div class="o_setting_left_pane">
+                        <field name="use_qrcode"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="use_qrcode"/>
+                        <div class="row">
+                            <div class="col-lg-8 text-muted">
+                                Add a QRCode to confirm the attendee on the registration badge
                             </div>
                         </div>
                     </div>

@@ -27,7 +27,10 @@
                 <attribute name="attrs">{'invisible': [('use_registration', '=', False)]}</attribute>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page name="advanced_settings" invisible="1" string="Advanced Settings">
+                <page name="advanced_settings" string="Advanced Settings">
+                    <group name="badge_settings" string="Badge">
+                        <field name="use_qrcode"/>
+                    </group>
                     <group name="advanced_settings_general"></group>
                 </page>
             </xpath>

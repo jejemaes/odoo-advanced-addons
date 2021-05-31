@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_registration_badge" inherit_id="event.event_registration_report_template_badge" priority="1">
+        <xpath expr="//div[@id='o_event_name']" position="after">
+            <div class="col-12" t-if="o.event_id.use_qrcode">
+                <div class="text-center justify-content-center">
+                    <img t-attf-src="data:image/png;base64,#{o.qrcode}" alt="QRCode" class="img-fluid"/>&amp;nbsp;
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="report_event_template_badge" inherit_id="event.event_event_report_template_badge" priority="1">
+        <xpath expr="//div[@id='o_event_attendee_name']" position="after">
+            <div class="col-12">
+                <div style="background: lightgrey;" class="text-center">
+                    <h1 class="text-center mt0"><i class="fa-2x fa fa-qrcode" title="QRCode" role="img" aria-label="QRCode"/></h1>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>
