@@ -68,6 +68,11 @@
                         <label for="name" class="oe_edit_only" string="Event Name"/>
                         <h1><field name="name" readonly="1"/></h1>
                     </div>
+                    <div class='alert alert-info' role="alert">
+                        <p>
+                            Depending on the email template chosen to send badge to attendees, some parts might not be visible on the badge.
+                        </p>
+                    </div>
                     <group>
                         <field name="badge_front"/>
                         <field name="badge_back"/>

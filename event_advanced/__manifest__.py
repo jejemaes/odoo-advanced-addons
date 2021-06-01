@@ -19,6 +19,7 @@
         'views/event_event_views.xml',
         'views/event_type_views.xml',
         'views/event_registration_qrcode_templates.xml',
+        'report/event_reports.xml',
         'report/event_report_templates.xml',
     ],
 }
