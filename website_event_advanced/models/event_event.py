@@ -8,6 +8,8 @@ from odoo.addons.http_routing.models.ir_http import slug
 class EventEvent(models.Model):
     _inherit = 'event.event'
 
+    registration_phone_mandatory = fields.Boolean("Phone Mandatory on Registration")
+
     @api.onchange('use_registration')
     def _onchange_use_registration(self):
         if not self.use_registration:

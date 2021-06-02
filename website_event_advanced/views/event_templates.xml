@@ -8,19 +8,32 @@
     </template>
 
     <!--
-    	Limit "registrable" seats during a reservation
-	-->
-	<template id="registration_template" inherit_id="website_event.registration_template">
-		<xpath expr="//div[@id='o_wevent_tickets_collapse']//t[@t-set='seats_max']" position="after">
-			<t t-if="ticket.seats_registration_limit">
-				<t t-set="seats_max" t-value="min(seats_max, ticket.seats_registration_limit + 1)"/>
-			</t>
-		</xpath>
-		<xpath expr="//div[hasclass('o_wevent_registration_single')]//t[@t-set='seats_max']" position="after">
-			<t t-if="tickets.seats_registration_limit">
-				<t t-set="seats_max" t-value="min(seats_max, tickets.seats_registration_limit + 1)"/>
-			</t>
-		</xpath>
-	</template>
+        Limit "registrable" seats during a reservation
+    -->
+    <template id="registration_template" inherit_id="website_event.registration_template">
+        <xpath expr="//div[@id='o_wevent_tickets_collapse']//t[@t-set='seats_max']" position="after">
+            <t t-if="ticket.seats_registration_limit">
+                <t t-set="seats_max" t-value="min(seats_max, ticket.seats_registration_limit + 1)"/>
+            </t>
+        </xpath>
+        <xpath expr="//div[hasclass('o_wevent_registration_single')]//t[@t-set='seats_max']" position="after">
+            <t t-if="tickets.seats_registration_limit">
+                <t t-set="seats_max" t-value="min(seats_max, tickets.seats_registration_limit + 1)"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!--
+        Make the phone mandatory on registration
+    -->
+    <template id="registration_attendee_details_questions" inherit_id="website_event.registration_attendee_details" name="Registration Attendee Details with questions">
+        <xpath expr="//input[@ t-attf-name='#{counter}-phone']/.." position="replace">
+            <div class="col-lg my-2">
+                <label>Phone <small t-if="not ticket['ticket'].event_id.registration_phone_mandatory">(Optional)</small></label>
+                <input class="form-control" type="tel" t-attf-name="#{counter}-phone" t-if="not ticket['ticket'].event_id.registration_phone_mandatory"/>
+                <input class="form-control" type="tel" t-attf-name="#{counter}-phone" required="This field is mandatory." t-if="ticket['ticket'].event_id.registration_phone_mandatory"/>
+            </div>
+        </xpath>
+    </template>
 
 </odoo>

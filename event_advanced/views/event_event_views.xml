@@ -28,10 +28,11 @@
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="advanced_settings" string="Advanced Settings">
-                    <group name="badge_settings" string="Badge">
-                        <field name="use_qrcode"/>
+                    <group name="advanced_settings_general">
+                        <group name="various_settings" string="Various">
+                            <field name="use_qrcode"/>
+                        </group>
                     </group>
-                    <group name="advanced_settings_general"></group>
                 </page>
             </xpath>
             <!-- Badge edition -->
