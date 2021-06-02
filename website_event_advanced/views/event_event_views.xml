@@ -13,6 +13,9 @@
             <xpath expr="//field[@name='menu_register_cta']" position="attributes">
                 <attribute name="attrs">{'invisible': [('use_registration', '=', False)]}</attribute>
             </xpath>
+            <xpath expr="//field[@name='use_qrcode']" position="after">
+                <field name="registration_phone_mandatory"/>
+            </xpath>
         </field>
     </record>
 
