@@ -7,4 +7,20 @@
         </xpath>
     </template>
 
+    <!--
+    	Limit "registrable" seats during a reservation
+	-->
+	<template id="registration_template" inherit_id="website_event.registration_template">
+		<xpath expr="//div[@id='o_wevent_tickets_collapse']//t[@t-set='seats_max']" position="after">
+			<t t-if="ticket.seats_registration_limit">
+				<t t-set="seats_max" t-value="min(seats_max, ticket.seats_registration_limit + 1)"/>
+			</t>
+		</xpath>
+		<xpath expr="//div[hasclass('o_wevent_registration_single')]//t[@t-set='seats_max']" position="after">
+			<t t-if="tickets.seats_registration_limit">
+				<t t-set="seats_max" t-value="min(seats_max, tickets.seats_registration_limit + 1)"/>
+			</t>
+		</xpath>
+	</template>
+
 </odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+
+    <!-- EVENT.TYPE.TICKET -->
+    <record id="event_type_ticket_view_tree_from_type" model="ir.ui.view">
+        <field name="name">event.type.ticket.tree</field>
+        <field name="model">event.type.ticket</field>
+        <field name="inherit_id" ref="event.event_type_ticket_view_tree_from_type"/>
+        <field name="arch" type="xml">
+            <field name="seats_max" position="after">
+                <field name="seats_registration_limit"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="event_type_ticket_view_form_from_type" model="ir.ui.view">
+        <field name="name">event.type.ticket.form</field>
+        <field name="model">event.type.ticket</field>
+        <field name="inherit_id" ref="event.event_type_ticket_view_form_from_type"/>
+        <field name="arch" type="xml">
+            <field name="seats_max" position="after">
+                <field name="seats_registration_limit"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- EVENT.TICKET -->
+    <record id="event_event_ticket_view_tree_from_event" model="ir.ui.view">
+        <field name="name">event.event.ticket.tree</field>
+        <field name="model">event.event.ticket</field>
+        <field name="inherit_id" ref="event.event_event_ticket_view_tree_from_event"/>
+        <field name="arch" type="xml">
+            <field name="seats_max" position="after">
+                <field name="seats_registration_limit"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="event_event_ticket_view_form_from_event" model="ir.ui.view">
+        <field name="name">event.event.ticket.tree</field>
+        <field name="model">event.event.ticket</field>
+        <field name="inherit_id" ref="event.event_event_ticket_view_form_from_event"/>
+        <field name="arch" type="xml">
+            <field name="seats_max" position="after">
+                <field name="seats_registration_limit"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="event_event_ticket_form_view" model="ir.ui.view">
+        <field name="name">event.event.ticket.form</field>
+        <field name="model">event.event.ticket</field>
+        <field name="inherit_id" ref="event.event_event_ticket_form_view"/>
+        <field name="arch" type="xml">
+            <field name="seats_max" position="after">
+                <field name="seats_registration_limit"/>
+            </field>
+        </field>
+    </record>
+</data></odoo>
+
