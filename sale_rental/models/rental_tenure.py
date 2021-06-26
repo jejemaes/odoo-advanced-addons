@@ -19,7 +19,7 @@ class ProductRentalTenure(models.Model):
     tenure_type = fields.Selection(related='product_template_id.rental_tenure_type', store=True)
     currency_id = fields.Many2one('res.currency', "Currency", related='product_template_id.currency_id')
     base_price = fields.Monetary("Base Rent Price", required=True, default=1)
-    rent_price = fields.Monetary("Rent Price", compute='_compute_rent_price')
+    rent_price = fields.Float("Rent Price", compute='_compute_rent_price', help="This amount is expressed in the currency of the pricelist, or (fallback) in product currency.")
     sequence = fields.Integer("Sequence", default=5)
 
     duration_value = fields.Integer("Tenue")
@@ -49,23 +49,29 @@ class ProductRentalTenure(models.Model):
             if tenure.tenure_type == 'duration':
                 tenure.tenure_name = '%s %s' % (tenure.duration_value, dict(self._fields['duration_uom']._description_selection(self.env))[tenure.duration_uom])
             elif tenure.tenure_type == 'weekday':
-                tenure.tenure_name = ', '.join(tenure.weekday_ids.mapped('shortname'))
+                tenure.tenure_name = ', '.join(tenure.sudo().weekday_ids.mapped('shortname'))
             else:
                 tenure.tenure_name = False
 
     @api.depends('base_price')
-    @api.depends_context('pricelist_id', 'quantity', 'uom_id', 'date_order')
+    @api.depends_context('pricelist_id', 'quantity', 'date_order')
     def _compute_rent_price(self):
-        # TODO here we must start the pricelist integeration
+        """ This will show the price for one unit of the tenure, with the pricelist (if given in context) applied. No tax is applied here. """
         pricelist_id = self._context.get('pricelist_id', False)
-        currency_id = self._context.get('currency_id', False)
-        quantity = self._context.get('quantity', 1)
-        uom_id = self._context.get('uom_id', False)
         date_order = self._context.get('date_order', False)
 
+        tenure_price_map = {}  # if no pricelist, this map is not updated
+
+        pricelist = None
+        if pricelist_id:
+            pricelist = self.env['product.pricelist'].browse(pricelist_id)
+
+            price_data_map = self._get_pricelist_price_data(pricelist, date=date_order)
+            for tenure in self:
+                tenure_price_map[tenure.id] = price_data_map[tenure.id]['price_list']
+
         for tenure in self:
-            currency = self.env['res.currency'].browse(currency_id)
-            tenure.rent_price = tenure.base_price
+            tenure.rent_price = tenure_price_map.get(tenure.id, tenure.base_price)
 
     @api.depends('weekday_ids')
     def _compute_weekday_selectable_ids(self):
@@ -166,6 +172,34 @@ class ProductRentalTenure(models.Model):
         for tenure in self:
             res.append((tenure.id, tenure.tenure_name))
         return res
+
+    # ----------------------------------------------------------------------------
+    # Pricing Helper Methods
+    # ----------------------------------------------------------------------------
+
+    def _get_pricelist_price_data(self, pricelist, date=False):
+        """ Get pricelist data (unit price, base price and discount) for one unit of given tenure. All amounts here
+            are converted in pricelist currency.
+            :param pricelist : product.pricelist record to apply on tenure price
+            :returns a dict with tenure ID as key, and the following dict as value such as:
+                'price_base': the converted price in PL currency
+                'price_list': price with the currency applied
+                'discount': percentage of discount that should be applied on 'price_base' to get 'price_list'
+        """
+        result = {}
+        tenure_product_map = dict.fromkeys(self.mapped('product_template_id'), self.env['product.rental.tenure'])
+        for tenure in self:
+            tenure_product_map[tenure.product_template_id] |= tenure
+
+        for product_template, tenures in tenure_product_map.items():
+            sorted_tenures = tenures.sorted(key=lambda r: r.id)
+            price_list = [t.base_price for t in sorted_tenures]
+
+            converted_price_data_list = pricelist.apply_rental_pricelist_on_template(product_template, price_list, date=date, quantity=1.0)
+            for tenure, price_data in zip(sorted_tenures, converted_price_data_list):
+                result[tenure.id] = price_data
+
+        return result
 
     # ----------------------------------------------------------------------------
     # Helper Methods

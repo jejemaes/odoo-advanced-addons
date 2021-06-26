@@ -139,7 +139,7 @@
         <field name="name">rental.booking.calendar</field>
         <field name="model">rental.booking</field>
         <field name="arch" type="xml">
-            <calendar string="Rental Orders" date_start="date_from" date_stop="date_to" color="resource_color">
+            <calendar string="Rental Orders" date_start="date_from" date_stop="date_to" color="resource_color" mode="month">
                 <field name="display_name"/>
                 <field name="partner_id"/>
                 <field name="resource_id"/>

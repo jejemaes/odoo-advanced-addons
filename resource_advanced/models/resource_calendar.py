@@ -14,6 +14,14 @@ from odoo.addons.resource.models.resource import Intervals
 from odoo.addons.resource.models.resource_mixin import timezone_datetime
 
 
+def _fix_border_intervals(date_interval_list):
+    result = []
+    for start, stop in date_interval_list:
+        if start != stop:
+            result.append((start, stop))
+    return result
+
+
 class ResourceCalendar(models.Model):
     _inherit = 'resource.calendar'
 
@@ -51,6 +59,19 @@ class ResourceCalendar(models.Model):
                     raise ValidationError(_("A Full day work calendar can not have the 2 weeks mode activated."))
                 if not calendar.working_day_ids:
                     raise ValidationError(_("A Full day work calendar must have working days defined."))
+
+    # --------------------------------------------------
+    # Public API
+    # --------------------------------------------------
+
+    def get_work_intervals(self, start_dt, end_dt, resource=None, domain=None, tz=None):
+        if resource is None:
+            resource = self.env['resource.resource']
+        work_intervals = self._work_intervals_batch(
+            start_dt, end_dt, resources=resource, domain=domain, tz=tz
+        )[resource.id]
+
+        return [(start, stop) for start, stop, meta in work_intervals]
 
     # --------------------------------------------------
     # Computation API
@@ -123,7 +144,13 @@ class ResourceCalendar(models.Model):
         """
         if not domain:
             domain = self.env['resource.calendar.leaves'].get_unavailable_domain()
-        return super(ResourceCalendar, self)._unavailable_intervals_batch(start_dt, end_dt, resources=resources, domain=domain, tz=tz)
+        result = super(ResourceCalendar, self)._unavailable_intervals_batch(start_dt, end_dt, resources=resources, domain=domain, tz=tz)
+
+        # odoo native method returns interval with same start and stop dates
+        new_result = {}
+        for key, values in result.items():
+            new_result[key] = _fix_border_intervals(values)
+        return new_result
 
     def _available_intervals_batch(self, start_dt, end_dt, resources=None, domain=None, tz=None):
         """ Return the effective work intervals between the given datetimes. """

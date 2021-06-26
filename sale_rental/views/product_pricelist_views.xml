@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Pricelist item
+    -->
+    <record id="product_pricelist_item_view_form" model="ir.ui.view">
+        <field name="name">product.pricelist.item.form.rental</field>
+        <field name="inherit_id" ref="product.product_pricelist_item_form_view"/>
+        <field name="model">product.pricelist.item</field>
+        <field name="arch" type="xml">
+            <xpath expr="//h1" position="after">
+                <group>
+                    <field name="applicable_on" widget="radio" options="{'horizontal': true}"/>
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='pricelist_rule_base']" position="attributes">
+                <attribute name="attrs">{'invisible': [('applicable_on', '=', 'rent')]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='pricelist_rule_base']" position="after">
+                <group name="pricelist_rule_base_rental" attrs="{'invisible': [('applicable_on', '=', 'sale')]}">
+                    <field name="fixed_price" attrs="{'invisible':[('compute_price', '!=', 'fixed')]}"/>
+                    <label for="percent_price" attrs="{'invisible':[('compute_price', '!=', 'percentage')]}"/>
+                    <div attrs="{'invisible':[('compute_price', '!=', 'percentage')]}">
+                    <field name="percent_price"
+                        class="oe_inline"
+                        attrs="{'invisible':[('compute_price', '!=', 'percentage')]}"/>
+                      %%
+                    </div>
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='pricelist_rule_advanced']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('compute_price', '!=', 'formula'), ('applicable_on', '=', 'rent')]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='pricelist_rule_advanced']" position="after">
+                <group name="pricelist_rule_advanced_rental" col="6" attrs="{'invisible':['|', ('applicable_on', '=', 'sale'), ('compute_price', '!=', 'formula')]}" groups="product.group_sale_pricelist">
+                  <label for="base" string="New Price = "/>
+                  <div>
+                      <span attrs="{'invisible':[('base', '!=', 'list_price')]}">Rent Price  -  </span>
+                  </div>
+                  <label for="price_discount"/>
+                  <div class="o_row">
+                      <field name="price_discount"/>
+                      <span>%%</span>
+                  </div>
+                  <label string=" + " for="price_surcharge"/>
+                  <field name="price_surcharge" nolabel="1"/>
+
+                  <field name="price_round" string="Rounding Method"/>
+                  <field name="price_min_margin" string="Min. Margin"/>
+                  <field name="price_max_margin" string="Max. Margin"/>
+              </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+        Pricelist : items list, add 'applicable_on' as first column, whatever the user groups are.
+    -->
+    <record id="product_pricelist_view_form" model="ir.ui.view">
+        <field name="model">product.pricelist</field>
+        <field name="name">product.pricelist.form.renal.inheirit.items</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="groups_id" eval="[(4, ref('product.group_sale_pricelist'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='item_ids']/tree//field[@name='name']" position="before">
+                <field name="applicable_on"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_pricelist_view_form_inherit" model="ir.ui.view">
+        <field name="model">product.pricelist</field>
+        <field name="name">product.pricelist.form.renal.inheirit.items</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="priority">2</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='item_ids']/tree//field[@name='product_tmpl_id']" position="before">
+                <field name="applicable_on"/>
+            </xpath>
+        </field>
+    </record>
+    <!--
+
+    <record id="product_pricelist_view_form" model="ir.ui.view">
+        <field name="name">product.pricelist.form.renal</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="model">product.pricelist</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_tmpl_id']" position="before">
+                <field name="applicable_on"/>
+            </xpath>
+        </field>
+    </record> -->
+
+</odoo>

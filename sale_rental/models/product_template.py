@@ -232,9 +232,10 @@ class ProductTemplate(models.Model):
     def _tenure_weekday_price_combinaison(self, start_dt, end_dt, currency_dst):
         assert start_dt <= end_dt, "Start dates must be before the end date."
 
+        # TODO: not sure this is right
         tzinfo = start_dt.tzinfo
-        start_dt = start_of(start_dt, 'day').replace(tzinfo=tzinfo)
-        end_dt = end_of(end_dt, 'day').replace(tzinfo=tzinfo)
+        start_dt = start_dt.replace(tzinfo=tzinfo)
+        end_dt = end_dt.replace(tzinfo=tzinfo)
 
         cost = 0.0
         combinaison = []
