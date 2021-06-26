@@ -38,7 +38,7 @@ class Resource(models.Model):
             stop = timezone_datetime(fields.Datetime.from_string(end_dt))
             unavailable_map = self.get_unavailable_intervals(start, stop)
             for resource in self:
-                resource.is_available = bool(unavailable_map.get(resource.id, False))
+                resource.is_available = not bool(unavailable_map.get(resource.id, False))
         else:
             for resource in self:
                 resource.is_available = True

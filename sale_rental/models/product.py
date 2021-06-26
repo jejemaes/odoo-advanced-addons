@@ -36,7 +36,6 @@ class Product(models.Model):
         currency = self.env['res.currency'].browse(self._context['currency_id'])
 
         price_map = self.mapped('product_tmpl_id')._get_rental_price_unit(start_dt, end_dt, currency)
-        print("##### price_map=", price_map)
         for product in self:
             currency = currency or product.currency_id
             combinaison = price_map[product.product_tmpl_id.id]['combinaison']
