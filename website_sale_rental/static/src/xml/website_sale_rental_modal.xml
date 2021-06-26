@@ -1,0 +1,9 @@
+<templates>
+
+    <t t-name="website_sale_rental.RentalCalendar">
+        <div class="o_website_sale_rental_calendar_inner"/>
+        <span class="badge bg-warning">Waiting Confirmation</span> <span class="badge bg-danger">Booked</span> <span class="badge bg-light text-dark">Unavailable</span>
+
+    </t>
+
+</templates>

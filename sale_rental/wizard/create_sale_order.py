@@ -43,7 +43,8 @@ class ProjectCreateSalesOrder(models.TransientModel):
 
     product_id = fields.Many2one('product.product', string="Product", required=True, related='rental_booking_id.resource_id.product_id')
     price_unit = fields.Float("Unit Price")
-    rental_pricing_explanation = fields.Text("Pricing explanation", compute='_compute_rental_pricing_explanation', help="Helper text to understand rental price computation.")
+    discount = fields.Float("Discount")
+    rental_pricing_explanation = fields.Text("Pricing explanation", compute='_compute_rental_price_details', compute_sudo=True, help="Helper text to understand rental price computation.")
 
     rental_start_date = fields.Datetime(related='rental_booking_id.date_from', readonly=True)
     rental_stop_date = fields.Datetime(related='rental_booking_id.date_to', readonly=True)
@@ -56,27 +57,31 @@ class ProjectCreateSalesOrder(models.TransientModel):
             else:
                 wizard.auto_confirm = False
 
-    @api.depends('product_id', 'rental_start_date', 'rental_stop_date', 'partner_id', 'pricelist_id')
-    def _compute_rental_pricing_explanation(self):
+    @api.depends('product_id', 'rental_start_date', 'rental_stop_date', 'pricelist_id')
+    def _compute_rental_price_details(self):
         for wizard in self:
-            if wizard.product_id and wizard.rental_start_date and wizard.rental_stop_date:
+            if wizard.product_id and wizard.rental_start_date and wizard.rental_stop_date and wizard.pricelist_id:
                 if wizard.rental_start_date <= wizard.rental_stop_date:
                     pricing_explanation = wizard.product_id.with_context(lang=self.partner_id.lang or 'en_US').get_rental_pricing_explanation(wizard.rental_start_date, wizard.rental_stop_date, currency_id=self.currency_id.id)[wizard.product_id.id]
-                    pricing_data = wizard.product_id.get_rental_price(wizard.rental_start_date, wizard.rental_stop_date, wizard.pricelist_id.id, quantity=1)
                     wizard.rental_pricing_explanation = pricing_explanation
-                    wizard.price_unit = pricing_data[wizard.product_id.id]['price_list']
                 else:
                     wizard.rental_pricing_explanation = False
-                    wizard.price_unit = 0.0
             else:
                 wizard.rental_pricing_explanation = False
-                wizard.price_unit = 0.0
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         if self.partner_id:
             self.partner_shipping_id = self.partner_id.address_get(['delivery'])['delivery']
             self.pricelist_id = self.with_company(self.company_id).partner_id.property_product_pricelist
+
+    @api.onchange('product_id', 'rental_start_date', 'rental_stop_date', 'pricelist_id')
+    def _onchange_rent_price_and_discount(self):
+        if self.product_id and self.rental_start_date and self.rental_stop_date and self.pricelist_id:
+            if self.rental_start_date <= self.rental_stop_date:
+                pricing_data = self.product_id.get_rental_price(self.rental_start_date, self.rental_stop_date, self.pricelist_id.id, quantity=1)
+                self.price_unit = pricing_data[self.product_id.id]['price_list']
+                self.discount = pricing_data[self.product_id.id]['discount']
 
     def action_create_sale_order(self):
         # creates sales order
@@ -89,6 +94,8 @@ class ProjectCreateSalesOrder(models.TransientModel):
             'product_id': self.product_id.id,
             'price_unit': self.price_unit,
             'product_uom_qty': 1.0,
+            'product_uom': self.product_id.uom_id.id,
+            'discount': self.discount,
             'rental_start_date': self.rental_start_date,
             'rental_stop_date': self.rental_stop_date,
         }
@@ -96,11 +103,10 @@ class ProjectCreateSalesOrder(models.TransientModel):
             sol_values['resource_ids'] = [(6, 0, [self.rental_booking_id.resource_id.id])]
 
         sale_order_line = self.env['sale.order.line'].create(sol_values)
-        sale_order_line.product_id_change()
+        sale_order_line._compute_tax_id()
 
         sale_order_line.write({
             'name': sale_order_line.get_sale_order_line_multiline_description_sale(self.product_id),
-            'price_unit': self.price_unit, # erased by onchange
         })
 
         # link booking to SO

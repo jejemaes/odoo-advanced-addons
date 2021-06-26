@@ -197,7 +197,6 @@ class SaleOrderLine(models.Model):
             # auto set the one resource
             if self.product_id.rental_tracking == 'use_resource' and self.rental_start_date and self.rental_stop_date:
                 if self.product_id.resource_count == 1:
-                    print(self.product_id.resource_ids.with_context(resource_start_dt=self.rental_start_date, resource_stop_dt=self.rental_stop_date).filtered(lambda res: res.is_available))
                     self.resource_ids = self.product_id.resource_ids.with_context(resource_start_dt=self.rental_start_date, resource_stop_dt=self.rental_stop_date).filtered(lambda res: res.is_available)
         else:
             result = super(SaleOrderLine, self).product_id_change()
@@ -264,7 +263,7 @@ class SaleOrderLine(models.Model):
     def create(self, vals_list):
         lines = super(SaleOrderLine, self).create(vals_list)
         for line in lines:
-            if not line.is_expense and line.is_rental and line.state == 'sale':
+            if not line.is_expense and line.is_rental and line.state == 'sale' and line.resource_ids:
                 line.sudo().with_company(self.company_id).with_context(
                     default_company_id=self.company_id.id,
                 )._rental_booking_generation()

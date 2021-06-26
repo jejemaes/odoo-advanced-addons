@@ -24,4 +24,15 @@
        </field>
     </record>
 
+    <record id="rental_booking_view_search" model="ir.ui.view">
+        <field name="name">rental.booking.form.sale.rental</field>
+        <field name="model">rental.booking</field>
+        <field name="inherit_id" ref="rental.rental_booking_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="sale_order_id"/>
+            </xpath>
+       </field>
+    </record>
+
 </odoo>
