@@ -7,10 +7,6 @@
     <template id="page_document_layout" name="Documents: Page Main Layout">
         <t t-call="portal.frontend_layout">
 
-            <t t-set="head">
-                <t t-call-assets="document.document_assets_frontend"/>
-            </t>
-
             <t t-set="body_classname" t-value="'o_document_body'"/>
 
             <div class="container">

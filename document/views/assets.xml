@@ -12,11 +12,10 @@
         </xpath>
     </template>
 
-    <template id="document_assets_frontend" name="Docuemnts: Assets Frontend (Downlaod Page Specific)">
-        <t t-call="web._assets_helpers">
-            <t t-call="web._assets_frontend_helpers"/>
-        </t>
-        <link rel="stylesheet" type="text/scss" href="/document/static/src/scss/document_frontent.scss"/>
+    <template id="assets_frontend" name="Document Assets" inherit_id="web.assets_frontend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/scss" href="/document/static/src/scss/document_frontent.scss"/>
+        </xpath>
     </template>
 
 </odoo>
