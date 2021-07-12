@@ -68,10 +68,6 @@ class SaleOrder(models.Model):
             'target': 'new',
         }
 
-    def action_generate_rental_booking(self):
-        self.mapped('order_line').filtered('is_rental')._rental_booking_generation()
-        return True
-
     def action_draft(self):
         """ When resetting the SO, the none picked up bookings should be reset too """
         result = super(SaleOrder, self).action_draft()
