@@ -31,13 +31,13 @@ class TestSaleRentalWizard(TestCommonSaleRentalNoChart):
 
     def test_rental_draft(self):
         """ From a draft rental, create a SO """
-        form_wizard = Form(self.env['rental.create.sale.order'].with_context(
+        form_wizard = Form(self.env['rental.link.sale.order'].with_context(
             active_model='rental.booking',
             active_id=self.rental_booking.id
         ))
         wizard = form_wizard.save()
 
-        action = wizard.action_create_sale_order()
+        action = wizard.action_link_to_sale_order()
         sale_order = self.env['sale.order'].browse(action['res_id'])
 
         self.assertEqual(sale_order.state, 'draft')
@@ -63,13 +63,13 @@ class TestSaleRentalWizard(TestCommonSaleRentalNoChart):
         """ From a reserved rental, create a SO (confirmed) """
         self.rental_booking.action_reserve()
 
-        form_wizard = Form(self.env['rental.create.sale.order'].with_context(
+        form_wizard = Form(self.env['rental.link.sale.order'].with_context(
             active_model='rental.booking',
             active_id=self.rental_booking.id
         ))
         wizard = form_wizard.save()
 
-        action = wizard.action_create_sale_order()
+        action = wizard.action_link_to_sale_order()
         sale_order = self.env['sale.order'].browse(action['res_id'])
 
         self.assertEqual(sale_order.state, 'sale')  # order is confirmed
@@ -96,7 +96,7 @@ class TestSaleRentalWizard(TestCommonSaleRentalNoChart):
         self.rental_booking.write({'resource_id': self.resource_no_product.id})
 
         with self.assertRaises(UserError):
-            form_wizard = Form(self.env['rental.create.sale.order'].with_context(
+            form_wizard = Form(self.env['rental.link.sale.order'].with_context(
                 active_model='rental.booking',
                 active_id=self.rental_booking.id
             ))

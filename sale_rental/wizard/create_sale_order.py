@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 
 
 class ProjectCreateSalesOrder(models.TransientModel):
-    _name = 'rental.create.sale.order'
+    _name = 'rental.link.sale.order'
     _description = "Create SO from Rental Booking"
 
     @api.model
@@ -24,14 +24,25 @@ class ProjectCreateSalesOrder(models.TransientModel):
                 raise UserError(_("You can not create a Sales Order, since your resource is not linked to a product."))
 
             result['rental_booking_id'] = rental.id
-            result['partner_id'] = rental.partner_id.id
+            result['partner_id'] = rental.partner_id.commercial_partner_id.id
             result['partner_shipping_id'] = rental.partner_shipping_id.id
 
         return result
 
+    link_mode = fields.Selection([
+        ('new', 'Create Sales Order'),
+        ('attach', 'Attach to Existing Sales Order')
+    ], default='new', required=True)
+
     rental_booking_id = fields.Many2one('rental.booking', "Rental", required=True)
+    rental_start_date = fields.Datetime(related='rental_booking_id.date_from', readonly=True)
+    rental_stop_date = fields.Datetime(related='rental_booking_id.date_to', readonly=True)
     company_id = fields.Many2one(related='rental_booking_id.company_id')
 
+    # attach mode
+    sale_order_id = fields.Many2one('sale.order', "Sales Order")
+
+    # new SO mode
     partner_id = fields.Many2one('res.partner', string="Customer", required=True, help="Customer of the sales order")
     partner_shipping_id = fields.Many2one('res.partner', string='Delivery Address', domain="[('commercial_partner_id', '=', partner_id), '|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="Delivery address for current booking.")
     commercial_partner_id = fields.Many2one(related='partner_id.commercial_partner_id')
@@ -41,13 +52,12 @@ class ProjectCreateSalesOrder(models.TransientModel):
     analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     auto_confirm = fields.Boolean("Auto Confirm Order", compute='_compute_auto_confirm', store=True, readonly=False)
 
+    # sale order line details
     product_id = fields.Many2one('product.product', string="Product", required=True, related='rental_booking_id.resource_id.product_id')
     price_unit = fields.Float("Unit Price")
     discount = fields.Float("Discount")
     rental_pricing_explanation = fields.Text("Pricing explanation", compute='_compute_rental_price_details', compute_sudo=True, help="Helper text to understand rental price computation.")
 
-    rental_start_date = fields.Datetime(related='rental_booking_id.date_from', readonly=True)
-    rental_stop_date = fields.Datetime(related='rental_booking_id.date_to', readonly=True)
 
     @api.depends('rental_booking_id')
     def _compute_auto_confirm(self):
@@ -69,6 +79,13 @@ class ProjectCreateSalesOrder(models.TransientModel):
             else:
                 wizard.rental_pricing_explanation = False
 
+    @api.onchange('link_mode')
+    def _onchange_link_mode(self):
+        if self.link_mode == 'attach':
+            self.auto_confirm = False
+        else:
+            self.sale_order_id = False
+
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         if self.partner_id:
@@ -83,31 +100,16 @@ class ProjectCreateSalesOrder(models.TransientModel):
                 self.price_unit = pricing_data[self.product_id.id]['price_list']
                 self.discount = pricing_data[self.product_id.id]['discount']
 
-    def action_create_sale_order(self):
-        # creates sales order
-        sale_order = self._create_sale_order()
+    def action_link_to_sale_order(self):
+        sale_order = self.sale_order_id
+        if self.link_mode == 'new':
+            # creates sales order
+            sale_order = self._create_sale_order()
+        return self._action_new_sale_order(sale_order)
 
+    def _action_new_sale_order(self, sale_order):
         # adds SO line
-        sol_values = {
-            'order_id': sale_order.id,
-            'is_rental': True,
-            'product_id': self.product_id.id,
-            'price_unit': self.price_unit,
-            'product_uom_qty': 1.0,
-            'product_uom': self.product_id.uom_id.id,
-            'discount': self.discount,
-            'rental_start_date': self.rental_start_date,
-            'rental_stop_date': self.rental_stop_date,
-        }
-        if self.product_id.rental_tracking == 'use_resource':
-            sol_values['resource_ids'] = [(6, 0, [self.rental_booking_id.resource_id.id])]
-
-        sale_order_line = self.env['sale.order.line'].create(sol_values)
-        sale_order_line._compute_tax_id()
-
-        sale_order_line.write({
-            'name': sale_order_line.get_sale_order_line_multiline_description_sale(self.product_id),
-        })
+        sale_order_line = self._create_sale_order_line(sale_order)
 
         # link booking to SO
         self.rental_booking_id.write({'sale_line_id': sale_order_line.id})
@@ -138,3 +140,27 @@ class ProjectCreateSalesOrder(models.TransientModel):
         })
         sale_order.onchange_partner_shipping_id()  # set the fiscal position
         return sale_order
+
+    def _create_sale_order_line(self, sale_order):
+        # adds SO line
+        sol_values = {
+            'order_id': sale_order.id,
+            'is_rental': True,
+            'product_id': self.product_id.id,
+            'price_unit': self.price_unit,
+            'product_uom_qty': 1.0,
+            'product_uom': self.product_id.uom_id.id,
+            'discount': self.discount,
+            'rental_start_date': self.rental_start_date,
+            'rental_stop_date': self.rental_stop_date,
+        }
+        if self.product_id.rental_tracking == 'use_resource':
+            sol_values['resource_ids'] = [(6, 0, [self.rental_booking_id.resource_id.id])]
+
+        sale_order_line = self.env['sale.order.line'].create(sol_values)
+        sale_order_line._compute_tax_id()
+
+        sale_order_line.write({
+            'name': sale_order_line.get_sale_order_line_multiline_description_sale(self.product_id),
+        })
+        return sale_order_line
