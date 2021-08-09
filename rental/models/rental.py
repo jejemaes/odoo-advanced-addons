@@ -59,7 +59,7 @@ class RentalBooking(models.Model):
         ('resource_time_unique', 'UNIQUE(resource_time_id)', "Time Entry can only be linked to one Rental."),
     ]
 
-    @api.depends('state')
+    @api.depends('state', 'overlap_count')
     def _compute_state_color(self):
         color_map = {
             'draft': 8, # grey
@@ -70,7 +70,10 @@ class RentalBooking(models.Model):
             'cancel': 8, # grey
         }
         for rental in self:
-            rental.state_color = color_map.get(rental.state, 1)  # red for no known state
+            if rental.overlap_count:
+                rental.state_color = 1 # red
+            else:
+                rental.state_color = color_map.get(rental.state, 1)  # red for no known state
 
     @api.depends('resource_time_id.date_from', 'resource_time_id.date_to')
     def _compute_overlap_count(self):
