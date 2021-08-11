@@ -62,6 +62,7 @@
                 t-att-data-product-template-id="product.id"
                 t-att-data-product-id="product.product_variant_id.id"
                 t-att-data-resource-count="product.resource_count"
+                t-att-data-rental-select-overlap-mode="product.rental_select_overlap_mode"
                 t-att-data-rental-min-duration="product.rental_min_duration_unit">
                 <div t-if="product.website_rental_display_mode == 'calendar'" class="row">
                     <div class="col-12">

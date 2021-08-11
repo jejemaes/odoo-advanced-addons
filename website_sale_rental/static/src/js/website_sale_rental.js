@@ -253,6 +253,7 @@ var RentalCalendar = publicWidget.Widget.extend({
     init: function (parent, options) {
         this.productTemplateId = options['productTemplateId'];
         this.rentalMinDuration = options['rentalMinDuration'];
+        this.rentalSelectOverlapMode = options['rentalSelectOverlapMode'] || 'none';
 
         this.calendar = null;
         return this._super(...arguments);
@@ -326,6 +327,11 @@ var RentalCalendar = publicWidget.Widget.extend({
             },
             unselectAuto: false, // the selection stays when clicking outside
             selectOverlap: function (event) {
+                if (self.rentalSelectOverlapMode !== 'none') {
+                    if (!event.rendering) {
+                        return _.contains(event.classNames, "bg-warning");
+                    }
+                }
                 return false;
             },
             events: function(info, successCallback, failureCallback) {
