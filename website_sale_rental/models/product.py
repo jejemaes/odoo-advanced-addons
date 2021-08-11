@@ -16,6 +16,10 @@ class ProductTemplate(models.Model):
         ('week', 'Week(s)'),
         ('month', 'Month(s)'),
     ], string="Rental Min. Duration", compute='_compute_rental_min_duration')
+    rental_select_overlap_mode = fields.Selection([
+        ('none', "No overlap"),
+        ('only_draft', "Draft renting can be selected"),
+    ], default="none")
     website_rental_display_mode = fields.Selection([
         ('calendar', 'Calendar'),
         ('form', 'Form'),
