@@ -168,10 +168,11 @@ class RentalBooking(models.Model):
         self.write({'state': 'draft'})
 
     def action_view_overlap(self):
-        overlap_ids = set(self.env['rental.booking'].search([('date_to', '>=', self.date_from), ('date_from', '<=', self.date_to), ('resource_id', '=', self.resource_id.id)]).ids)
+        overlap_ids = set(self.env['rental.booking'].search([('date_to', '>', self.date_from), ('date_from', '<=', self.date_to), ('resource_id', '=', self.resource_id.id)]).ids)
         action = self.env.ref('rental.rental_booking_action_rental').read()[0]
         action['domain'] = [('id', 'in', list(overlap_ids))]
         action['name'] = _('Overlap(s) of %s') % (self.name,)
+        action['context'] = {}
         return action
 
 
