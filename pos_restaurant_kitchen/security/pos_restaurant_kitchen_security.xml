@@ -18,16 +18,10 @@
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
-    <record id="restaurant_kitchen_stage_rule_mutli_company" model="ir.rule">
-        <field name="name">Kitchen stage multi company</field>
-        <field name="model_id" ref="model_restaurant_kitchen_stage"/>
-        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-    </record>
-
     <record id="pos_order_line_rule_cooker" model="ir.rule">
         <field name="name">Pos Order Line: cooker</field>
         <field name="model_id" ref="point_of_sale.model_pos_order_line"/>
-        <field name="domain_force">[('kitchen_stage_id', '!=', False)]</field>
+        <field name="domain_force">[('order_id.kitchen_ids', '!=', False)]</field>
         <field name="perm_read" eval="True"/>
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="False"/>

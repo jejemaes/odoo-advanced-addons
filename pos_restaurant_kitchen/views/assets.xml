@@ -5,6 +5,7 @@
         <xpath expr="." position="inside">
             <script type="text/javascript" src="/pos_restaurant_kitchen/static/src/js/autorefresh_kanban_view.js"></script>
             <script type="text/javascript" src="/pos_restaurant_kitchen/static/src/js/printer_fix.js"></script>
+            <script type="text/javascript" src="/pos_restaurant_kitchen/static/src/js/print_widget.js"></script>
         </xpath>
     </template>
 
