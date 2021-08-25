@@ -99,10 +99,10 @@
                 <filter string="Not Printed" name="not_printed" domain="[('print_count','=',0)]"/>
                 <filter string="Already Printed" name="already_printed" domain="[('print_count','!=',0)]"/>
                 <separator/>
-                <filter string="Last 15 minutes" name="last_15min" domain="[('date_order','&gt;', (datetime.datetime.now() - datetime.timedelta(minutes=15)).strftime('%%Y-%%m-%%d %%H:%%M:%%S'))]"/>
-                <filter string="Last 30 minutes" name="last_30min" domain="[('date_order','&gt;', (datetime.datetime.now() - datetime.timedelta(minutes=30)).strftime('%%Y-%%m-%%d %%H:%%M:%%S'))]"/>
-                <filter string="Last hour" name="last_hour" domain="[('date_order','&gt;', (datetime.datetime.now() - datetime.timedelta(hours=1)).strftime('%%Y-%%m-%%d %%H:%%M:%%S'))]"/>
-                <filter string="Last 2 hours" name="last_2hour" domain="[('date_order','&gt;', (datetime.datetime.now() - datetime.timedelta(hours=2)).strftime('%%Y-%%m-%%d %%H:%%M:%%S'))]"/>
+                <filter string="Last 15 minutes" name="last_15min" domain="[('date_order','&gt;', (datetime.datetime.utcnow() - datetime.timedelta(minutes=15)).strftime('%%Y-%%m-%%d %%H:%%M:%%S'))]"/>
+                <filter string="Last 30 minutes" name="last_30min" domain="[('date_order','&gt;', (datetime.datetime.utcnow() - datetime.timedelta(minutes=30)).strftime('%%Y-%%m-%%d %%H:%%M:%%S'))]"/>
+                <filter string="Last hour" name="last_hour" domain="[('date_order','&gt;', (datetime.datetime.utcnow() - datetime.timedelta(hours=1)).strftime('%%Y-%%m-%%d %%H:%%M:%%S'))]"/>
+                <filter string="Last 2 hours" name="last_2hour" domain="[('date_order','&gt;', (datetime.datetime.utcnow() - datetime.timedelta(hours=2)).strftime('%%Y-%%m-%%d %%H:%%M:%%S'))]"/>
                 <filter string="Order Date" name="order_date" date="date_order"/>
                 <group expand="0" string="Group By">
                     <filter string="Session" name="session" domain="[]" context="{'group_by': 'session_id'}"/>
