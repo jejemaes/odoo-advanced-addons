@@ -14,6 +14,7 @@ Wizard to create multiple table on a floor plan
     'depends' : ['pos_restaurant'],
     'data': [
         'security/ir.model.access.csv',
+        'views/restaurant_table_views.xml',
         'wizard/restaurant_table_generator_views.xml',
     ],
     'installable': True,
