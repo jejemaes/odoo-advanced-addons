@@ -7,7 +7,7 @@
     <record id="product_template_rental_caravane" model="product.template">
         <field name="name">Bar Mobile</field>
         <field name="can_be_rented" eval="True"/>
-        <field name="default_code">RENT</field>
+        <field name="default_code">RENT-BM</field>
         <field name="type">consu</field>
         <field name="list_price">0.00</field>
         <field name="standard_price">0.00</field>
@@ -118,10 +118,10 @@
     <!--
         2nd Product
     -->
-    <record id="product_template_rental_remorque" model="product.template">
-        <field name="name">Toilette Mobile</field>
+    <record id="product_template_rental_podium" model="product.template">
+        <field name="name">Scene Mobile</field>
         <field name="can_be_rented" eval="True"/>
-        <field name="default_code">RENT</field>
+        <field name="default_code">RENT-SM</field>
         <field name="type">consu</field>
         <field name="list_price">0.00</field>
         <field name="standard_price">0.00</field>
@@ -133,7 +133,7 @@
     </record>
 
     <record id="product_rental_tenure_remorque_monday" model="product.rental.tenure">
-        <field name="product_template_id" ref="product_template_rental_remorque"/>
+        <field name="product_template_id" ref="product_template_rental_podium"/>
         <field name="weekday_ids"
             eval="[
                 (6, 0, [
@@ -145,7 +145,7 @@
     </record>
 
     <record id="product_rental_tenure_remorque_tuesday" model="product.rental.tenure">
-        <field name="product_template_id" ref="product_template_rental_remorque"/>
+        <field name="product_template_id" ref="product_template_rental_podium"/>
         <field name="weekday_ids"
             eval="[
                 (6, 0, [
@@ -157,7 +157,7 @@
     </record>
 
     <record id="product_rental_tenure_remorque_wednesday" model="product.rental.tenure">
-        <field name="product_template_id" ref="product_template_rental_remorque"/>
+        <field name="product_template_id" ref="product_template_rental_podium"/>
         <field name="weekday_ids"
             eval="[
                 (6, 0, [
@@ -169,7 +169,7 @@
     </record>
 
     <record id="product_rental_tenure_remorque_thursday" model="product.rental.tenure">
-        <field name="product_template_id" ref="product_template_rental_remorque"/>
+        <field name="product_template_id" ref="product_template_rental_podium"/>
         <field name="weekday_ids"
             eval="[
                 (6, 0, [
@@ -181,7 +181,7 @@
     </record>
 
     <record id="product_rental_tenure_remorque_friday" model="product.rental.tenure">
-        <field name="product_template_id" ref="product_template_rental_remorque"/>
+        <field name="product_template_id" ref="product_template_rental_podium"/>
         <field name="weekday_ids"
             eval="[
                 (6, 0, [
@@ -193,7 +193,7 @@
     </record>
 
     <record id="product_rental_tenure_remorque_saturday" model="product.rental.tenure">
-        <field name="product_template_id" ref="product_template_rental_remorque"/>
+        <field name="product_template_id" ref="product_template_rental_podium"/>
         <field name="weekday_ids"
             eval="[
                 (6, 0, [
@@ -205,7 +205,7 @@
     </record>
 
     <record id="product_rental_tenure_remorque_sunday" model="product.rental.tenure">
-        <field name="product_template_id" ref="product_template_rental_remorque"/>
+        <field name="product_template_id" ref="product_template_rental_podium"/>
         <field name="weekday_ids"
             eval="[
                 (6, 0, [
@@ -217,7 +217,122 @@
     </record>
 
     <record id="product_rental_tenure_remorque_weekend" model="product.rental.tenure">
-        <field name="product_template_id" ref="product_template_rental_remorque"/>
+        <field name="product_template_id" ref="product_template_rental_podium"/>
+        <field name="weekday_ids"
+            eval="[
+                (6, 0, [
+                    ref('resource_advanced.resource_day_saturday'),
+                    ref('resource_advanced.resource_day_sunday'),
+                ]),
+            ]"
+        />
+        <field name="base_price">75.00</field>
+    </record>
+
+
+    <!--
+        3rd Product
+    -->
+    <record id="product_template_rental_remorque_bar" model="product.template">
+        <field name="name">Remorque Bar Mobile</field>
+        <field name="can_be_rented" eval="True"/>
+        <field name="default_code">RENT-RBM</field>
+        <field name="type">consu</field>
+        <field name="list_price">0.00</field>
+        <field name="standard_price">0.00</field>
+        <field name="uom_id" ref="uom.product_uom_hour"/>
+        <field name="uom_po_id" ref="uom.product_uom_hour"/>
+        <field name="rental_calendar_id" ref="rental.resource_calendar_rental_work_week"/>
+        <field name="rental_tenure_type">weekday</field>
+        <field name="rental_tracking">use_resource</field>
+    </record>
+
+    <record id="product_rental_tenure_remorque_bar_monday" model="product.rental.tenure">
+        <field name="product_template_id" ref="product_template_rental_remorque_bar"/>
+        <field name="weekday_ids"
+            eval="[
+                (6, 0, [
+                    ref('resource_advanced.resource_day_monday'),
+                ]),
+            ]"
+        />
+        <field name="base_price">50.00</field>
+    </record>
+
+    <record id="product_rental_tenure_remorque_bar_tuesday" model="product.rental.tenure">
+        <field name="product_template_id" ref="product_template_rental_remorque_bar"/>
+        <field name="weekday_ids"
+            eval="[
+                (6, 0, [
+                    ref('resource_advanced.resource_day_tuesday'),
+                ]),
+            ]"
+        />
+        <field name="base_price">50.00</field>
+    </record>
+
+    <record id="product_rental_tenure_remorque_bar_wednesday" model="product.rental.tenure">
+        <field name="product_template_id" ref="product_template_rental_remorque_bar"/>
+        <field name="weekday_ids"
+            eval="[
+                (6, 0, [
+                    ref('resource_advanced.resource_day_wednesday'),
+                ]),
+            ]"
+        />
+        <field name="base_price">50.00</field>
+    </record>
+
+    <record id="product_rental_tenure_remorque_bar_thursday" model="product.rental.tenure">
+        <field name="product_template_id" ref="product_template_rental_remorque_bar"/>
+        <field name="weekday_ids"
+            eval="[
+                (6, 0, [
+                    ref('resource_advanced.resource_day_thursday'),
+                ]),
+            ]"
+        />
+        <field name="base_price">50.00</field>
+    </record>
+
+    <record id="product_rental_tenure_remorque_bar_friday" model="product.rental.tenure">
+        <field name="product_template_id" ref="product_template_rental_remorque_bar"/>
+        <field name="weekday_ids"
+            eval="[
+                (6, 0, [
+                    ref('resource_advanced.resource_day_friday'),
+                ]),
+            ]"
+        />
+        <field name="base_price">50.00</field>
+    </record>
+
+    <record id="product_rental_tenure_remorque_bar_saturday" model="product.rental.tenure">
+        <field name="product_template_id" ref="product_template_rental_remorque_bar"/>
+        <field name="weekday_ids"
+            eval="[
+                (6, 0, [
+                    ref('resource_advanced.resource_day_saturday'),
+                ]),
+            ]"
+        />
+        <field name="base_price">50.00</field>
+    </record>
+
+    <record id="product_rental_tenure_remorque_bar_sunday" model="product.rental.tenure">
+        <field name="product_template_id" ref="product_template_rental_remorque_bar"/>
+        <field name="weekday_ids"
+            eval="[
+                (6, 0, [
+                    ref('resource_advanced.resource_day_sunday'),
+                ]),
+            ]"
+        />
+        <field name="base_price">50.00</field>
+    </record>
+
+    <record id="product_rental_tenure_remorque_bar_weekend" model="product.rental.tenure">
+        <field name="product_template_id" ref="product_template_rental_remorque_bar"/>
         <field name="weekday_ids"
             eval="[
                 (6, 0, [
