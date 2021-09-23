@@ -39,7 +39,7 @@ class Resource(models.Model):
             if resource.product_template_id and not resource.product_id:
                 raise ValidationError(_("A Product should be set, as the resource is linked to a product template."))
             if not resource.product_template_id and resource.product_id:
-                raise ValidationError(_("kkkkk A Product should be set, as the resource is linked to a product template."))
+                raise ValidationError(_("A Product should be set, as the resource is linked to a product template."))
             if resource.product_template_id and resource.product_id:
                 if resource.product_id not in resource.product_template_id.with_context(active_test=False).product_variant_ids:
                     raise ValidationError(_("The resource product should be related to the product template."))
