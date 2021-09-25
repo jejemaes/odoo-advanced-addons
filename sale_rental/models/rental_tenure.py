@@ -244,6 +244,6 @@ class ProductRentalTenure(models.Model):
 
         for tenure in applicable_tenures:
             # minus one second bacuase a day is from 00:00:00 to 23:59:59,99999 accordting to start_of/end_of
-            if start + tenure._get_tenure_timedelta() - relativedelta(seconds=1) <= stop:
+            if start + tenure._get_tenure_timedelta() <= stop:
                 return tenure
         return applicable_tenures[-1]  # the last is the less worth

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import math
 
+from datetime import time
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
 
@@ -232,9 +233,14 @@ class ProductTemplate(models.Model):
     def _tenure_weekday_price_combinaison(self, start_dt, end_dt, currency_dst):
         assert start_dt <= end_dt, "Start dates must be before the end date."
 
-        # TODO: not sure this is right
         tzinfo = start_dt.tzinfo
-        start_dt = start_dt.replace(tzinfo=tzinfo)
+        start_dt = start_of(start_dt, 'day').replace(tzinfo=tzinfo)
+
+        # 00:00:00 of the next does not count the next day in the combinaison, but ease the computation.
+        # renting from 2021-10-21 00:00:00 to 2021-10-23 00:00:00 reprensent 2 days (Thursday and Friday)
+        # To 2021-10-23 00:00:01 will add Saturday.
+        if end_dt.time() != time.min:
+            end_dt = start_of(end_dt + relativedelta(days=1), 'day')
         end_dt = end_dt.replace(tzinfo=tzinfo)
 
         cost = 0.0
