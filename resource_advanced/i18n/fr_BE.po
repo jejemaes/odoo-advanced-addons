@@ -1,0 +1,254 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* resource_advanced
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-23 12:07+0000\n"
+"PO-Revision-Date: 2021-09-23 12:07+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: resource_advanced
+#: code:addons/resource_advanced/models/resource_calendar.py:0
+#, python-format
+msgid "A Full day work calendar can not have the 2 weeks mode activated."
+msgstr "Un calendrier en 'jour complet' ne peut avoir l'option '2 semaines' activée."
+
+#. module: resource_advanced
+#: code:addons/resource_advanced/models/resource_calendar.py:0
+#, python-format
+msgid "A Full day work calendar must have working days defined."
+msgstr "Un calendrier en 'jour de semaine' doit avoir au moins 1 jour de sélectionné."
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day__shortname
+msgid "Abbreviation"
+msgstr "Abbréviation"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar__attendance_mode
+msgid "Attendance Mode"
+msgstr "Mode de présence"
+
+#. module: resource_advanced
+#: model:ir.model.fields,help:resource_advanced.field_resource_resource__is_available
+msgid ""
+"Available means free for work (not leaves, during working time, not busy to "
+"anything else)"
+msgstr "Disponible signifie libre pour travailler (pas de congé, qui n'est pas occupé à autre chose)"
+
+#. module: resource_advanced
+#: model_terms:ir.ui.view,arch_db:resource_advanced.resource_calendar_leaves_view_search
+msgid "Calendar"
+msgstr "Calendrier"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_resource__color
+msgid "Color"
+msgstr "Couleur"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day__create_date
+msgid "Created on"
+msgstr "Créé à"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar__display_name
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar_leaves__display_name
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day__display_name
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_resource__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar_leaves__duration_days
+msgid "Duration (days)"
+msgstr "Durée (jours)"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar_leaves__duration_hours
+msgid "Duration (hours)"
+msgstr "Durée (heures)"
+
+#. module: resource_advanced
+#: model:ir.model.fields,help:resource_advanced.field_resource_calendar_leaves__duration_days
+msgid ""
+"Duration expressed in days, calculated with the working calendar (if set)."
+msgstr "Durée exprimée en jour, calculée avec le calendrier de travail (si assigné)."
+
+#. module: resource_advanced
+#: model:ir.model.fields,help:resource_advanced.field_resource_calendar_leaves__duration_hours
+msgid ""
+"Duration expressed in hours, calculated with the working calendar (if set)."
+msgstr "Durée exprimée en heure, calculée avec le calendrier de travail (si assigné)."
+
+#. module: resource_advanced
+#: model:resource.day,name:resource_advanced.resource_day_friday
+msgid "Friday"
+msgstr "Vendredi"
+
+#. module: resource_advanced
+#: model:ir.model.fields.selection,name:resource_advanced.selection__resource_calendar__attendance_mode__full_day
+msgid "Full Day"
+msgstr "Jours Complet"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar__working_day_ids
+msgid "Full Working Days"
+msgstr "Calendrier en jour complet"
+
+#. module: resource_advanced
+#: model_terms:ir.ui.view,arch_db:resource_advanced.resource_calendar_leaves_view_search
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar__id
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar_leaves__id
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day__id
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_resource__id
+msgid "ID"
+msgstr ""
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_resource__is_available
+msgid "Is Available"
+msgstr "Est disponible"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar____last_update
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_calendar_leaves____last_update
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day____last_update
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_resource____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: resource_advanced
+#: model:ir.actions.act_window,name:resource_advanced.resource_calendar_leaves_action_from_resource
+#: model_terms:ir.ui.view,arch_db:resource_advanced.resource_resource_view_form
+msgid "Leaves"
+msgstr "Congé"
+
+#. module: resource_advanced
+#: model:resource.day,name:resource_advanced.resource_day_monday
+msgid "Monday"
+msgstr "Lundi"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_resource__leaves_count
+msgid "Number of leaves"
+msgstr "Nombre de congé"
+
+#. module: resource_advanced
+#: model:ir.model.constraint,message:resource_advanced.constraint_resource_day_dayofweek_unique
+msgid "Only one dayofweek"
+msgstr "Seulement 1 jour de semaine"
+
+#. module: resource_advanced
+#: model_terms:ir.ui.view,arch_db:resource_advanced.resource_calendar_leaves_view_search
+#: model_terms:ir.ui.view,arch_db:resource_advanced.resource_resource_view_form
+msgid "Resource"
+msgstr "Ressource"
+
+#. module: resource_advanced
+#: model:ir.model,name:resource_advanced.model_resource_day
+msgid "Resource Day"
+msgstr "Jour de semaine pour resource"
+
+#. module: resource_advanced
+#: model:ir.model,name:resource_advanced.model_resource_calendar_leaves
+msgid "Resource Time Off Detail"
+msgstr "Détails des congés de la ressource"
+
+#. module: resource_advanced
+#: model:ir.model,name:resource_advanced.model_resource_calendar
+msgid "Resource Working Time"
+msgstr "Temps de travail de la ressource"
+
+#. module: resource_advanced
+#: model:ir.model,name:resource_advanced.model_resource_resource
+#: model_terms:ir.ui.view,arch_db:resource_advanced.resource_resource_view_tree
+msgid "Resources"
+msgstr "Ressources"
+
+#. module: resource_advanced
+#: model_terms:ir.ui.view,arch_db:resource_advanced.resource_resource_view_form
+msgid "Responsible"
+msgstr "Responsable"
+
+#. module: resource_advanced
+#: model:resource.day,name:resource_advanced.resource_day_saturday
+msgid "Saturday"
+msgstr "Samedi"
+
+#. module: resource_advanced
+#: model:ir.model.fields.selection,name:resource_advanced.selection__resource_calendar__attendance_mode__shift_per_day
+msgid "Shift per Day"
+msgstr "Tranches horaire par jour"
+
+#. module: resource_advanced
+#: model:resource.day,name:resource_advanced.resource_day_sunday
+msgid "Sunday"
+msgstr "Dimanche"
+
+#. module: resource_advanced
+#: model:ir.model.constraint,message:resource_advanced.constraint_resource_calendar_leaves_dates_chronological
+msgid "The start date must be smaller than its stop date."
+msgstr "La date de début doit être plus petite que celle de fin."
+
+#. module: resource_advanced
+#: model:resource.day,name:resource_advanced.resource_day_thursday
+msgid "Thursday"
+msgstr "Jeudi"
+
+#. module: resource_advanced
+#: model:resource.day,name:resource_advanced.resource_day_tuesday
+msgid "Tuesday"
+msgstr "Mardi"
+
+#. module: resource_advanced
+#: model:resource.day,name:resource_advanced.resource_day_wednesday
+msgid "Wednesday"
+msgstr "Mercredi"
+
+#. module: resource_advanced
+#: model:ir.model.fields,field_description:resource_advanced.field_resource_day__dayofweek
+msgid "Weekday"
+msgstr "Jour"
+
+#. module: resource_advanced
+#: model:ir.model.fields,help:resource_advanced.field_resource_day__dayofweek
+msgid "Weekday index (1 is monday, ....)"
+msgstr "Position de jour dans la semaine (1 pour lundi, ...)"
+
+#. module: resource_advanced
+#: model:ir.model.constraint,message:resource_advanced.constraint_resource_day_dayofweek_range
+msgid "Weekday must be between 1 and 7"
+msgstr "Les jours de semaine doivent être entre 1 et 7."
