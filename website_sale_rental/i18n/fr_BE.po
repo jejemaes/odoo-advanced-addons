@@ -1,0 +1,313 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* website_sale_rental
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-23 12:01+0000\n"
+"PO-Revision-Date: 2021-09-23 12:01+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+msgid "<i class=\"fa fa-calendar\"/> Rent me"
+msgstr "<i class=\"fa fa-calendar\"/> Louez moi"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+msgid "<i class=\"fa fa-shopping-cart\"/> Add to Cart"
+msgstr "<i class=\"fa fa-shopping-cart\"/> Ajouter au panier"
+
+#. module: website_sale_rental
+#. openerp-web
+#: code:addons/website_sale_rental/static/src/xml/website_sale_rental_modal.xml:0
+#, python-format
+msgid "Booked"
+msgstr "Réservé"
+
+#. module: website_sale_rental
+#: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__website_rental_display_mode__calendar
+msgid "Calendar"
+msgstr "Calendrier"
+
+#. module: website_sale_rental
+#. openerp-web
+#: code:addons/website_sale_rental/static/src/js/website_sale_rental_modal.js:0
+#: code:addons/website_sale_rental/static/src/js/website_sale_rental_modal.js:0
+#, python-format
+msgid "Configure Your Rental"
+msgstr "Configurer votre demande de location"
+
+#. module: website_sale_rental
+#: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__rental_min_duration_unit__day
+msgid "Day(s)"
+msgstr "Jour(s)"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+msgid "Disabled input example"
+msgstr ""
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_rental_tenure__display_name
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template__display_name
+#: model:ir.model.fields,field_description:website_sale_rental.field_sale_order__display_name
+#: model:ir.model.fields,field_description:website_sale_rental.field_sale_order_line__display_name
+#: model:ir.model.fields,field_description:website_sale_rental.field_website__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_rental_tenure__website_list_price
+msgid "Display price with pricelist applied"
+msgstr ""
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_rental_tenure__website_base_price
+msgid "Display price without pricelist applied"
+msgstr ""
+
+#. module: website_sale_rental
+#: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__rental_select_overlap_mode__only_draft
+msgid "Draft renting can be selected"
+msgstr "Les locations en draft peuvent être selectionnées."
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_product__rental_tenure_id
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template__rental_tenure_id
+msgid "First Rental Price"
+msgstr "Premier prix de location"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.products_item
+msgid "For Free"
+msgstr "Gratuit"
+
+#. module: website_sale_rental
+#: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__website_rental_display_mode__form
+msgid "Form"
+msgstr ""
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.products_item
+msgid "From"
+msgstr "De"
+
+#. module: website_sale_rental
+#: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__rental_min_duration_unit__hour
+msgid "Hour(s)"
+msgstr "Heure(s)"
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_rental_tenure__id
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template__id
+#: model:ir.model.fields,field_description:website_sale_rental.field_sale_order__id
+#: model:ir.model.fields,field_description:website_sale_rental.field_sale_order_line__id
+#: model:ir.model.fields,field_description:website_sale_rental.field_website__id
+msgid "ID"
+msgstr "Id"
+
+#. module: website_sale_rental
+#: code:addons/website_sale_rental/models/sale_order.py:0
+#, python-format
+msgid "It is forbidden to modify a sales order which is not in draft status."
+msgstr ""
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_rental_tenure____last_update
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template____last_update
+#: model:ir.model.fields,field_description:website_sale_rental.field_sale_order____last_update
+#: model:ir.model.fields,field_description:website_sale_rental.field_sale_order_line____last_update
+#: model:ir.model.fields,field_description:website_sale_rental.field_website____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: website_sale_rental
+#: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__rental_min_duration_unit__month
+msgid "Month(s)"
+msgstr "Mois"
+
+#. module: website_sale_rental
+#: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__rental_select_overlap_mode__none
+msgid "No overlap"
+msgstr "Pas de superposition"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+msgid "Price Unit"
+msgstr "Prix Unitaire"
+
+#. module: website_sale_rental
+#: model:ir.model,name:website_sale_rental.model_product_template
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product_rental_price_details
+msgid "Rent it for Free"
+msgstr "Emprunter le gratuitement"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+msgid "Rental Calendar"
+msgstr "Calendrier de location"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+msgid "Rental Form"
+msgstr "Formulaire de location"
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_product__rental_min_duration_unit
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template__rental_min_duration_unit
+msgid "Rental Min. Duration"
+msgstr "Min. durée de location"
+
+#. module: website_sale_rental
+#: model:ir.model,name:website_sale_rental.model_product_rental_tenure
+msgid "Rental Price"
+msgstr "Prix de location"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product_rental_price_details
+msgid ""
+"Rental Pricing\n"
+"                    <i class=\"fa fa-info-circle\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Those prices are computed as you rent only 1 time unit. Taxes and discount are applied on the combinaison of tenures.\"/>"
+msgstr ""
+"Prix de Location\n"
+"                    <i class=\"fa fa-info-circle\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Ces prix sont calculés comme si vous louiez 1 unité de temps. Les taxes et réductions sont appliquées sur la combinaison du temps loué.\"/>"
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_product__website_rental_pricing_timezone
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template__website_rental_pricing_timezone
+msgid "Rental Pricing Timezone"
+msgstr "Timezone de location"
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_product__rental_select_overlap_mode
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template__rental_select_overlap_mode
+msgid "Rental Select Overlap Mode"
+msgstr ""
+
+#. module: website_sale_rental
+#: code:addons/website_sale_rental/controllers/website_sale.py:0
+#, python-format
+msgid "Rental dates are mandatory !"
+msgstr "Les dates de locations sont obligatoires !"
+
+#. module: website_sale_rental
+#: code:addons/website_sale_rental/models/sale_order.py:0
+#: code:addons/website_sale_rental/models/sale_order.py:0
+#, python-format
+msgid ""
+"Resources are not available anymore for you. Please remove your order line "
+"and try to set up new rental."
+msgstr ""
+"Les ressources ne sont plus disponibles pour vous. Merci de supprimer votre "
+"ligne de location et essayer d'en créer une nouvelle."
+
+#. module: website_sale_rental
+#: model:ir.model,name:website_sale_rental.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: website_sale_rental
+#: model:ir.model,name:website_sale_rental.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: website_sale_rental
+#: code:addons/website_sale_rental/controllers/main.py:0
+#, python-format
+msgid "The rental calendar does not allow to rent this period."
+msgstr ""
+"Le calendrier de location n'autorise pas une location pour cette période."
+
+#. module: website_sale_rental
+#: code:addons/website_sale_rental/controllers/main.py:0
+#, python-format
+msgid "There is no resource available to rent for your period."
+msgstr "Il n'y a pas de ressource disponible à louer pour cette période."
+
+#. module: website_sale_rental
+#: code:addons/website_sale_rental/controllers/main.py:0
+#, python-format
+msgid "There is only %s available resources to rent for your period."
+msgstr ""
+"Il n'y a que %s resource(s) disponible(s) à la location pour cette période."
+
+#. module: website_sale_rental
+#: code:addons/website_sale_rental/controllers/main.py:0
+#, python-format
+msgid "There is only %s resource to rent. You can not reserve more."
+msgstr ""
+"Il n'y a que %s ressources disponibles a la location. Vous ne pouvez en "
+"réserver plus."
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+msgid "This product has no valid combination."
+msgstr ""
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product
+msgid "To"
+msgstr "à"
+
+#. module: website_sale_rental
+#. openerp-web
+#: code:addons/website_sale_rental/static/src/xml/website_sale_rental_modal.xml:0
+#, python-format
+msgid "Unavailable"
+msgstr "Indisponible"
+
+#. module: website_sale_rental
+#. openerp-web
+#: code:addons/website_sale_rental/static/src/xml/website_sale_rental_modal.xml:0
+#, python-format
+msgid "Waiting Confirmation"
+msgstr "En attente de confirmation"
+
+#. module: website_sale_rental
+#: model:ir.model,name:website_sale_rental.model_website
+msgid "Website"
+msgstr "Site web"
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_product__website_rental_display_mode
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template__website_rental_display_mode
+msgid "Website Rental Display Mode"
+msgstr "Mode d'affichage de réservation sur le site"
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_sale_order_line__website_rental_unit_price
+msgid "Website Rental Unit Price"
+msgstr "Prix unitaire de location sur le site"
+
+#. module: website_sale_rental
+#: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__rental_min_duration_unit__week
+msgid "Week(s)"
+msgstr "Semaine(s)"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.products_item
+msgid "day(s)"
+msgstr "jour(s)"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product_rental_price_details
+msgid "h5"
+msgstr ""
