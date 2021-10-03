@@ -8,6 +8,7 @@
             <script type="text/javascript" src="/web_gantt/static/src/js/gantt_model.js"/>
             <script type="text/javascript" src="/web_gantt/static/src/js/gantt_controller.js"/>
             <script type="text/javascript" src="/web_gantt/static/src/js/gantt_view.js"/>
+            <script type="text/javascript" src="/web_gantt/static/src/js/gantt_row.js"/>
         </xpath>
     </template>
 </data>

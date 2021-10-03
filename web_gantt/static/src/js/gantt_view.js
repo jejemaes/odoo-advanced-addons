@@ -79,10 +79,11 @@ var GanttView = BasicView.extend({
         var precisionAttrs = arch.attrs.precision ? pyUtils.py_eval(arch.attrs.precision) : {};
         var cellPrecisions = {};
         _.each(this.SCALES, function (vals, key) {
+            // set default value
+            var defaultUntiPrecision = vals.defaultUnitPrecision.split(':');
+            cellPrecisions[key] = {unit: defaultUntiPrecision[0], precision: defaultUntiPrecision[1]};
+
             if (precisionAttrs[key]) {
-                // set default value
-                var defaultUntiPrecision = vals.defaultUnitPrecision.split(':');
-                cellPrecisions[key] = {unit: defaultUntiPrecision[0], precision: defaultUntiPrecision[1]};
 
                 // set the unit from attrs
                 var unitPrecision = precisionAttrs[key].split(':'); // hour:half

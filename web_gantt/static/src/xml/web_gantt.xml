@@ -22,4 +22,7 @@
         </button>
     </div>
 
+    <div t-name="GanttView.Row" t-attf-class="row no-gutters o_gantt_row">
+    </div>
+
 </templates>
