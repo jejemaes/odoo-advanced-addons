@@ -232,7 +232,6 @@ return AbstractRenderer.extend({
         };
 
         var scale = this.state.scale;
-        debugger;
         var scaleInfo = this.cellPrecisions[this.state.scale];
         var result = [{unit: scale, step: 1, format: scaleMainFormat[scale]}];
         switch (scale) {
