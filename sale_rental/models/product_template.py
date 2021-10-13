@@ -95,8 +95,6 @@ class ProductTemplate(models.Model):
     def _check_service_for_rental(self):
         for product in self:
             if product.type == 'service':
-                if product.can_be_rented and product.rental_tracking != 'no':
-                    raise ValidationError("A rentable service can not be tracked.")
                 if not product.can_be_rented and product.rental_tracking:
                     raise ValidationError("A non-rentable service can not be tracked.")
 
