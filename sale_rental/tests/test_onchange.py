@@ -5,8 +5,10 @@ from odoo import fields, tools
 from odoo.addons.sale_rental.tests.common import TestCommonSaleRentalNoChart
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests.common import Form
+from odoo.tests import tagged
 
 
+@tagged('post_install', '-at_install')
 class TestOnchangeFlow(TestCommonSaleRentalNoChart):
 
     @classmethod

@@ -19,8 +19,8 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='calendar_details']" position="after">
                 <group name="rental_details">
-                    <field name="product_template_id" options="{'no_create': True}" groups='product.group_product_variant'/>
-                    <field name="product_id" options="{'no_create': True}" attrs="{'required': [('product_template_id', '!=', False)]}"/>
+                    <field name="product_template_id" options="{'no_create': True}"/>
+                    <field name="product_id" options="{'no_create': True}" attrs="{'required': [('product_template_id', '!=', False)]}" groups="product.group_product_variant"/>
                 </group>
             </xpath>
         </field>

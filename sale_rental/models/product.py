@@ -55,6 +55,18 @@ class Product(models.Model):
         if not self.rental_tracking:
             self.resource_ids = None
 
+    @api.onchange('type')
+    def _onchange_service_for_rental(self):
+        self.product_tmpl_id._onchange_service_for_rental()
+
+    @api.onchange('rental_tenure_type')
+    def _onchange_rental_tenure_type(self):
+        self.product_tmpl_id._onchange_rental_tenure_type()
+
+    @api.onchange('rental_tracking')
+    def _onchange_rental_tracking(self):
+        self.product_tmpl_id._onchange_rental_tracking()
+
     # ----------------------------------------------------------------------------
     # Rental Pricing Methods
     # ----------------------------------------------------------------------------

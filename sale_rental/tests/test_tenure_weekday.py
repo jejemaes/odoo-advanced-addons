@@ -4,8 +4,10 @@ from datetime import datetime
 from odoo import fields
 from odoo.addons.sale_rental.tests.common import TestCommonSaleRentalNoChart
 from odoo.exceptions import UserError, ValidationError
+from odoo.tests import tagged
 
 
+@tagged('post_install', '-at_install')
 class TestSaleRentalTenurePerDay(TestCommonSaleRentalNoChart):
 
     @classmethod
