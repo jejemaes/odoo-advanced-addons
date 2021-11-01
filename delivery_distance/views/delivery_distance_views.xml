@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="delivery_carrier_view_form_distance" model="ir.ui.view">
+        <field name="name">delivery.carrier.form.provider.distance</field>
+        <field name="model">delivery.carrier</field>
+        <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount']" position="after">
+                <field name="distance_uom"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
