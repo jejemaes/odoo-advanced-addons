@@ -99,7 +99,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website_sale_rental.product
 #: model_terms:ir.ui.view,arch_db:website_sale_rental.products_item
 msgid "From"
-msgstr "De"
+msgstr "A partir de"
 
 #. module: website_sale_rental
 #: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__rental_min_duration_unit__hour
