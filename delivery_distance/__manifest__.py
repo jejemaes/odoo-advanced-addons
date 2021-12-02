@@ -11,7 +11,7 @@ Delivery your products but compute how many kilometer you will have to do.
     'category': 'Inventory/Delivery',
     'sequence': 330,
     'version': '1.0',
-    'depends': ['delivery', 'base_geolocalize'],
+    'depends': ['delivery', 'base_georouting'],
     'data': [
         'security/ir.model.access.csv',
         'views/delivery_distance_views.xml',
