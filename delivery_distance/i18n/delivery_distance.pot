@@ -1,0 +1,125 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* delivery_distance
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-02 20:57+0000\n"
+"PO-Revision-Date: 2021-12-02 20:57+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: delivery_distance
+#: code:addons/delivery_distance/models/sale_order.py:0
+#, python-format
+msgid ""
+"\n"
+"Delivery distance (used in price computation) is %s km."
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,field_description:delivery_distance.field_sale_order__delivery_distance_km
+msgid "Delivery Distance"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model,name:delivery_distance.model_delivery_price_rule
+msgid "Delivery Price Rules"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_carrier__display_name
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_price_rule__display_name
+#: model:ir.model.fields,field_description:delivery_distance.field_sale_order__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields.selection,name:delivery_distance.selection__delivery_price_rule__variable__distance
+#: model:ir.model.fields.selection,name:delivery_distance.selection__delivery_price_rule__variable_factor__distance
+msgid "Distance"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields.selection,name:delivery_distance.selection__delivery_price_rule__variable__distance_qty
+#: model:ir.model.fields.selection,name:delivery_distance.selection__delivery_price_rule__variable_factor__distance_qty
+msgid "Distance * Quantity"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,help:delivery_distance.field_sale_order__delivery_distance_km
+msgid ""
+"Distance between the delivery address and the warehouse or the company (in "
+"kilometers)."
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_carrier__id
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_price_rule__id
+#: model:ir.model.fields,field_description:delivery_distance.field_sale_order__id
+msgid "ID"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields.selection,name:delivery_distance.selection__delivery_carrier__distance_uom__km
+msgid "Kilometer"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_carrier____last_update
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_price_rule____last_update
+#: model:ir.model.fields,field_description:delivery_distance.field_sale_order____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields.selection,name:delivery_distance.selection__delivery_carrier__distance_uom__miles
+msgid "Miles"
+msgstr ""
+
+#. module: delivery_distance
+#: code:addons/delivery_distance/models/sale_order.py:0
+#, python-format
+msgid "Missing address to compute distance on sale order %s"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_carrier__distance_calculation
+msgid "Required to compute the distance"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model,name:delivery_distance.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model,name:delivery_distance.model_delivery_carrier
+msgid "Shipping Methods"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_carrier__distance_uom
+msgid "UoM for distance"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,help:delivery_distance.field_delivery_carrier__distance_uom
+msgid "UoM for distance used in price rules."
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_price_rule__variable
+msgid "Variable"
+msgstr ""
+
+#. module: delivery_distance
+#: model:ir.model.fields,field_description:delivery_distance.field_delivery_price_rule__variable_factor
+msgid "Variable Factor"
+msgstr ""
