@@ -63,8 +63,8 @@
                     <br/>
                 </t>
                 <div class="pos-receipt-contact">
-                    <div t-field="order.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
-                    <t t-if="order.company_id.vat">
+                    <div t-if="kitchen.order_line_mode == 'all'"  t-field="order.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                    <t t-if="kitchen.order_line_mode == 'all' and order.company_id.vat">
                         <div><t t-esc="order.company_id.vat"/></div>
                     </t>
                     <t t-if="order.config_id.receipt_header">
@@ -73,11 +73,11 @@
                     <t t-if="order.user_id">
                         <div class="cashier">
                             <div>--------------------------------</div>
-                            <div>Served by <t t-esc="order.user_id.name"/> <t t-if="order.table_id"> at <span class="font-weight-bold" t-esc="order.table_id.name"/></t> </div>
+                            <div>Served by <t t-esc="order.user_id.name"/> <t t-if="order.table_id"> at <strong t-esc="order.table_id.name"/></t> </div>
                         </div>
                     </t>
                 </div>
-                <br /><br />
+                <br/><br/>
 
                 <!-- orer lines -->
                 <t t-foreach="lines" t-as="line">
@@ -110,46 +110,50 @@
                 </t>
 
                 <!-- Subtotal -->
-                <t t-set="isTaxIncluded" t-value="False"/>
-                <t t-if="not isTaxIncluded">
+                <t t-if="kitchen.order_line_mode == 'all'">
+
+                    <t t-set="isTaxIncluded" t-value="False"/>
+                    <t t-if="not isTaxIncluded">
+                        <div class="pos-receipt-right-align">--------</div>
+                        <br/>
+                        <div>Subtotal <span t-esc="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" class="pos-receipt-right-align"/>
+                        </div>
+                        <t t-foreach="tax_details or []" t-as="tax" t-key="tax.name">
+                            <div>
+                                <t t-esc="tax.name" />
+                                <span t-esc='env.pos.format_currency_no_symbol(tax.amount)' class="pos-receipt-right-align"/>
+                            </div>
+                        </t>
+                    </t>
+
+                    <!-- Total -->
                     <div class="pos-receipt-right-align">--------</div>
                     <br/>
-                    <div>Subtotal <span t-esc="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" class="pos-receipt-right-align"/>
+                    <div class="pos-receipt-amount">
+                        TOTAL
+                        <span t-esc="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" class="pos-receipt-right-align"/>
                     </div>
-                    <t t-foreach="tax_details or []" t-as="tax" t-key="tax.name">
+                    <!-- <t t-if="receipt.total_rounded != receipt.total_with_tax">
+                        <div class="pos-receipt-amount">
+                          Rounding
+                        <span t-esc='env.pos.format_currency(receipt.rounding_applied)' class="pos-receipt-right-align"/>
+                        </div>
+                        <div class="pos-receipt-amount">
+                          To Pay
+                         <span t-esc='env.pos.format_currency(receipt.total_rounded)' class="pos-receipt-right-align"/>
+                      </div>
+                    </t> -->
+                    <br/><br/>
+
+                    <!-- Payment Lines -->
+                    <t t-foreach="order.payment_ids" t-as="line">
                         <div>
-                            <t t-esc="tax.name" />
-                            <span t-esc='env.pos.format_currency_no_symbol(tax.amount)' class="pos-receipt-right-align"/>
+                            <t t-esc="line.payment_method_id.name" />
+                            <span t-esc="line.amount" class="pos-receipt-right-align"  t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
                         </div>
                     </t>
                 </t>
 
-                <!-- Total -->
-                <div class="pos-receipt-right-align">--------</div>
-                <br/>
-                <div class="pos-receipt-amount">
-                    TOTAL
-                    <span t-esc="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" class="pos-receipt-right-align"/>
-                </div>
-                <!-- <t t-if="receipt.total_rounded != receipt.total_with_tax">
-                    <div class="pos-receipt-amount">
-                      Rounding
-                    <span t-esc='env.pos.format_currency(receipt.rounding_applied)' class="pos-receipt-right-align"/>
-                    </div>
-                    <div class="pos-receipt-amount">
-                      To Pay
-                     <span t-esc='env.pos.format_currency(receipt.total_rounded)' class="pos-receipt-right-align"/>
-                  </div>
-                </t> -->
-                <br/><br/>
-
-                <!-- Payment Lines -->
-                <t t-foreach="order.payment_ids" t-as="line">
-                    <div>
-                        <t t-esc="line.payment_method_id.name" />
-                        <span t-esc="line.amount" class="pos-receipt-right-align"  t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
-                    </div>
-                </t>
                 <br/>
 
                 <div class="before-footer"/>
@@ -160,7 +164,7 @@
                     <br/>
                 </div>
 
-                <div class="pos-receipt-center-align">
+                <div class="pos-receipt-center-align pos-receipt-contact">
                     <span t-esc="order.date_order" t-options="{'widget': 'datetime'}"/>
                     <br/>
                     <span t-esc="order.name"/>
