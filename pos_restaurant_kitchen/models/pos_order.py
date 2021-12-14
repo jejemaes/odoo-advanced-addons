@@ -92,13 +92,13 @@ class PosOrder(models.Model):
             # extract categories
             pos_categories = order.lines.mapped('product_id.pos_categ_id')
             # select kitchen from the config that are involved in at least one pos line
-            kitchen_ids = []
+            kitchen_ids = set()
             for kitchen in order.config_id.kitchen_ids:
                 if kitchen.order_line_mode == 'all':
-                    kitchen_ids.append(kitchen.id)
+                    kitchen_ids.add(kitchen.id)
                 elif kitchen.order_line_mode == 'category':
                     if set(kitchen.pos_category_ids.ids) & set(pos_categories.ids):
-                        kitchen_ids.append(kitchen.id)
+                        kitchen_ids.add(kitchen.id)
             # create kitchen status here, in order to having the default value set (m2m model problem)
             if kitchen_ids:
                 value_to_create = []
@@ -110,32 +110,6 @@ class PosOrder(models.Model):
                 self.env['pos.order.kitchen.status'].sudo().create(value_to_create)
 
         return order
-
-    @api.model
-    def _complete_values_from_session(self, session, values):
-        values = super()._complete_values_from_session(session, values)
-
-        if session.config_id.is_kitchen_preparation:
-            # extract product of lines to be created
-            product_ids = []
-            for cmd in values.get('lines', []):
-                if len(cmd) == 3:
-                    product_ids.append(cmd[2]['product_id'])
-            pos_categories = self.env['product.product'].browse(product_ids).mapped('pos_categ_id')
-
-            # select kitchen from the config that are involved in at least one pos line
-            kitchen_ids = []
-            for kitchen in session.config_id.kitchen_ids:
-                if kitchen.order_line_mode == 'all':
-                    kitchen_ids.append(kitchen.id)
-                elif kitchen.order_line_mode == 'category':
-                    if set(kitchen.pos_category_ids.ids) & set(pos_categories.ids):
-                        kitchen_ids.append(kitchen.id)
-
-            if kitchen_ids:
-                values['kitchen_ids'] = [(6, 0, kitchen_ids)]
-
-        return values
 
     def action_mark_as_print(self):
         self.sudo().write({'print_count': -1})
