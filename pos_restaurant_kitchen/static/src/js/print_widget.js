@@ -24,7 +24,7 @@ var PrintWidget = AbstractField.extend({
      */
     _render: function () {
         if (this.value) {
-            this.$el.html('<button class="btn btn-primary"><i class="fa fa-print"/>Print</button>');
+            this.$el.html('<button class="btn btn-primary"><i class="fa fa-print"/> Print</button>');
             this.$el.attr('title', this.value);
             this.$el.attr('aria-label', this.value);
         }
