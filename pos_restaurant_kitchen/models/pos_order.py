@@ -14,8 +14,8 @@ class PosOrderPrint(models.Model):
     _description = 'Order Kitchen Status'
     _table = 'pos_order_kitchen_status'
 
-    kitchen_id = fields.Many2one('restaurant.kitchen', string="Kitchen", required=True)
-    order_id = fields.Many2one('pos.order', string="PoS Order", required=True)
+    kitchen_id = fields.Many2one('restaurant.kitchen', string="Kitchen", required=True, ondelete='cascade')
+    order_id = fields.Many2one('pos.order', string="PoS Order", required=True, ondelete='cascade')
     print_count = fields.Integer("Print Counter", default=0)
 
 
