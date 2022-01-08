@@ -8,3 +8,4 @@ class EventType(models.Model):
     _inherit = 'event.type'
 
     registration_phone_mandatory = fields.Boolean("Phone Mandatory on Registration")
+    website_hide_event_location = fields.Boolean("Hide Event Location")
