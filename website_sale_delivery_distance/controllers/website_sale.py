@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from odoo import fields, _
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 from odoo.http import request
+
+_logger = logging.getLogger(__name__)
 
 
 class WebsiteShop(WebsiteSale):
@@ -23,20 +27,23 @@ class WebsiteShop(WebsiteSale):
 
         # if not errors on the address fields, try to locate it
         if not any(fname in errors for fname in shipping_fields_required):
-            # compute the lat / long of the partner
-            state_name = request.env['res.country.state'].browse(new_values['state_id']).name if new_values.get('state_id') else ''
-            country_name = request.env['res.country'].browse(new_values['country_id']).name if new_values.get('country_id') else ''
-            result = request.env['res.partner'].sudo()._geo_localize_route(street=new_values.get('street', ''), zip=new_values.get('zip', ''), city=new_values.get('city', ''), state=state_name, country=country_name)
-            # if can not be locate, then don't create and return errors
-            if result is None:
-                error_msg.append(_("Can not locate the given address. Please be carreful and be precise; don't forget the number in the street, check the spell of street name, ..."))
-                for fname in shipping_fields_required:
-                    if not fname in errors:
-                        errors[fname] = 'error'
-            # otherwise, extend the new_values (lat / long / date_localisation)
-            else:
-                new_values['partner_latitude'] = result[0]
-                new_values['partner_longitude'] = result[1]
-                new_values['date_localization'] = fields.Date.context_today(order)
+            try:
+                # compute the lat / long of the partner
+                state_name = request.env['res.country.state'].browse(new_values['state_id']).name if new_values.get('state_id') else ''
+                country_name = request.env['res.country'].browse(new_values['country_id']).name if new_values.get('country_id') else ''
+                result = request.env['res.partner'].sudo()._geo_localize_route(street=new_values.get('street', ''), zip=new_values.get('zip', ''), city=new_values.get('city', ''), state=state_name, country=country_name)
+                # if can not be locate, then don't create and return errors
+                if result is None:
+                    error_msg.append(_("Can not locate the given address. Please be carreful and be precise; don't forget the number in the street, check the spell of street name, ..."))
+                    for fname in shipping_fields_required:
+                        if not fname in errors:
+                            errors[fname] = 'error'
+                # otherwise, extend the new_values (lat / long / date_localisation)
+                else:
+                    new_values['partner_latitude'] = result[0]
+                    new_values['partner_longitude'] = result[1]
+                    new_values['date_localization'] = fields.Date.context_today(order)
+            except Exception:
+                _logger.error("GeoLoc service does not reply.")
 
         return new_values, errors, error_msg
