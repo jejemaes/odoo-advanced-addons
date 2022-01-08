@@ -15,6 +15,7 @@
             </xpath>
             <xpath expr="//field[@name='use_qrcode']" position="after">
                 <field name="registration_phone_mandatory"/>
+                <field name="website_hide_event_location"/>
             </xpath>
         </field>
     </record>
