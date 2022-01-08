@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
 <odoo>
 
+    <template id="event_description_full" name="Event Location optionnal" inherit_id="website_event.event_description_full">
+        <xpath expr="//div[@t-if='event.address_id']" position="attributes">
+            <attribute name="t-if">event.address_id and not event.website_hide_event_location</attribute>
+        </xpath>
+    </template>
+
     <template id="event_details" name="Event Header" inherit_id="website_event.event_details">
         <xpath expr="//t[@t-call='website_event.registration_template']" position="attributes">
             <attribute name="t-if">event.use_registration</attribute>
