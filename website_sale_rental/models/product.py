@@ -84,7 +84,7 @@ class ProductTemplate(models.Model):
         if self.rental_tracking == 'use_resource':
             resource = self.resource_ids[:1]
             calendar = self.resource_ids[:1].calendar_id
-        unavailabilities = calendar._unavailable_intervals(start_dt, end_dt, resource=resource, domain=None, tz=tz)  # domain is none implies not attendance + leaves
+        unavailabilities = calendar._unavailable_intervals(start_dt, end_dt, resource=resource, domain=[('time_type', '=', 'leave')], tz=tz)  # domain is none implies not attendance + leaves
         return [(fields.Datetime.to_string(item[0]), fields.Datetime.to_string(item[1]), 'unavailability') for item in unavailabilities if item[0] != item[1]]  # remove intervals having the same start and stop
 
     def _rental_get_bookings(self, start_dt, end_dt):

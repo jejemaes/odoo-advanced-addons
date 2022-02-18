@@ -303,7 +303,7 @@ var RentalCalendar = publicWidget.Widget.extend({
                 right: allowedViews.join(','),
             },
             defaultView: defaultView,
-           // timeZone: this.rentalTimezone,
+            timeZone: 'local',
             defaultDate: moment().format("YYYY-MM-DD"),
             navLinks: true, // can click day/week names to navigate views
             selectable: true,
@@ -311,6 +311,8 @@ var RentalCalendar = publicWidget.Widget.extend({
             validRange: {
                 start: moment.utc().startOf('month').format("YYYY-MM-DD"),
             },
+            displayEventTime: false,
+            eventTextColor: 'white',
             select: function(info) {
                 var startUtc =  moment(info.start).add(info.start.getTimezoneOffset(), 'minutes');
                 var stopUtc =  moment(info.end).add(info.end.getTimezoneOffset(), 'minutes');
@@ -341,7 +343,7 @@ var RentalCalendar = publicWidget.Widget.extend({
                 var end = endDate.format(DATETIME_SERVER_FORMAT);
 
                 self._fetchUnavailabilities(start, end).then(function (data) {
-                    var unavailabilities = self._toCalendarEvent(data['unavailabilities']);
+                    var unavailabilities = self._unavailabilitiesToCalendarEvent(data['unavailabilities']);
                     var rental = self._toCalendarEvent(data['bookings']);
                     var intervals = rental.concat(unavailabilities);
                     successCallback(intervals);
@@ -371,20 +373,16 @@ var RentalCalendar = publicWidget.Widget.extend({
         data.forEach(function(item){
             // create the  fullcalendar event
             var values = {
+                'title': _t('Ends on ') + moment.utc(item[1]).subtract(new Date().getTimezoneOffset(), 'minutes').format(' LLL'),
                 'start': moment.utc(item[0]).format(),
                 'end': moment.utc(item[1]).format(),
-                'allDay': true, // default
+                'allDay': false, // default
             };
-            if (self.rentalMinDuration && _.contains(['day', 'week', 'month'], self.rentalMinDuration)) {
-                values['end'] = moment.utc(item[1]).endOf('day').format(); //
-            }
-
 
             if (_.contains(['draft', 'confirmed'], item[2])) {
                 values['classNames'] = item[2] == 'draft' ? ['bg-warning'] : ['bg-danger'];
             } else { // unavailability
                 values['backgroundColor'] = 'grey';
-                values['rendering'] = 'background';
                 if (self.rentalMinDuration && _.contains(['hour', 'minute'], self.rentalMinDuration)) {
                     values['allDay'] = false;
                 }
