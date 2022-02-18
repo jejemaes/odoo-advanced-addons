@@ -34,8 +34,8 @@ class RentalBooking(models.Model):
     resource_id = fields.Many2one(related='resource_time_id.resource_id', inherited=True, tracking=True, domain=[('resource_type', '=', 'material')], states={'reserved': [('readonly', True)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]}, string="Equipment", required=True)
     resource_color = fields.Integer(related='resource_time_id.resource_id.color', readonly=True)
 
-    date_from = fields.Datetime(default=_default_date_from, inherited=True, related='resource_time_id.date_from', tracking=True, states={'reserved': [('readonly', True)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]})
-    date_to = fields.Datetime(default=_default_date_to, inherited=True, related='resource_time_id.date_from', tracking=True, states={'reserved': [('readonly', True)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]})
+    date_from = fields.Datetime(default=_default_date_from, inherited=True, related='resource_time_id.date_from', tracking=True, states={'reserved': [('readonly', False)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]})
+    date_to = fields.Datetime(default=_default_date_to, inherited=True, related='resource_time_id.date_from', tracking=True, states={'reserved': [('readonly', False)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]})
 
     code = fields.Char('Reference', readonly=True)
     partner_id = fields.Many2one('res.partner', string='Customer', required=True, copy=False, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", tracking=True)
@@ -126,13 +126,6 @@ class RentalBooking(models.Model):
                 else:
                     values['code'] = self.env['ir.sequence'].next_by_code('rental.booking') or _('New')
         return super(RentalBooking, self).create(value_list)
-
-    def write(self, values):
-        if 'date_from' in values or 'date_to' in values:
-            states = self.mapped('state')
-            if any([state in states for state in ['reserved', 'picked_up', 'returned', 'done']]):
-                raise UserError(_('You can not change the dates of a none draft booking'))
-        return super(RentalBooking, self).write(values)
 
     def unlink(self):
         if any(rental.state not in ['draft', 'cancel'] for rental in self):
