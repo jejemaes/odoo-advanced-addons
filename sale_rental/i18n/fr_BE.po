@@ -245,7 +245,7 @@ msgstr "Créer un bon de commande depuis une location"
 #: model:ir.model.fields.selection,name:sale_rental.selection__rental_link_sale_order__link_mode__new
 #: model_terms:ir.ui.view,arch_db:sale_rental.rental_booking_view_form
 msgid "Create Sales Order"
-msgstr "Créer un bon de commande"
+msgstr "Faire une commande"
 
 #. module: sale_rental
 #: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__create_uid
