@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
 import werkzeug
@@ -36,7 +35,7 @@ class WebsiteGallery(http.Controller):
             page=page,
             step=self._gallery_per_page,
         )
-        galleries = Gallery.search(domain, offset=(page - 1) * self._gallery_per_page, limit=self._gallery_per_page)
+        galleries = Gallery.search(domain, offset=(page - 1) * self._gallery_per_page, limit=self._gallery_per_page, order="date DESC")
 
         return request.render('website_gallery.gallery_index', {
             'galleries': galleries,
@@ -61,7 +60,7 @@ class WebsiteGallery(http.Controller):
         if request.env.user.has_group('website.group_website_designer'):
             domain = expression.AND([domain, ['|', ('website_published', '=', True), ('website_published', '=', False)]])
 
-        images = GalleryImage.search(domain, offset=(page - 1) * image_per_page, limit=image_per_page)
+        images = GalleryImage.search(domain, offset=(page - 1) * image_per_page, limit=image_per_page, order="sequence ASC, id ASC")
         total = GalleryImage.search_count(domain)
 
         pager = request.website.pager(

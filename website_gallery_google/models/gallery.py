@@ -37,7 +37,7 @@ class Gallery(models.Model):
         """ Import all picture from google as website.gallery.image """
         result = {}
         for gallery in self.filtered(lambda gal: gal.gallery_type == 'google'):
-            media_items = self.env['google.api'].sudo(gallery.website_id.user_id)._photos_fetch_all_media_items(gallery.google_identifier)
+            media_items = self.env['google.api'].with_user(gallery.website_id.user_id)._photos_fetch_all_media_items(gallery.google_identifier)
             images = self.env['google.api']._photos_create_gallery_image(gallery.id, media_items)
             result[gallery.id] = images
 
@@ -48,7 +48,7 @@ class Gallery(models.Model):
     def _google_photo_sync(self):
         """ Synchronize the new pictures from goole and remove the needed ones. This applies the state of google into Odoo """
         for gallery in self.filtered(lambda gal: gal.gallery_type == 'google'):
-            media_items = self.env['google.api'].sudo(gallery.website_id.user_id)._photos_fetch_all_media_items(gallery.google_identifier)
+            media_items = self.env['google.api'].with_user(gallery.website_id.user_id)._photos_fetch_all_media_items(gallery.google_identifier)
 
             image_gid = gallery.image_ids.mapped('google_identifier')
 
@@ -61,7 +61,7 @@ class Gallery(models.Model):
                 media_ids_from_google.append(media_item['id'])
 
             # create the new image from google
-            self.env['google.api'].sudo(gallery.website_id.user_id)._photos_create_gallery_image(gallery.id, media_to_create)
+            self.env['google.api'].with_user(gallery.website_id.user_id)._photos_create_gallery_image(gallery.id, media_to_create)
 
             # remove in odoo the ones removed from in google
             image_gid_to_remove = set(image_gid) - set(media_ids_from_google)
@@ -122,7 +122,7 @@ class GalleryImage(models.Model):
         for website, images in grouped_by_website.items():
             # fetch new google urls
             expired_images_gid = images.mapped('google_identifier')
-            media_items = self.env['google.api'].sudo(website.user_id)._photos_batch_get_media_items(expired_images_gid)
+            media_items = self.env['google.api'].with_user(website.user_id)._photos_batch_get_media_items(expired_images_gid)
             gid_url_map = {item['id']: item['baseUrl'] for item in media_items}
 
             # store them on the attachment
