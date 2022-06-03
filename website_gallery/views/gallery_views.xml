@@ -41,13 +41,10 @@
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button class="oe_stat_button" name="website_publish_button"
-                                type="object" icon="fa-globe">
-                                <field name="website_published" widget="website_button"/>
-                            </button>
                             <button type="action" name="%(website_gallery.action_website_gallery_image_from_gallery)d" class="oe_stat_button" icon="fa-camera">
                                 <field name="image_count" widget="statinfo" string="Pictures"/>
                             </button>
+                            <field name="website_published" widget="website_redirect_button"/>
                         </div>
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
@@ -58,7 +55,7 @@
                         <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                         <group>
                             <group>
-                                <field name="author_name"/>
+                                <field name="user_id"/>
                                 <field name="date"/>
                                 <field name="image_id"/>
                             </group>
@@ -67,6 +64,8 @@
                                 <field name="display_type"/>
                                 <field name="website_id" options="{'no_create': True}" groups="website.group_multi_website"/>
                             </group>
+                        </group>
+                        <group>
                             <field name="description"/>
                         </group>
                     </sheet>
@@ -81,7 +80,7 @@
                 <kanban class="o_kanban_mobile">
                     <field name="id"/>
                     <field name="name"/>
-                    <field name="author_name"/>
+                    <field name="user_id"/>
                     <field name="date"/>
                     <field name="image_count"/>
                     <field name="image_small_url"/>
@@ -100,8 +99,8 @@
                                     <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                     <ul class="mt-3">
                                         <li t-if="record.image_count.raw_value"><i class="fa fa-camera"/> <t t-esc="record.image_count.raw_value"/></li>
-                                        <li t-if="record.date.raw_value"><i class="fa fa-calendar"/> <t t-esc="record.date.raw_value"/></li>
-                                        <li t-if="record.author_name.raw_value"><i class="fa fa-user"/> <t t-esc="record.author_name.raw_value"/></li>
+                                        <li t-if="record.date.value"><i class="fa fa-calendar"/> <field name="date"/></li>
+                                        <li t-if="record.user_id.value"><i class="fa fa-user"/> <field name="user_id"/></li>
                                     </ul>
                                 </div>
                             </div>
@@ -133,10 +132,7 @@
                 <form>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button class="oe_stat_button" name="website_publish_button"
-                                type="object" icon="fa-globe">
-                                <field name="website_published" widget="website_button"/>
-                            </button>
+                            <field name="website_published" widget="website_redirect_button"/>
                         </div>
                         <field name="datas" widget="image" class="oe_avatar"/>
                         <div class="oe_title">
@@ -211,8 +207,9 @@
             <field name="name">website.gallery.tag.list</field>
             <field name="model">website.gallery.tag</field>
             <field name="arch" type="xml">
-                <tree string="Tag Categories">
+                <tree string="Tag Categories" editable="top">
                     <field name="name"/>
+                    <field name="color" widget="color_picker"/>
                 </tree>
             </field>
         </record>
