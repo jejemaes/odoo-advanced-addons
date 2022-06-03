@@ -106,7 +106,6 @@ class GalleryImportGoogleLine(models.TransientModel):
     def _prepare_gallery_values(self):
         return {
             'name': self.album_name,
-            'author_name': False,
             'google_identifier': self.album_identifier,
             'gallery_type': 'google',
             'google_last_sync_date': False,

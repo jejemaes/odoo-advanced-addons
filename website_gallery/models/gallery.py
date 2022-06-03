@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import uuid
 
 from odoo import api, models, fields
 from odoo.addons.http_routing.models.ir_http import slug
@@ -12,9 +13,10 @@ class Gallery(models.Model):
     _inherit = ['website.seo.metadata', 'website.published.multi.mixin']
 
     name = fields.Char("Name", required=True)
-    author_name = fields.Char("Author")
-    date = fields.Date("Date", help="Displayed gallery date on website.")
-    description = fields.Text("Description")
+    user_id = fields.Many2one('res.users', string="Author", default=lambda self: self.env.user.id)
+    user_name = fields.Char(related="user_id.name", string="Author Name", related_sudo=True)
+    date = fields.Date("Publication Date", default=fields.Date.today(), help="Displayed gallery date on website.")
+    description = fields.Html("Description")
     tag_ids = fields.Many2many('website.gallery.tag', 'website_gallery_tag_rel', string='Tags')
     gallery_type = fields.Selection([
         ('manual', 'Manual')

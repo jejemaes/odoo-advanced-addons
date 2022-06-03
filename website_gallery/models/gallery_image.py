@@ -13,7 +13,7 @@ class GalleryImage(models.Model):
 
     # attachment fields
     attachment_id = fields.Many2one('ir.attachment', 'File', domain=[('mimetype', 'ilike', 'image')], required=True, ondelete='cascade')
-    public = fields.Boolean('Is public document', related='attachment_id.public', inherited=True, default=True)  # public by default
+    public = fields.Boolean('Is public document', related='attachment_id.public', inherited=True, default=True, compute_sudo=True)  # public by default
 
     # website mixin
     is_published = fields.Boolean(default=True)
@@ -23,9 +23,13 @@ class GalleryImage(models.Model):
     gallery_type = fields.Selection(related='gallery_id.gallery_type', readonly=True)
     sequence = fields.Integer("Sequence", default=20)
 
-    image_url = fields.Char("Image URL", compute='_compute_image_urls')
-    image_small_url = fields.Char("Thumbnail URL", compute='_compute_image_urls')
-    image_medium_url = fields.Char("Medium Image URL", compute='_compute_image_urls')
+    image_url = fields.Char("Image URL", compute='_compute_image_urls', compute_sudo=True)
+    image_small_url = fields.Char("Thumbnail URL", compute='_compute_image_urls', compute_sudo=True)
+    image_medium_url = fields.Char("Medium Image URL", compute='_compute_image_urls', compute_sudo=True)
+
+    def _compute_display_name(self):
+        for image in self.sudo():
+            image.display_name = image.attachment_id.name
 
     def _compute_website_url(self):
         for image in self:
