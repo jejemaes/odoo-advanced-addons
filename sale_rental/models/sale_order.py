@@ -98,6 +98,10 @@ class SaleOrder(models.Model):
         self.mapped('order_line').filtered(lambda l: l.is_rental).mapped('rental_booking_ids').sudo().filtered(lambda b: b.state != 'picked_up').action_cancel()
         return result
 
+    def action_generate_rental_booking(self):
+        self.mapped('order_line')._rental_booking_generation()
+        return True
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -325,7 +329,7 @@ class SaleOrderLine(models.Model):
         paddings = self.product_id._get_rental_paddings_timedelta()
         return {
             'sale_line_id': self.id,
-            'name': self.order_id.name,
+            'name': "%s - %s" % (self.order_id.name, self.order_id.partner_id.commercial_partner_id.name),
             'resource_id': resource.id,
             'date_from': self.rental_start_date - paddings['before'],
             'date_to': self.rental_stop_date + paddings['after'],
