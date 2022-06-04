@@ -15,6 +15,12 @@
                    <field name="rental_count" widget="statinfo" string="Rental Bookings"/>
                 </button>
             </xpath>
+            <xpath expr="//group[@name='note_group']" position="before">
+                <div class="oe_right">
+                    <field name="rental_line_count" invisible="1"/>
+                    <button string="Generate Rental" name="action_generate_rental_booking" type="object" attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('rental_line_count', '=', 0)]}"/>
+                </div>
+            </xpath>
 
             <!-- Sale Order Line, rental mode -->
             <xpath expr="//create[@name='add_product_control']" position="after">
