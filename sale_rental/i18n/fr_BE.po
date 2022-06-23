@@ -1,0 +1,880 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sale_rental
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-23 13:09+0000\n"
+"PO-Revision-Date: 2021-09-23 13:09+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/product_template.py:0
+#: code:addons/sale_rental/models/product_template.py:0
+#, python-format
+msgid "%s * %s"
+msgstr "%s * %s"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/product_template.py:0
+#: code:addons/sale_rental/models/product_template.py:0
+#, python-format
+msgid "%s * %s (%s)"
+msgstr "%s * %s (%s)"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
+msgid "<br/><b>Agreement:</b>"
+msgstr "<br/><b>Contract:</b>"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.rental_create_sale_order_view_form
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_view_form_inherit
+msgid ""
+"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"Arrow icon\" "
+"title=\"Arrow\"/>"
+msgstr ""
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_pricelist_item_view_form
+msgid ""
+"<span attrs=\"{'invisible':[('base', '!=', 'list_price')]}\">Rent Price  -  "
+"</span>"
+msgstr ""
+"<span attrs=\"{'invisible':[('base', '!=', 'list_price')]}\">Prix de location  -  "
+"</span>"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.res_config_settings_view_form
+msgid "<span class=\"o_form_label\">Default Padding Time</span>"
+msgstr "<span class=\"o_form_label\">Temps de sécurité par défaut</span>"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/resource.py:0
+#: code:addons/sale_rental/models/resource.py:0
+#, python-format
+msgid ""
+"A Product should be set, as the resource is linked to a product template."
+msgstr "Un article doit être assigné, car la ressource est lié à un modèle d'article."
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_product_product__description_rental
+#: model:ir.model.fields,help:sale_rental.field_product_template__description_rental
+msgid "A description of the Product to rent it."
+msgstr "Une description d'article pour sa location."
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_product_rental_tenure_duration_uom_required_tenure_type
+msgid "A duration UoM is required for a tenure of 'duration' type."
+msgstr "Une durée UdM est requise pour un prix de location par durée temporelle."
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_product_rental_tenure_duration_valure_required_tenure_type
+msgid "A duration value is required for a tenure of 'duration' type."
+msgstr "Une valeur de durée est requise pour un prix de location par durée temporelle."
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_product_rental_tenure_duration_combinaition
+msgid "A product can not have multi tenure defined for the same duration."
+msgstr "Un article ne peut avoir plusieurs prix de location pour la même durée."
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_product_template_rental_tenure_type_required
+msgid "A rental product needs a rental tenure type."
+msgstr "Un article louable a besoin d'une méthode de configuration de prix de location."
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_product_template_rental_tracking_required
+msgid "A rental product needs a rental tracking."
+msgstr "Un produit louable a besoin d'un mode de suivi des ressources."
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_product_template_rental_tz_required
+msgid "A rental product with tracking needs a rental timezone."
+msgstr "Un article louable avec suivi a besoin d'une timezone"
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_product_template_rental_calendar_required
+msgid "A rental product without tracking needs a rental calendar."
+msgstr "Un article louable sans suivi a besoin d'un calendrier de location."
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_sale_order_line_rental_start_date_required_for_rental
+msgid "A rental sale item requires a start date."
+msgstr "Une ligne de bon de commande pour une location a besoin d'une date de début."
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_sale_order_line_rental_stop_date_required_for_rental
+msgid "A rental sale item requires a stop date."
+msgstr "Une ligne de bon de commande pour une location a besoin d'une date de fin."
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid "A rental sale line must be linked to a rental product."
+msgstr "Une ligne de bon de commande pour une location doit être liée à un article louable."
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_sale_order_line__qty_delivered_method
+msgid ""
+"According to product configuration, the delivered quantity can be automatically computed by mechanism :\n"
+"  - Manual: the quantity is set manually on the line\n"
+"  - Analytic From expenses: the quantity is the quantity sum from posted expenses\n"
+"  - Timesheet: the quantity is the sum of hours recorded on tasks linked to this sale line\n"
+"  - Stock Moves: the quantity comes from confirmed pickings\n"
+msgstr ""
+"Selon la configuration du produit, la quantité livrée peut être automatiquement calculée par mécanisme:\n"
+" - Manuel: la quantité est définie manuellement sur la ligne\n"
+" - Analytique des dépenses: la quantité est la somme des dépenses enregistrées\n"
+" - Feuilles de temps: la quantité est la somme des heures enregistrées sur les tâches liées à cette ligne de vente\n"
+" - Mouvements de stock: la quantité provient des transferts confirmés\n"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid "Add Rental Line"
+msgstr "Ajouter une location"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_view_form_inherit
+msgid "Add a Rental"
+msgstr "Ajouter une location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_padding_after
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_padding_after
+#: model:ir.model.fields,field_description:sale_rental.field_res_config_settings__default_rental_padding_after
+msgid "After Security Time"
+msgstr "Temps de sécurité d'après location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__analytic_account_id
+msgid "Analytic Account"
+msgstr "Compte Analytique"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__duration
+msgid "Any Duration"
+msgstr "N'importe quelle durée"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/rental_tenure.py:0
+#, python-format
+msgid "At least one day musmt be selected for the tenure."
+msgstr "Au moins un jour doit être selectionné pour le tarif."
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__rental_link_sale_order__link_mode__attach
+msgid "Attach to Existing Sales Order"
+msgstr "Attacher à un bon de commande existant"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.rental_create_sale_order_view_form
+msgid "Attach to Sales Order"
+msgstr "Attacher à un bon de commande"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__auto_confirm
+msgid "Auto Confirm Order"
+msgstr "Auto-confirmation du bon de commande"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__base_price
+msgid "Base Rent Price"
+msgstr "Prix de base"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_padding_before
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_padding_before
+#: model:ir.model.fields,field_description:sale_rental.field_res_config_settings__default_rental_padding_before
+msgid "Before Security Time"
+msgstr "Temps de sécurité d'avant location"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
+msgid "Calendar"
+msgstr "Calendrier"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__can_be_rented
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__can_be_rented
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_template_view_search_rental
+msgid "Can be Rented"
+msgstr "Peut être loué"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.rental_create_sale_order_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.report_saleorder_document_inherit_sale_stock
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
+msgid "Code"
+msgstr "Code"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__commercial_partner_id
+msgid "Commercial Entity"
+msgstr "Entité Commerciale"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de config"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_rental_link_sale_order
+msgid "Create SO from Rental Booking"
+msgstr "Créer un bon de commande depuis une location"
+
+#. module: sale_rental
+#: model:ir.actions.act_window,name:sale_rental.rental_create_sale_order_action_multi
+#: model:ir.model.fields.selection,name:sale_rental.selection__rental_link_sale_order__link_mode__new
+#: model_terms:ir.ui.view,arch_db:sale_rental.rental_booking_view_form
+msgid "Create Sales Order"
+msgstr "Faire une commande"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__create_uid
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__create_date
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__create_date
+msgid "Created on"
+msgstr "Créé à"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__currency_id
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__partner_id
+msgid "Customer"
+msgstr "Client"
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_rental_link_sale_order__partner_id
+msgid "Customer of the sales order"
+msgstr "Client du bon de commande"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.rental_create_sale_order_view_form
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_view_form_inherit
+msgid "Date"
+msgstr "Date"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_rental_tenure__duration_uom__day
+msgid "Day(s)"
+msgstr "Jour(s)"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.res_config_settings_view_form
+msgid "Default rental security time"
+msgstr ""
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_sale_order_line__product_uom_id
+msgid "Default unit of measure used for all stock operations."
+msgstr ""
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__partner_shipping_id
+#: model_terms:ir.ui.view,arch_db:sale_rental.report_saleorder_document_inherit_sale_stock
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
+msgid "Delivery Address"
+msgstr "Adresse de livraison"
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_rental_link_sale_order__partner_shipping_id
+msgid "Delivery address for current booking."
+msgstr "Adresse de livraison de la location courante"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
+msgid "Description"
+msgstr "Description"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__discount
+msgid "Discount"
+msgstr "Réduction"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_pricelist__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_product_pricelist_item__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_rental_booking__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_resource_resource__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order__display_name
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid "Each linked resources should have created a rental booking."
+msgstr "Chaque ressource doit avoir généré une location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__rental_stop_date
+#: model_terms:ir.ui.view,arch_db:sale_rental.report_saleorder_document_inherit_sale_stock
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
+msgid "End Date"
+msgstr "Date de fin"
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_product_product__rental_padding_after
+#: model:ir.model.fields,help:sale_rental.field_product_product__rental_padding_before
+#: model:ir.model.fields,help:sale_rental.field_product_template__rental_padding_after
+#: model:ir.model.fields,help:sale_rental.field_product_template__rental_padding_before
+msgid "Expressed in hours"
+msgstr "Exprimé en heure"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_tenure_id
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_tenure_id
+msgid "First Rental Price"
+msgstr "Premier prix de location"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/product_template.py:0
+#, python-format
+msgid "Free"
+msgstr "Gratuit"
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_rental_link_sale_order__rental_pricing_explanation
+#: model:ir.model.fields,help:sale_rental.field_sale_order_line__rental_pricing_explanation
+msgid "Helper text to understand rental price computation."
+msgstr "Texte expliquant le détail de calcul du prix de location"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_rental_tenure__duration_uom__hour
+msgid "Hour(s)"
+msgstr "Heure(s)"
+
+#. module: sale_rental
+#: model:product.template,uom_name:sale_rental.product_template_rental_caravane
+#: model:product.template,uom_name:sale_rental.product_template_rental_podium
+#: model:product.template,uom_name:sale_rental.product_template_rental_remorque_bar
+msgid "Hours"
+msgstr "Heures"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_pricelist__id
+#: model:ir.model.fields,field_description:sale_rental.field_product_pricelist_item__id
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__id
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__id
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__id
+#: model:ir.model.fields,field_description:sale_rental.field_rental_booking__id
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__id
+#: model:ir.model.fields,field_description:sale_rental.field_res_config_settings__id
+#: model:ir.model.fields,field_description:sale_rental.field_resource_resource__id
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order__id
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__id
+msgid "ID"
+msgstr "Id"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
+msgid "Invoicing"
+msgstr "Facturation"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__is_rental
+msgid "Is a rental"
+msgstr "Est une location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_pricelist____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_product_pricelist_item____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_product_product____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_product_template____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_rental_booking____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_res_config_settings____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_resource_resource____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order____last_update
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__write_uid
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__write_date
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__link_mode
+msgid "Link Mode"
+msgstr ""
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.rental_create_sale_order_view_form
+msgid "Link to Sales Order"
+msgstr ""
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_pricelist_item_view_form
+msgid "Max. Margin"
+msgstr "Marge Max."
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__qty_delivered_method
+msgid "Method to update delivered qty"
+msgstr "Méthode de mise à jour des des quantités livrées"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_pricelist_item_view_form
+msgid "Min. Margin"
+msgstr "Marge Min."
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_pricelist_item__applicable_on
+msgid "Mode"
+msgstr "Mode"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_rental_tenure__duration_uom__month
+msgid "Month(s)"
+msgstr "Mois"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_pricelist_item_view_form
+msgid "New Price ="
+msgstr "Nouveau Prix ="
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tracking__no
+msgid "No Tracking"
+msgstr "Pas de suivi"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order__rental_count
+msgid "Number of Rental Bookings"
+msgstr "Nombre de location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__weekday_count
+msgid "Number of Weekdays"
+msgstr "Number de jours"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__weekday
+msgid "Per Week Day"
+msgstr "Par jours de semaine"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_product_pricelist
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__pricelist_id
+msgid "Pricelist"
+msgstr "Liste de prix"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_product_pricelist_item
+msgid "Pricelist Rule"
+msgstr "Règle des listes des prix"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__rental_pricing_explanation
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__rental_pricing_explanation
+msgid "Pricing explanation"
+msgstr "Explication du prix de location"
+
+#. module: sale_rental
+#: model:ir.actions.act_window,name:sale_rental.product_product_action_rental
+#: model:ir.model,name:sale_rental.model_product_product
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__product_template_id
+#: model:ir.model.fields,field_description:sale_rental.field_rental_booking__resource_product_id
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__product_id
+#: model:ir.model.fields,field_description:sale_rental.field_resource_resource__product_id
+#: model_terms:ir.ui.view,arch_db:sale_rental.report_saleorder_document_inherit_sale_stock
+#: model_terms:ir.ui.view,arch_db:sale_rental.resource_resource_view_search
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
+msgid "Product"
+msgstr "Article"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_product_template
+#: model:ir.model.fields,field_description:sale_rental.field_resource_resource__product_template_id
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__product_uom_id
+msgid "Product UoM"
+msgstr ""
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__rent_price
+msgid "Rent Price"
+msgstr "Prix de Location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__rental_booking_id
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
+msgid "Rental"
+msgstr "Location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_agreement_id
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_agreement_id
+msgid "Rental Agreement"
+msgstr "Contract de location"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order__rental_booking_ids
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__rental_booking_ids
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_view_form_inherit
+#, python-format
+msgid "Rental Bookings"
+msgstr "Locations"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_calendar_id
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_calendar_id
+msgid "Rental Calendar"
+msgstr "Calendrier de location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__description_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__description_rental
+msgid "Rental Description"
+msgstr "Description de location"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.report_saleorder_document_inherit_sale_stock
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
+msgid "Rental Details"
+msgstr "Détails de location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__rental_stop_date
+msgid "Rental End Date"
+msgstr "Date de fin"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order__rental_line_count
+msgid "Rental Line Count"
+msgstr "Nombre de ligne de location"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_product_rental_tenure
+msgid "Rental Price"
+msgstr "Prix de location"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
+msgid "Rental Pricing"
+msgstr "Tarifs de Location"
+
+#. module: sale_rental
+#: model:ir.ui.menu,name:sale_rental.rental_menu_product
+msgid "Rental Products"
+msgstr "Articles Louables"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_rental_booking
+msgid "Rental Reservation"
+msgstr "Location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__rental_start_date
+msgid "Rental Start Date"
+msgstr "Date de début"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_tenure_ids
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_tenure_ids
+msgid "Rental Tenures"
+msgstr "Tarifs de location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rent_price_unit
+msgid "Rental Unit Price"
+msgstr "Prix unitaire de location"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rent_price_explanation
+msgid "Rental Unit Price Explanation"
+msgstr "Détail du prix unitaire"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid "Rental from %s to %s"
+msgstr "Location du %s à %s"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_pricelist_item__applicable_on__rent
+msgid "Renting"
+msgstr "Location"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__sale_order_line__qty_delivered_method__rental
+msgid "Rentings"
+msgstr "Locations"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
+msgid "Reservation"
+msgstr "Réservation"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__resource_count
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__resource_count
+msgid "Resource Count"
+msgstr "Nombre de ressource"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_resource_resource
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__resource_ids
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__resource_ids
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__resource_ids
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
+msgid "Resources"
+msgstr "Ressources"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_pricelist_item_view_form
+msgid "Rounding Method"
+msgstr "Méthode d'arrondissement"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_booking__sale_line_id
+msgid "Sale Item"
+msgstr "Ligne de bon de commande"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_booking__sale_order_id
+msgid "Sale Order"
+msgstr "Bon de commande"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_sale_order
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__sale_order_id
+#: model_terms:ir.ui.view,arch_db:sale_rental.rental_booking_view_form
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: sale_rental
+#: model:ir.model,name:sale_rental.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_pricelist_item__applicable_on__sale
+msgid "Selling"
+msgstr "Vente"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_product_product__can_be_rented
+#: model:ir.model.fields,help:sale_rental.field_product_template__can_be_rented
+msgid "Specify if the product can be rent in a sales order line."
+msgstr ""
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__rental_start_date
+#: model_terms:ir.ui.view,arch_db:sale_rental.report_saleorder_document_inherit_sale_stock
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
+msgid "Start Date"
+msgstr "Date de début"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__weekday_start
+msgid "Start of Weekday"
+msgstr "Premier jour de la semaine"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__duration_value
+msgid "Tenue"
+msgstr "Tarif"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_tenure_type
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__tenure_type
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_tenure_type
+msgid "Tenure Duration"
+msgstr "Durée du tarif"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__tenure_name
+msgid "Tenure Name"
+msgstr "Nom du tarif de location"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid ""
+"The Sale Item should be linked to rental bookings, as the product tracked "
+"resources."
+msgstr ""
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid ""
+"The Sale Item should be linked to resources as the product is tracked for "
+"rentings."
+msgstr ""
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid ""
+"The Sale Item should not be linked to rental bookings as the line is not a "
+"rental one."
+msgstr ""
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid ""
+"The Sale Item should not be linked to resources as the line is not a rental "
+"one."
+msgstr "La ligne de bon de commande ne doit pas être liée à des ressources car elle n'est pas une location."
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid ""
+"The Sale Item should not be linked to resources as the product is no tracked"
+" for rentings."
+msgstr "La ligne de bon de commande ne doit pas être liée à des ressources car son article ne suit pas les ressources."
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/rental_tenure.py:0
+#, python-format
+msgid "The chosen days must all be consecutives. %s are not."
+msgstr "Les jours choisis ne sont pas consécutifs. %s ne le sont pas."
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/rental_tenure.py:0
+#, python-format
+msgid "The duration is required on the tenure."
+msgstr "La durée est requise sur le tarif."
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/rental_tenure.py:0
+#, python-format
+msgid "The duration unit is required on the tenure."
+msgstr "L'unité de durée"
+
+#. module: sale_rental
+#: model:ir.model.constraint,message:sale_rental.constraint_product_rental_tenure_base_price_positive
+msgid "The rent price must be positive."
+msgstr "Le prix du tarif doit être positif."
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/resource.py:0
+#, python-format
+msgid "The resource product should be related to the product template."
+msgstr "La ressource doit être liée à un modèle d'article."
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_product_rental_tenure__rent_price
+msgid ""
+"This amount is expressed in the currency of the pricelist, or (fallback) in "
+"product currency."
+msgstr "Ce montant est exprimé dans la devise de la liste de prix, ou celle da société de l'article."
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
+msgid "This note is added to sales orders and invoices."
+msgstr "Cette note est ajoutée au bon de commande et facture."
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_tz
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_tz
+msgid "Timezone"
+msgstr "Timezone"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tracking__use_resource
+msgid "Track Individual Items"
+msgstr "Suivre les ressources individuellement"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_tracking
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_tracking
+#: model:ir.model.fields,field_description:sale_rental.field_sale_order_line__product_rental_tracking
+msgid "Tracking Type"
+msgstr "Mode de gestion des ressources"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__duration_uom
+msgid "Unit"
+msgstr "Unité"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__price_unit
+msgid "Unit Price"
+msgstr "Prix Unitaire"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_rental_tenure__duration_uom__week
+msgid "Week(s)"
+msgstr "Semaine(s)"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__weekday_selectable_ids
+msgid "Weekday Selectable"
+msgstr "Jours de semaine choississable"
+
+#. module: sale_rental
+#: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__weekday_ids
+msgid "Weekdays"
+msgstr "Jours de semaine"
+
+#. module: sale_rental
+#: code:addons/sale_rental/wizard/create_sale_order.py:0
+#, python-format
+msgid ""
+"You can not create a Sales Order, since your resource is not linked to a "
+"product."
+msgstr "Vous ne pouvez pas créer de bon de commande car la ressource n'est pas liée un produit."
+
+#. module: sale_rental
+#: code:addons/sale_rental/wizard/create_sale_order.py:0
+#, python-format
+msgid "You can only apply this action from a rental booking."
+msgstr "Vous ne pouvez seulement appliquer cette action sur un location."

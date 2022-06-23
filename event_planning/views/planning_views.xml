@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Planning -->
+    <record id="planning_planning_view_form" model="ir.ui.view">
+        <field name="name">planning.planning.form</field>
+        <field name="model">planning.planning</field>
+        <field name="inherit_id" ref="planning.planning_planning_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='planning_type']" position="after">
+                <field name="event_id" options="{'no_create': True, 'no_create_edit': True}" attrs="{'required': [('planning_type', '=', 'event')], 'invisible': [('planning_type', '!=', 'event')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='planning_type']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="planning_planning_view_kanban" model="ir.ui.view">
+        <field name="name">planning.planning.kanban</field>
+        <field name="model">planning.planning</field>
+        <field name="inherit_id" ref="planning.planning_planning_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
+                <span style="font-weight:bold;" class="badge badge-success" t-if="record.planning_type.raw_value == 'event'" title="Event" role="img" aria-label="Event">Event</span>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Shift -->
+	<record id="planning_shift_view_form" model="ir.ui.view">
+        <field name="name">planning.shift.form</field>
+        <field name="model">planning.shift</field>
+        <field name="inherit_id" ref="planning.planning_shift_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_id']" position="after">
+                <field name="event_id" options="{'no_create': True, 'no_create_edit': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="planning_shift_view_search" model="ir.ui.view">
+        <field name="name">planning.shift.search</field>
+        <field name="model">planning.shift</field>
+        <field name="inherit_id" ref="planning.planning_shift_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_id']" position="after">
+                <field name="event_id"/>
+            </xpath>
+            <xpath expr="//filter[@name='past']" position="after">
+                <separator/>
+                <filter name="event" string="For Event" domain="[('event_id', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

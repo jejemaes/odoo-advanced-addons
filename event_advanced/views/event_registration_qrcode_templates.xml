@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="page_registration_qrcode" name="Registration Status Page for QRCode URL">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <t t-call-assets="web.assets_common" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+            </t>
+
+            <t t-set="styling_status_map" t-value="{'invalid_ticket': 'danger', 'canceled_registration': 'warning', 'not_ongoing_event': 'warning', 'need_manual_confirmation': 'danger', 'confirmed_registration': 'success', 'already_registered': 'info'}"/>
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-sm-12 mt-5">
+                        <div class="o_logo">
+                            <img class="img img-fluid d-block mx-auto" src="/web/binary/company_logo" alt="Logo"/>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-12 mt-5">
+                        <div t-attf-class="card bg-#{styling_status_map.get(mode, 'info')}">
+                            <div class="card-header">
+                                <h2><t t-esc="event.display_name"/></h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="clearfix mb16">
+                                    <div role="alert" t-attf-class="alert alert-#{styling_status_map.get(mode, 'info')}">
+                                        <span class="font-weight-bold">
+                                            <t t-if="mode == 'invalid_ticket'">
+                                                No registration found, the ticket does not exist.
+                                            </t>
+                                            <t t-if="mode == 'canceled_registration'">
+                                                The registration has been cancelled, no access is granted.
+                                            </t>
+                                            <t t-if="mode == 'not_ongoing_event'">
+                                                The event is not ongoing.
+                                            </t>
+                                            <t t-if="mode == 'need_manual_confirmation'">
+                                                The registration does not match the event. The ticket has been registered for <t t-esc="event.name"/>, but the ticket is about <t t-esc="registration.event_id.name"/>. Manual action needs to be taken.
+                                            </t>
+                                            <t t-if="mode == 'confirmed_registration'">
+                                                Registration has just been marked as attended.
+                                            </t>
+                                            <t t-if="mode == 'already_registered'">
+                                                Registration is already attended.
+                                            </t>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive" t-if="registration">
+                                    <table class="o_event_table table table-striped">
+                                        <tr>
+                                            <th>Invitation for</th>
+                                            <td><t t-esc="registration.name"/> (<t t-esc="registration.email"/>)</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Registration Date</th>
+                                            <td><t t-esc="registration.create_date" t-options="{'widget': 'datetime', 'format':'yyyy-MM-dd hh:mm:ss'}"/></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Phone</th>
+                                            <td><t t-esc="registration.phone"/></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Status</th>
+                                            <td>
+                                                <h4><span class="badge badge-info">
+                                                    <t t-if="registration.state == 'draft'">Draft</t>
+                                                    <t t-if="registration.state == 'cancel'">Cancelled</t>
+                                                    <t t-if="registration.state == 'open'">Confirmed</t>
+                                                    <t t-if="registration.state == 'done'">Attended</t>
+                                                </span></h4>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Ticket</th>
+                                            <td><t t-esc="registration.event_ticket_id.display_name"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </t>
+    </template>
+
+</odoo>

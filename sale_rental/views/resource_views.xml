@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="resource_resource_view_tree" model="ir.ui.view">
+        <field name="name">resource.resource.tree</field>
+        <field name="model">resource.resource</field>
+        <field name="inherit_id" ref="resource_advanced.resource_resource_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='calendar_id']" position="after">
+                <field name="product_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="resource_resource_view_form" model="ir.ui.view">
+        <field name="name">resource.resouce.rental.form</field>
+        <field name="model">resource.resource</field>
+        <field name="inherit_id" ref="resource_advanced.resource_resource_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='calendar_details']" position="after">
+                <group name="rental_details">
+                    <field name="product_template_id" options="{'no_create': True}"/>
+                    <field name="product_id" options="{'no_create': True}" attrs="{'required': [('product_template_id', '!=', False)]}" groups="product.group_product_variant"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="resource_resource_view_search" model="ir.ui.view">
+        <field name="name">resource.resouce.rental.search</field>
+        <field name="model">resource.resource</field>
+        <field name="inherit_id" ref="resource.view_resource_resource_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="inside">
+                <filter string="Product" name="group_by_product_id" domain="[]" context="{'group_by':'product_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

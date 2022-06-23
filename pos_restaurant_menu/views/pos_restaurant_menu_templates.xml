@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="pos_restaurant_online_menu" name="PoS Advanced Online Menu">
+        <t t-call="web.basic_layout">
+            <t t-set="title">
+                <t t-esc="menu.name"/>
+            </t>
+            <div class="content">
+                <div class="container">
+                    <div class="row mt-3">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                            <t t-if="company.logo_web">
+                                <img t-att-src="image_data_uri(company.logo_web)" style="max-height:1cm; max-width:4cm;" alt="logo"/>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                            <h1 class="page-title"><t t-esc="menu.name"/></h1>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mb40">
+                            <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
+                                <t t-foreach="categories.sorted(key=lambda r: r.sequence)" t-as="category">
+                                    <li t-attf-class="nav-item #{'active' if category_index == 0 else ''}" role="presentation">
+                                        <a t-attf-class="nav-link #{'active' if category_index == 0 else ''} h4" t-attf-id="pills-tab-#{category.id}" data-toggle="pill" t-attf-href="#pills-#{category.id}" role="tab" t-attf-aria-controls="pills-#{category.id}" aria-selected="true"><t t-esc="category.name"/></a>
+                                    </li>
+                                </t>
+                            </ul>
+                            <div class="tab-content" id="pills-tabContent">
+                                <t t-foreach="categories" t-as="category">
+                                    <div t-attf-class="tab-pane fade show #{'active' if category_index == 0 else ''}" t-attf-id="pills-#{category.id}" role="tabpanel" t-attf-aria-labelledby="pills-tab-#{category.id}">
+                                        <t t-foreach="product_category_map.get(category, [])" t-as="product">
+                                            <div class="border-bottom p-2">
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-lg-left text-md-left text-center">
+                                                        <img t-attf-src="data:image/png;base64,#{product.image_128}" alt="" class="img-circle img-thumbnail"/>
+                                                    </div>
+                                                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 text-lg-left text-md-left text-center">
+                                                        <h3><t t-esc="product.name"/></h3>
+                                                        <p class="text-muted">
+                                                            <t t-esc="product.description_sale"/>
+                                                        </p>
+                                                     </div>
+                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 text-center">
+                                                        <p class="text-danger font-weight-bolder h4" t-esc="product.list_price" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4" t-if="menu.badge_extra_content">
+                        <t t-raw="menu.badge_extra_content"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

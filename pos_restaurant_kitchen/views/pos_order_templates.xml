@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="receipt_layout" name="Receipt layout">&lt;!DOCTYPE html&gt;
+        <html t-att="html_data or {}">
+            <head>
+                <meta charset="utf-8"/>
+                <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+
+                <title t-esc="title or 'Odoo'"/>
+                <link type="image/x-icon" rel="shortcut icon" t-att-href="x_icon or '/web/static/src/img/favicon.ico'"/>
+
+                <t t-raw="head or ''"/>
+
+                <t t-call="point_of_sale.assets_common" t-js="False"/>
+                <t t-call="web.conditional_assets_tests" t-js="False"/>
+
+                <style>
+                    @media print {
+                        .pos .pos-receipt-container, .pos .pos-receipt-container  * {
+                            visibility: visible;
+                            background: white !important;
+                            color: black !important;
+                        }
+                        .pos .pos-receipt-container {
+                            position: absolute !important;
+                            top: 0;
+                            left: 0;
+                        }
+                    }
+                </style>
+
+                <script>
+                    function do_print(){window.print();window.close()}
+                    function auto_print(){
+                        setTimeout(do_print, 10);
+                    }
+                </script>
+
+            </head>
+            <body onload="auto_print()">
+                <div class="pos">
+                    <div class="pos-receipt-container">
+                        <t t-raw="0"/>
+                    </div>
+                </div>
+            </body>
+        </html>
+    </template>
+
+    <template id="pos_order_reprint_receipt" name="PoS Order Reprint Receipt">
+        <t t-call="pos_restaurant_kitchen.receipt_layout">
+
+            <div class="pos-receipt">
+                <t t-if="order.company_id.logo">
+                    <img class="pos-receipt-logo" t-attf-src="data:image/png;base64,{{order.company_id.logo}}" alt="Logo"/>
+                    <br/>
+                </t>
+                <t t-if="not order.company_id.logo">
+                    <h2 class="pos-receipt-center-align">
+                        <t t-esc="order.company_id.name" />
+                    </h2>
+                    <br/>
+                </t>
+                <div class="pos-receipt-contact">
+                    <div t-if="kitchen.order_line_mode == 'all'"  t-field="order.company_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                    <t t-if="kitchen.order_line_mode == 'all' and order.company_id.vat">
+                        <div><t t-esc="order.company_id.vat"/></div>
+                    </t>
+                    <t t-if="order.config_id.receipt_header">
+                        <t t-raw="order.config_id.receipt_header" />
+                    </t>
+                    <t t-if="order.user_id">
+                        <div class="cashier">
+                            <div>--------------------------------</div>
+                            <div>Served by <t t-esc="order.user_id.name"/> <t t-if="order.table_id"> at <strong t-esc="order.table_id.name"/></t> </div>
+                        </div>
+                    </t>
+                </div>
+                <br/><br/>
+
+                <!-- orer lines -->
+                <t t-foreach="lines" t-as="line">
+                    <t t-if="is_line_simple(line)">
+                        <div>
+                            <t t-esc="line.product_id.name" />
+                            <t t-if="line.note">
+                                (<t t-esc="line.note"/>)
+                            </t>
+                            <span t-esc="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': line.currency_id}" class="price_display pos-receipt-right-align"/>
+
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div>
+                            <t t-esc="line.product_id.name" />
+                            <t t-if="line.note">
+                                (<t t-esc="line.note"/>)
+                            </t>
+                        </div>
+
+                        <span></span>
+                        <div class="pos-receipt-left-padding">
+                            <t t-esc="line.qty"/> x <t t-esc="line.price_unit" t-options="{'widget': 'float', 'precision': line.currency_id.decimal_places}"/>
+                            <span class="price_display pos-receipt-right-align">
+                                <t t-esc="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
+                            </span>
+                        </div>
+                    </t>
+                </t>
+
+                <!-- Subtotal -->
+                <t t-if="kitchen.order_line_mode == 'all'">
+
+                    <t t-set="isTaxIncluded" t-value="False"/>
+                    <t t-if="not isTaxIncluded">
+                        <div class="pos-receipt-right-align">--------</div>
+                        <br/>
+                        <div>Subtotal <span t-esc="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" class="pos-receipt-right-align"/>
+                        </div>
+                        <t t-foreach="tax_details or []" t-as="tax" t-key="tax.name">
+                            <div>
+                                <t t-esc="tax.name" />
+                                <span t-esc='env.pos.format_currency_no_symbol(tax.amount)' class="pos-receipt-right-align"/>
+                            </div>
+                        </t>
+                    </t>
+
+                    <!-- Total -->
+                    <div class="pos-receipt-right-align">--------</div>
+                    <br/>
+                    <div class="pos-receipt-amount">
+                        TOTAL
+                        <span t-esc="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" class="pos-receipt-right-align"/>
+                    </div>
+                    <!-- <t t-if="receipt.total_rounded != receipt.total_with_tax">
+                        <div class="pos-receipt-amount">
+                          Rounding
+                        <span t-esc='env.pos.format_currency(receipt.rounding_applied)' class="pos-receipt-right-align"/>
+                        </div>
+                        <div class="pos-receipt-amount">
+                          To Pay
+                         <span t-esc='env.pos.format_currency(receipt.total_rounded)' class="pos-receipt-right-align"/>
+                      </div>
+                    </t> -->
+                    <br/><br/>
+
+                    <!-- Payment Lines -->
+                    <t t-foreach="order.payment_ids" t-as="line">
+                        <div>
+                            <t t-esc="line.payment_method_id.name" />
+                            <span t-esc="line.amount" class="pos-receipt-right-align"  t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
+                        </div>
+                    </t>
+                </t>
+
+                <br/>
+
+                <div class="before-footer"/>
+
+                <!-- Footer -->
+                <div t-if="order.config_id.receipt_footer" class="pos-receipt-center-align">
+                    <t t-raw="order.config_id.receipt_footer" />
+                    <br/>
+                </div>
+
+                <div class="pos-receipt-center-align pos-receipt-contact">
+                    <span t-esc="order.date_order" t-options="{'widget': 'datetime'}"/>
+                    <br/>
+                    <span t-esc="order.name"/>
+                    <br/>
+                    <span t-esc="order.pos_reference"/>
+                    <br/>
+                </div>
+                <!-- <div t-if="!receipt.footer_html and receipt.footer"  class="pos-receipt-center-align" style="white-space:pre-line">
+                    <br/>
+                    <t t-esc="receipt.footer" />
+                    <br/>
+                    <br/>
+                </div> -->
+            </div>
+        </t>
+    </template>
+
+    <template id="pos_order_reprint_receipt_order_line" name="PoS Order Reprint Receipt: Order line">
+        <ul class="list-unstyled">
+            <t t-foreach="lines" t-as="line">
+                <li>
+                    <t t-esc="line.qty"/> x <t t-esc="line.product_id.name"/>
+                    <t t-if="line.note">
+                        (<t t-esc="line.note"/>)
+                    </t>
+                </li>
+            </t>
+        </ul>
+    </template>
+
+</odoo>

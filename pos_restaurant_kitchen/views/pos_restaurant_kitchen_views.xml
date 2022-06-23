@@ -1,0 +1,132 @@
+<odoo>
+
+    <!--
+        Kitchens
+    -->
+    <record id="restaurant_kitchen_view_tree" model="ir.ui.view">
+        <field name="name">restaurant.kitchen.tree</field>
+        <field name="model">restaurant.kitchen</field>
+        <field name="arch" type="xml">
+            <tree string="Restaurant Kitchen">
+                <field name="name"/>
+                <field name="order_line_mode"/>
+                <field name="pos_category_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="restaurant_kitchen_view_form" model="ir.ui.view">
+        <field name="name">restaurant.kitchen.form</field>
+        <field name="model">restaurant.kitchen</field>
+        <field name="arch" type="xml">
+            <form string="Kitchen">
+                <header>
+                    <button string="Mark as Printed" name="action_mark_all_as_print" type="object"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box">
+                        <button name="%(pos_restaurant_kitchen.pos_order_action)d" type="action" icon="fa-eye" class="oe_stat_button">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Orders</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="refresh_timer"/>
+                            <field name="order_line_mode"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="pos_category_ids" nolabel="1" attrs="{'invisible': [('order_line_mode', '!=', 'category')]}"/>
+                    </group>
+                </sheet>
+            </form>
+         </field>
+    </record>
+
+    <record id="restaurant_kitchen_view_kanban" model="ir.ui.view">
+        <field name="name">restaurant.kitchen.kanban</field>
+        <field name="model">restaurant.kitchen</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="order_line_mode"/>
+                <field name="pos_category_ids"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div>
+                            <div class="o_dropdown_kanban dropdown">
+                                <a class="dropdown-toggle o-no-caret btn" role="button" data-toggle="dropdown" data-display="static" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                    <span class="fa fa-ellipsis-v"/>
+                                </a>
+                                <div class="dropdown-menu" role="menu">
+                                    <t t-if="widget.editable"><a role="menuitem" type="edit" class="dropdown-item">Edit</a></t>
+                                    <t t-if="widget.deletable"><a role="menuitem" type="delete" class="dropdown-item">Delete</a></t>
+                                </div>
+                            </div>
+                            <div class="oe_kanban_content">
+                                <div class="o_kanban_record_title oe_kanban_details">
+                                    <strong><field name="name"/></strong>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <field t-if="record.order_line_mode.raw_value == 'category'" name="pos_category_ids" widget="many2many_tags"/>
+                                </div>
+                                <div class="o_kanban_record_bottom mt-3">
+                                    <div class="oe_kanban_bottom_left">
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <button class="btn btn-primary" name="action_order_dashbaord" type="object">Orders to Prepare</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="oe_clear"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!--
+        Tables
+    -->
+    <record id="restaurant_table_view_tree" model="ir.ui.view">
+        <field name="name">restaurant.table.tree</field>
+        <field name="model">restaurant.table</field>
+        <field name="arch" type="xml">
+            <tree string="Table">
+                <field name="name"/>
+                <field name="floor_id"/>
+                <field name="seats"/>
+                <field name="shape"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--
+        Actions and Menus
+    -->
+    <record id="restaurant_kitchen_action" model="ir.actions.act_window">
+        <field name="name">Kitchens</field>
+        <field name="res_model">restaurant.kitchen</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+
+    <menuitem id="menu_point_of_sale_kitchens"
+        name="Kitchens"
+        parent="point_of_sale.menu_point_root"
+        action="restaurant_kitchen_action"
+        groups="group_pos_cooker"
+        sequence="9"/>
+
+    <record id="point_of_sale.menu_point_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[(4, ref('group_pos_cooker'))]"/>
+    </record>
+
+</odoo>

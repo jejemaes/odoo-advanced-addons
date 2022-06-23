@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<odoo>
+
+
+    <!--
+        Project Views
+    -->
+    <record id="project_project_view_form" model="ir.ui.view">
+        <field name="name">project.project.form</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='extra_settings']" position="inside">
+                <field name="resource_calendar_id"/>
+                <field name="date_start"/>
+                <field name="date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+        Task Views
+    -->
+    <record id="project_task_view_form" model="ir.ui.view">
+        <field name="name">project.task.form</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <field name="date_last_stage_update" position="after">
+                <field name="planned_start_date" attrs="{'required': [('planned_stop_date', '!=', False)]}"/>
+                <field name="planned_stop_date" attrs="{'required': [('planned_start_date', '!=', False)]}"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="project_task_view_gantt" model="ir.ui.view">
+        <field name="name">Tasks Gantt</field>
+        <field name="model">project.task</field>
+        <field name="type">gantt</field>
+        <field name="arch" type="xml">
+            <gantt
+                type="planning"
+                string="Schedule"
+                date_start="planned_start_date"
+                date_stop="planned_stop_date"
+                scales="day,week,month,year"
+                precision="{'day': 'hour:half', 'week': 'day:full', 'month': 'day:full', 'year': 'month:full'}"
+                default_scale="month"
+                default_group_by="user_id"/>
+        </field>
+    </record>
+
+    <record id="project.act_project_project_2_project_task_all" model="ir.actions.act_window">
+        <field name="view_mode">kanban,tree,form,calendar,pivot,graph,gantt,activity</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+
+    <record id="event_type_view_form" model="ir.ui.view">
+        <field name="name">event.type.view.form.inherit.sms</field>
+        <field name="model">event.type</field>
+        <field name="inherit_id" ref="event.view_event_type_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='event_type_attendees']" position="after">
+                <h2>Various</h2>
+                <div class="row mt16 o_settings_container" name="event_type_various">
+                    <div class="col-6 o_setting_box" name="event_type_various_registration_phone_mandatory">
+                        <div class="o_setting_left_pane">
+                            <field name="registration_phone_mandatory"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="registration_phone_mandatory"/>
+                            <div class="row">
+                                <div class="col-lg-8 mt16 text-muted">
+                                    During registration, the phone number of attendees is mandatory.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 o_setting_box" name="event_type_various_hide_address">
+                        <div class="o_setting_left_pane">
+                            <field name="website_hide_event_location"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="website_hide_event_location"/>
+                            <div class="row">
+                                <div class="col-lg-8 mt16 text-muted">
+                                    Hide the Event Location on the Event website page. This is usefull for secret event, ...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</data></odoo>

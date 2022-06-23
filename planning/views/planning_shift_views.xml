@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Planning Shift
+    -->
+    <record id="planning_shift_view_tree" model="ir.ui.view">
+        <field name="name">planning.shift.tree</field>
+        <field name="model">planning.shift</field>
+        <field name="arch" type="xml">
+            <tree string="Shifts">
+                <field name="name" string="Name"/>
+                <field name="employee_id"/>
+                <field name="role_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="planning_shift_view_form" model="ir.ui.view">
+        <field name="name">planning.shift.form</field>
+        <field name="model">planning.shift</field>
+        <field name="arch" type="xml">
+            <form string="Shift">
+                <header>
+                    <field name="can_self_assign" invisible="1"/>
+                    <field name="can_self_unassign" invisible="1"/>
+                    <button name="action_self_assign" type="object" string="Self Assign" attrs="{'invisible':[('can_self_assign','=', False)]}"/>
+                    <button name="action_self_unassign" type="object" string="Self Unassign" attrs="{'invisible':[('can_self_unassign','=', False)]}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_overlap" icon="fa-tasks" attrs="{'invisible': [('overlap_count', '=', 0)]}">
+                            <field string="Overlap" name="overlap_count" widget="statinfo"/>
+                        </button>
+                    </div>
+
+                    <group attrs="{'invisible': [('template_autocomplete_ids', '=', []), ('template_id', '=', False)]}" groups="planning.group_planning_manager" name="shift_templates">
+                        <label for="template_id" class="oe_edit_only"/>
+                        <field name="template_id" nolabel="1" class="text-break flex-wrap"
+                            domain="[['id', 'in', template_autocomplete_ids]]"
+                            widget="selection_badge" options="{'horizontal': true}"
+                        />
+                    </group>
+                    <field name="template_autocomplete_ids" invisible="1"/>
+
+                    <div class="oe_title">
+                        <div class="o_row h2">
+                            <field name="date_from" widget="daterange" nolabel="1" class="oe_inline" options="{'related_end_date': 'date_to'}"/>
+                            <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>
+                            <field name="date_to" widget="daterange" nolabel="1" class="oe_inline" options="{'related_start_date': 'date_from'}"/>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" placeholder="Title" nolabel="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="role_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="company_id" options="{'no_create': True, 'no_create_edit': True}" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="employee_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="planning_shift_view_gantt" model="ir.ui.view">
+        <field name="name">Planning Shift</field>
+        <field name="model">planning.shift</field>
+        <field name="type">gantt</field>
+        <field name="arch" type="xml">
+            <gantt
+                type="planning"
+                string="Schedule"
+                date_start="date_from"
+                date_stop="date_to"
+                scales="day,week,month,year"
+                precision="{'day': 'hour:half', 'week': 'day:full', 'month': 'day:full', 'year': 'month:full'}"
+                default_scale="day"
+                default_group_by="employee_id"/>
+        </field>
+    </record>
+
+    <record id="planning_shift_view_calendar" model="ir.ui.view">
+        <field name="name">planning.shift.calendar</field>
+        <field name="model">planning.shift</field>
+        <field name="arch" type="xml">
+            <calendar string="Planning Shifts" date_start="date_from" date_stop="date_to" event_open_popup="true"
+                color="role_id">
+                <field name="name"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="planning_shift_view_search" model="ir.ui.view">
+        <field name="name">planning.shift.search</field>
+        <field name="model">planning.shift</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Name" filter_domain="['|', ('name','ilike',self), ('note','ilike',self)]"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <filter string="My Shift" name="my_shift" domain="[('is_my_shift', '=', True)]"/>
+                <filter name="open_shifts" string="Open Shifts" domain="[('employee_id', '=', False)]"/>
+                <separator/>
+                <filter string="Published" name="published" domain="[('publication_date', '!=', False)]"/>
+                <filter string="Unpublished" name="unpublished" domain="[('publication_date', '=', False)]"/>
+                <separator groups="planning.group_planning_manager"/>
+                <filter name="future" string="Future" domain="[('date_from', '>=', time.strftime('%%Y-%%m-%%d 00:00:00'))]" />
+                <filter name="past" string="Past" domain="[('date_from', '&lt;=', time.strftime('%%Y-%%m-%%d 23:59:59'))]" />
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="group_by_employee_id" domain="[]" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Department" name="group_by_department_id" domain="[]" context="{'group_by': 'department_id'}"/>
+                    <filter string="Role" name="group_by_role_id" domain="[]" context="{'group_by': 'role_id'}"/>
+                    <filter string="Company" name="group_by_company_id" domain="[]" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                    <filter string="Start Date" name="group_by_date_from" domain="[]" context="{'group_by': 'date_from:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+    <!--
+        Planning Role
+    -->
+    <record id="planning_role_view_tree" model="ir.ui.view">
+        <field name="name">planning.role.tree</field>
+        <field name="model">planning.role</field>
+        <field name="arch" type="xml">
+            <tree string="Roles">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="planning_role_view_form" model="ir.ui.view">
+        <field name="name">planning.role.form</field>
+        <field name="model">planning.role</field>
+        <field name="arch" type="xml">
+            <form string="Role">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="color" widget="color_picker"/>
+                    </group>
+                    <group>
+                        <field name="description" nolabel="1" placeholder="Description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

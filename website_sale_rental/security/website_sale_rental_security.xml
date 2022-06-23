@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="product_template_rule_rental_public" model="ir.rule">
+        <field name="name">Public rental product template</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="domain_force">[('website_published', '=', True), ("can_be_rented", "=", True)]</field>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="product_rental_tenure_rule_public" model="ir.rule">
+        <field name="name">Public rental product tenures</field>
+        <field name="model_id" ref="sale_rental.model_product_rental_tenure"/>
+        <field name="domain_force">[('product_template_id.website_published', '=', True), ("product_template_id.can_be_rented", "=", True)]</field>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+</odoo>

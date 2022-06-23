@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-name="DocumentKanbanView.buttons" >
+        <button class="btn btn-primary o-kanban-button-upload-document">Upload</button>
+        <div class="dropdown" style="display: inline;">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="o_document_kanban_btn_list" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Create
+            </button>
+            <div class="dropdown-menu o_document_kanban_btn_list_dropdown" aria-labelledby="o_document_kanban_btn_list">
+                <a class="dropdown-item o-kanban-button-new" data-handler="attachment">File</a>
+            </div>
+        </div>
+    </t>
+
+</templates>

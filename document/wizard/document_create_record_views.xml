@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="document_create_record_view_form" model="ir.ui.view">
+        <field name="name">document.create.record.view.form</field>
+        <field name="model">document.create.record</field>
+        <field name="arch" type="xml">
+            <form string="Create Record">
+                <group>
+                    <group>
+                        <field name="document_ids" widget="many2many_tags" readonly="1"/>
+                        <field name="record_type" widget="radio"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Create" type="object" name="action_create_record" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel" type="object" class="btn btn-secondary oe_inline"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="document_create_record_action" model="ir.actions.act_window">
+        <field name="name">Generate Records</field>
+        <field name="res_model">document.create.record</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="document_create_record_view_form"/>
+        <field name="target">new</field>
+        <field name="context">{}</field>
+        <field name="binding_model_id" ref="model_document_document"/>
+        <field name="binding_view_types">list,kanban,form</field>
+    </record>
+
+</odoo>

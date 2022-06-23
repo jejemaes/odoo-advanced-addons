@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Views
+    -->
+    <record id="document_folder_view_tree" model="ir.ui.view">
+        <field name="name">document.folder.tree</field>
+        <field name="model">document.folder</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="facet_ids" widget="many2many_tags"/>
+                <field name="create_date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="document_folder_view_form" model="ir.ui.view">
+        <field name="name">document.folder.form</field>
+        <field name="model">document.folder</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="E.g. Finance"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="parent_id" domain="[('id', '!=', id)]"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="read_group_ids" widget="many2many_tags"/>
+                            <field name="write_group_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                    <group string="Tags">
+                        <field name="facet_ids" nolabel="1" context="{'default_folder_id': id, 'document_folder_form': True, 'hierarchical_naming': True}">
+                            <tree>
+                                <field name="name"/>
+                                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="document_folder_view_kanban" model="ir.ui.view">
+        <field name="name">document.folder.kanban</field>
+        <field name="model">document.folder</field>
+        <field name="arch" type="xml">
+            <kanban string="Folders" class="o_emphasize_colors o_kanban_dashboard o_slide_kanban breadcrumb_item active" edit="false" sample="1">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card">
+                            <div class="o_dropdown_kanban dropdown">
+                                <a role="button" class="dropdown-toggle o-no-caret btn" data-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                    <span class="fa fa-ellipsis-v" aria-hidden="false"/>
+                                </a>
+                                <div class="dropdown-menu" role="menu">
+                                    <t t-if="widget.deletable">
+                                        <a class="dropdown-item" role="menuitem" type="delete">Delete</a>
+                                    </t>
+                                    <a class="dropdown-item" role="menuitem" type="edit">
+                                        Edit
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title mb16">
+                                    <div class="o_primary">
+                                        <a type="edit" class="mr-auto">
+                                            <span><field name="name" class="o_primary"/></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container o_kanban_card_content mt0 mb0">
+                                <div class="row">
+                                    <div class="col-6 border-right">
+                                        <a name="action_view_subfolders" type="object" class="d-flex flex-column align-items-center">
+                                            <span class="font-weight-bold h2"><field name="children_count"/></span>
+                                            <span class="text-muted">Sub-folders</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a name="action_view_documents" type="object" class="d-flex flex-column align-items-center">
+                                            <span class="font-weight-bold h2"><field name="document_count"/></span>
+                                            <span class="text-muted">Documents</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="document_folder_view_search" model="ir.ui.view">
+        <field name="name">document.folder.search</field>
+        <field name="model">document.folder</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="description"/>
+
+                <filter name="root_folder" string="Root Folders" domain="[('parent_id','=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Parent Folder" name="by_parent" domain="[]" context="{'group_by': 'parent_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--
+        Actions
+    -->
+    <record id="document_folder_action" model="ir.actions.act_window">
+        <field name="name">Folders</field>
+        <field name="res_model">document.folder</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="document_folder_action_directories" model="ir.actions.act_window">
+        <field name="name">Folders</field>
+        <field name="res_model">document.folder</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="context">{'search_default_root_folder': 1}</field>
+    </record>
+
+</odoo>

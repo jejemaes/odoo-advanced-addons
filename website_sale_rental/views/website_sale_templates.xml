@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Product List page (thumbnail)
+    -->
+    <template id="products_item" inherit_id="website_sale.products_item" name="Rental eShop: price hidden on product list">
+        <xpath expr="//div[hasclass('product_price')]" position="attributes">
+            <attribute name="t-if">product.sale_ok</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('product_price')]" position="after">
+            <div class="product_price_rental" t-if="product.can_be_rented">
+                <span>
+                    <t t-if="product.rental_tenure_id">
+                        <t t-if="product.rental_tenure_id.tenure_type == 'weekday'">
+                            From
+                            <t t-call="website_sale_rental.rental_tenure_price">
+                                <t t-set="tenure" t-value="product.rental_tenure_id"/>
+                            </t>
+                            / <t t-esc="product.rental_tenure_id.weekday_count"/> day(s)
+                        </t>
+                        <t t-if="product.rental_tenure_id.tenure_type == 'duration'">
+                            From
+                            <t t-call="website_sale_rental.rental_tenure_price">
+                                <t t-set="tenure" t-value="product.rental_tenure_id"/>
+                            </t>
+                            / <t t-esc="product.rental_tenure_id.tenure_name"/>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        For Free
+                    </t>
+                </span>
+            </div>
+        </xpath>
+    </template>
+
+    <!--
+        Product Page
+    -->
+    <template id="product" inherit_id="website_sale.product" name="Rental eShop: rental price and description">
+        <xpath expr="//form[@action='/shop/cart/update']" position="attributes">
+            <attribute name="t-if">product.sale_ok</attribute>
+        </xpath>
+        <xpath expr="//p[@t-field='product.description_sale']/.." position="attributes">
+            <attribute name="t-if">product.sale_ok</attribute>
+        </xpath>
+        <xpath expr="//p[@t-else=''][hasclass('alert-warning')]" position="replace">
+            <p t-elif="product.sale_ok" class="alert alert-warning">This product has no valid combination.</p>
+        </xpath>
+        <xpath expr="//p[@t-field='product.description_sale']/.." position="after">
+            <t t-if="product.can_be_rented">
+                <hr t-if="product.sale_ok"/>
+                <t t-call="website_sale_rental.product_rental_price_details"/>
+                <div class="text-muted" t-field="product.description_rental"/>
+                <button class="btn btn-primary btn-lg mt16 o_website_sale_rental_btn" type="button" t-att-data-mode="product.website_rental_display_mode">
+                    <i class="fa fa-calendar"/> Rent me
+                </button>
+            </t>
+        </xpath>
+        <xpath expr="//div[@id='product_full_description']" position="after">
+            <section t-if="product.can_be_rented" t-attf-class="container o_website_sale_rental_mode_#{product.website_rental_display_mode} mb16"
+                t-att-data-product-template-id="product.id"
+                t-att-data-product-id="product.product_variant_id.id"
+                t-att-data-resource-count="product.resource_count"
+                t-att-data-rental-select-overlap-mode="product.rental_select_overlap_mode"
+                t-att-data-rental-min-duration="product.rental_min_duration_unit">
+                <div t-if="product.website_rental_display_mode == 'calendar'" class="row">
+                    <div class="col-12">
+                        <h3>Rental Calendar</h3>
+                    </div>
+                    <div class="col-8 col-s-12 o_website_sale_rental_calendar_container">
+                        <!-- JS widget here -->
+                    </div>
+                    <div class="col-4 col-s-12">
+                        <form class="o_website_sale_rental_js_form">
+                            <div class="row mb-3">
+                                <label for="rental-datetimepicker-start" class="col-sm-3 col-form-label">From</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group date" id="rental-datetimepicker-start" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input" data-target="#rental-datetimepicker-start"/>
+                                        <div class="input-group-append" data-target="#rental-datetimepicker-start" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="rental-datetimepicker-stop" class="col-sm-3 col-form-label">To</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group date" id="rental-datetimepicker-stop" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input" data-target="#rental-datetimepicker-stop"/>
+                                        <div class="input-group-append" data-target="#rental-datetimepicker-stop" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="rental-quantity" class="col-sm-3 col-form-label">Quantity</label>
+                                <div class="col-sm-9">
+                                    <input type="number" class="form-control" id="rental-quantity" value="1" min="1" t-att-max="product.resource_count"/>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label for="rental-unitprice" class="col-sm-3 col-form-label">Price Unit</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="rental-unitprice" aria-label="Disabled input example" disabled="1" readonly="1"/>
+                                    <span class="text-muted o_website_sale_rental_price_explanation"></span>
+                                </div>
+                            </div>
+                            <div class="alert alert-danger o_website_sale_rental_price_form_error d-none" role="alert"/>
+                            <a role="button" id="add_rental_to_cart" class="btn btn-primary btn-lg mt16 o_website_sale_rental_submit disabled float-right" href="#">
+                                <i class="fa fa-shopping-cart"/> Add to Cart
+                            </a>
+                        </form>
+                    </div>
+                </div>
+                <div t-if="product.website_rental_display_mode == 'form'" class="row">
+                    <div class="col-10 col-offset-1">
+                        <h3>Rental Form</h3>
+                    </div>
+                    <div class="col-10 col-offset-1">
+                        <form class="o_website_sale_rental_js_form">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="row mb-3">
+                                        <label for="rental-datetimepicker-start" class="col-sm-3 col-form-label">From</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group date" id="rental-datetimepicker-start" data-target-input="nearest">
+                                                <input type="text" class="form-control datetimepicker-input" data-target="#rental-datetimepicker-start"/>
+                                                <div class="input-group-append" data-target="#rental-datetimepicker-start" data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="rental-datetimepicker-stop" class="col-sm-3 col-form-label">To</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group date" id="rental-datetimepicker-stop" data-target-input="nearest">
+                                                <input type="text" class="form-control datetimepicker-input" data-target="#rental-datetimepicker-stop"/>
+                                                <div class="input-group-append" data-target="#rental-datetimepicker-stop" data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="row mb-3">
+                                        <label for="rental-quantity" class="col-sm-3 col-form-label">Quantity</label>
+                                        <div class="col-sm-9">
+                                            <input type="number" class="form-control" id="rental-quantity" value="1" min="1" t-att-max="product.resource_count"/>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="rental-unitprice" class="col-sm-3 col-form-label">Price Unit</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" id="rental-unitprice" aria-label="Disabled input example" disabled="1" readonly="1"/>
+                                            <span class="text-muted o_website_sale_rental_price_explanation"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="alert alert-danger o_website_sale_rental_price_form_error d-none" role="alert"/>
+                                    <a role="button" id="add_rental_to_cart" class="btn btn-primary btn-lg mt16 o_website_sale_rental_submit disabled float-right" href="#">
+                                        <i class="fa fa-shopping-cart"/> Add to Cart
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </xpath>
+    </template>
+
+    <template id="product_rental_price_details" name="Rental eShop: rental price details">
+        <div class="o_product_rental_details_tenure">
+            <t t-if="product.rental_tenure_ids">
+                <p>
+                    Rental Pricing
+                    <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="Those prices are computed as you rent only 1 time unit. Taxes and discount are applied on the combinaison of tenures."/>
+                </p>
+                <t t-if="product.rental_tenure_type == 'duration'">
+                    <ul>
+                        <t t-foreach="product.rental_tenure_ids" t-as="tenure">
+                            <li>
+                                <strong><t t-esc="tenure.tenure_name"/></strong> :
+                                <t t-call="website_sale_rental.rental_tenure_price">
+                                    <t t-set="heading_class">h5</t>
+                                    <t t-set="tenure" t-value="tenure"/>
+                                </t>
+                            </li>
+                        </t>
+                    </ul>
+                </t>
+                <t t-if="product.rental_tenure_type == 'weekday'">
+                    <ul>
+                        <t t-foreach="product.rental_tenure_ids" t-as="tenure">
+                            <li>
+                                <strong><t t-esc="tenure.tenure_name"/></strong> :
+                                <t t-call="website_sale_rental.rental_tenure_price">
+                                    <t t-set="heading_class">h5</t>
+                                    <t t-set="tenure" t-value="tenure"/>
+                                </t>
+                            </li>
+                        </t>
+                    </ul>
+                </t>
+            </t>
+            <t t-if="not product.rental_tenure_ids">
+                <p>Rent it for Free</p>
+            </t>
+        </div>
+    </template>
+
+    <!--
+        Cart Page
+    -->
+    <template id="cart_lines" inherit_id="website_sale.cart_lines" name="eShop: extend for rental">
+       <xpath expr="//div[hasclass('css_quantity')]" position="attributes">
+            <attribute name="t-if">not line.is_rental</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('css_quantity')]" position="after">
+            <div t-if="line.is_rental" class="css_quantity input-group mx-auto">
+                <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.product_id.id" t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty" disabled="1"/>
+            </div>
+        </xpath>
+        <xpath expr="//t[@t-set='list_price_converted']" position="after">
+            <t t-if="line.is_rental">
+                <t t-set="list_price_converted" t-value="line.website_rental_unit_price"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!--
+        Display rental tenure price, with reduction
+        :param: tenure (with the pricelist in context)
+        :heading_class : class name of the displayed price (ex: h2, h3, ...)
+    -->
+    <template id="rental_tenure_price">
+        <t t-if="not heading_class">
+            <t t-set="heading_class" t-value="h4"/>
+        </t>
+        <t t-set="show_reduction" t-value="website.currency_id.compare_amounts(tenure.website_base_price, tenure.website_list_price) != 0 and website.get_current_pricelist().discount_policy == 'without_discount'"/>
+        <div itemprop="offers" itemscope="itemscope" itemtype="http://schema.org/Offer" class="d-inline">
+            <p t-attf-class="{{ heading_class }} css_editable_mode_hidden d-inline">
+                <del t-attf-class="text-danger oe_default_price {{'' if show_reduction else 'd-none'}}" style="text-decoration: white-space: nowrap;" t-esc="tenure.website_base_price" t-options="{'widget': 'monetary', 'display_currency': website.get_current_pricelist().currency_id}"/>
+                <span class="oe_price" style="white-space: nowrap;" t-esc="tenure.website_list_price" t-options="{'widget': 'monetary', 'display_currency': website.get_current_pricelist().currency_id}"/>
+                <span itemprop="price" style="display:none;" t-esc="rental_base_price"/>
+                <span itemprop="priceCurrency" style="display:none;" t-esc="website.get_current_pricelist().currency_id.name"/>
+            </p>
+            <p t-attf-class="{{ heading_class }} css_non_editable_mode_hidden decimal_precision d-inline" t-att-data-precision="str(website.currency_id.decimal_places)">
+                <span t-field="tenure.base_price"
+                    t-options='{
+                       "widget": "monetary",
+                       "display_currency": product.currency_id,
+                   }'/>
+            </p>
+        </div>
+    </template>
+
+</odoo>

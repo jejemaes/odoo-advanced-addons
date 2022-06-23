@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="sale_order_portal_content" name="Orders Followup Products Links" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//section[@id='terms']" position="after">
+            <section class="mt32" t-if="sale_order.rental_booking_ids">
+                <h3>Rental Details</h3>
+
+                <table class="table table-sm o_rental_table">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Code</th>
+                            <th class="text-left">Product</th>
+                            <th class="text-left">Start Date</th>
+                            <th class="text-left">End Date</th>
+                            <th class="text-left">Delivery Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="sale_order.rental_booking_ids" t-as="booking">
+                            <tr>
+                                <td class="text-left">
+                                    <span t-field="booking.code"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="booking.sale_line_id.product_id.name"/>
+                                    <t t-if="booking.sale_line_id.product_id.rental_agreement_id.is_published">
+                                        <br/><b>Agreement:</b> <a t-attf-href="/web/content/?model=rental.agreement&amp;field=file&amp;id={{booking.agreement_id.id}}"><t t-esc="booking.agreement_id.name"/></a>
+                                    </t>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="booking.sale_line_id.rental_start_date"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="booking.sale_line_id.rental_stop_date"/>
+                                </td>
+                                <td class="text-left">
+                                    <div t-field="booking.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True, "phone_icons": True}'/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+            </section>
+        </xpath>
+    </template>
+
+</odoo>

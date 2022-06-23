@@ -1,0 +1,330 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* pos_restaurant_kitchen
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-13 22:02+0000\n"
+"PO-Revision-Date: 2021-02-13 22:02+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_config_view_form_inherit_restaurant
+msgid ""
+"<span class=\"fa fa-lg fa-cutlery\" title=\"For bars and restaurants\" "
+"role=\"img\" aria-label=\"For bars and restaurants\"/>"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_view_form
+msgid "<span class=\"o_stat_text\">Orders to Prepare</span>"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__kitchen_stage_button_text
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__button_text
+msgid "Button Text"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__kitchen_stage_color
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__color
+msgid "Color"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model,name:pos_restaurant_kitchen.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen__company_id
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__company_id
+msgid "Company"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:res.groups,name:pos_restaurant_kitchen.group_pos_cooker
+msgid "Cooker"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen__create_uid
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen__create_date
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_view_kanban
+msgid "Delete"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_config__display_name
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__display_name
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_res_company__display_name
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen__display_name
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_search
+msgid "Done"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_view_kanban
+msgid "Dropdown menu"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_view_kanban
+msgid "Edit"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__fold
+msgid "Folded in Pipeline"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_search
+msgid "Group By"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_config__id
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__id
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_res_company__id
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen__id
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__id
+msgid "ID"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__kitchen_stage_closed
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__is_closed
+msgid "Is Final Stage"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_view_form
+msgid "Kitchen"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen__name
+msgid "Kitchen Name"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.actions.act_window,name:pos_restaurant_kitchen.pos_order_line_action
+msgid "Kitchen Orders"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model,name:pos_restaurant_kitchen.model_restaurant_kitchen_stage
+msgid "Kitchen Preparation Stage"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.actions.act_window,name:pos_restaurant_kitchen.restaurant_kitchen_action
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_config__kitchen_ids
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__kitchen_ids
+#: model:ir.ui.menu,name:pos_restaurant_kitchen.menu_point_of_sale_kitchens
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_config_view_form_inherit_restaurant
+msgid "Kitchens"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_config____last_update
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line____last_update
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_res_company____last_update
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen____last_update
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen__write_uid
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen__write_date
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_view_form
+msgid "Mark All As Done"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_kanban
+msgid "Note:"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_search
+msgid "Ongoing"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_search
+msgid "Order Lines Search"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__order_id
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_search
+msgid "Order Ref"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_kanban
+msgid "Order:"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,help:pos_restaurant_kitchen.field_pos_order_line__user_id
+msgid ""
+"Person who uses the cash register. It can be a reliever, a student or an "
+"interim employee."
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_stage_view_tree
+msgid "PoS Preparation Stage"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__config_id
+msgid "Point of Sale"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model,name:pos_restaurant_kitchen.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model,name:pos_restaurant_kitchen.model_pos_order_line
+msgid "Point of Sale Order Lines"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen__pos_category_ids
+msgid "Pos Category"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_stage_view_form
+msgid "Pos Preparation Stage"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__kitchen_stage_id
+msgid "Preparation Stage"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.actions.act_window,name:pos_restaurant_kitchen.pos_kitchen_stage_action
+#: model:ir.ui.menu,name:pos_restaurant_kitchen.menu_config_kitchen_stages
+msgid "Preparation Stages"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_search
+msgid "Preparation State"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_config__is_kitchen_preparation
+msgid "Preparation in Kitchens"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_kanban
+msgid "Reset"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model,name:pos_restaurant_kitchen.model_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_view_tree
+msgid "Restaurant Kitchen"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_config_view_form_inherit_restaurant
+msgid "Send Order lines to selected Kitchen."
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_restaurant_kitchen_stage__name
+msgid "Stage Name"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__table_id
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_table_view_tree
+msgid "Table"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.pos_order_line_view_kanban
+msgid "Table:"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,help:pos_restaurant_kitchen.field_pos_order_line__config_id
+msgid "The physical point of sale you will use."
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,help:pos_restaurant_kitchen.field_pos_order_line__table_id
+msgid "The table where this order was served"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,help:pos_restaurant_kitchen.field_restaurant_kitchen_stage__fold
+msgid ""
+"This stage is folded in the kanban view when there are no records in that "
+"stage to display."
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,help:pos_restaurant_kitchen.field_restaurant_kitchen_stage__sequence
+msgid "Used to order stages. Lower is better."
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model:ir.model.fields,field_description:pos_restaurant_kitchen.field_pos_order_line__user_id
+msgid "User"
+msgstr ""
+
+#. module: pos_restaurant_kitchen
+#: model_terms:ir.ui.view,arch_db:pos_restaurant_kitchen.restaurant_kitchen_view_kanban
+msgid "View Orders to Prepare"
+msgstr ""
