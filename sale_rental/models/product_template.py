@@ -19,9 +19,11 @@ class ProductTemplate(models.Model):
     can_be_rented = fields.Boolean('Can be Rented', default=False, help="Specify if the product can be rent in a sales order line.", copy=True)
     description_rental = fields.Text('Rental Description', translate=True, help="A description of the Product to rent it.")
     rental_tenure_type = fields.Selection([
+        ('fixed', 'Fixed Duration'),
         ('duration', 'Any Duration'),
         ('weekday', 'Per Week Day'),
     ], string="Tenure Duration", default=False, copy=True)
+    rental_fixed_price = fields.Float("Fixed Price", default=1.0, help="Price used for any rental period.")
     rental_tenure_ids = fields.One2many('product.rental.tenure', 'product_template_id', string="Rental Tenures", copy=True)
     rental_tenure_id = fields.Many2one('product.rental.tenure', compute='_compute_rental_tenure_id', string="First Rental Price")
     rental_tracking = fields.Selection([
@@ -55,6 +57,7 @@ class ProductTemplate(models.Model):
     @api.onchange('can_be_rented')
     def _onchange_can_be_rented(self):
         if not self.can_be_rented:
+            self.rental_fixed_price = 0.0
             self.rental_tenure_type = None
             self.rental_tenure_ids = [(5, 0)]
             self.rental_tracking = None
@@ -75,12 +78,16 @@ class ProductTemplate(models.Model):
         if self.rental_tenure_type == 'weekday':
             weekdays = self.env['resource.day'].get_all_days()
             self.rental_tenure_ids = [(5, 0)] + [(0, 0, {'weekday_ids': [(6, 0, [weekday.id])], 'base_price': 1.0}) for weekday in weekdays]
+            self.rental_fixed_price = 0.0
         elif self.rental_tenure_type == 'duration':
             self.rental_tenure_ids = [
                 (5, 0),
                 (0, 0, {'duration_uom': 'hour', 'duration_value': 1, 'base_price': 1.0}),
                 (0, 0, {'duration_uom': 'day', 'duration_value': 1, 'base_price': 1.0}),
             ]
+            self.rental_fixed_price = 0.0
+        elif self.rental_tenure_type == 'fixed':
+            self.rental_tenure_ids = [(5, 0)]
 
     @api.onchange('rental_tracking')
     def _onchange_rental_tracking(self):
@@ -143,8 +150,13 @@ class ProductTemplate(models.Model):
             :param end_dt : timezoned datetime representing the end of the rental period
             :param currency_dst : currency record --> TODO remove that param as we only use currency of the product
         """
+        # ignore dates, and return fixed price
+        if self.rental_tenure_type == 'fixed':
+            return {'fixed': True}, self.rental_fixed_price
+
         if not self.rental_tenure_ids:
             return {}, 0.0
+
         # TODO check sart/end are timezoned
         tenure_type = self.rental_tenure_type
         if hasattr(self, '_tenure_%s_price_combinaison' % (tenure_type,)):
@@ -155,6 +167,9 @@ class ProductTemplate(models.Model):
     def _rental_get_human_pricing_details(self, combinaison_map, show_price=True, currency_dst=False):
         if not combinaison_map:
             return _("Free")
+        if 'fixed' in combinaison_map:
+            return _("Fixed Price")
+
         tenure_type = self.rental_tenure_type
         if hasattr(self, '_tenure_%s_get_human_pricing_details' % (tenure_type,)):
             return getattr(self, '_tenure_%s_get_human_pricing_details' % (tenure_type,))(combinaison_map, show_price=show_price, currency_dst=currency_dst)
