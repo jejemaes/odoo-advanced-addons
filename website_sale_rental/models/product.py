@@ -26,6 +26,10 @@ class ProductTemplate(models.Model):
     ], compute='_compute_website_rental_display_mode')
     website_rental_pricing_timezone = fields.Selection(_tz_get, string="Rental Pricing Timezone", compute='_compute_website_rental_pricing_timezone')
 
+    # fixed price
+    website_rental_base_price = fields.Float("Displayed fixed rental price without pricelist applied", compute='_compute_website_rental_base_price')
+    website_rental_list_price = fields.Float("Displayed fixed rental price with pricelist applied", compute='_compute_website_rental_list_price')
+
     @api.depends('rental_tenure_ids')
     def _compute_rental_tenure_id(self):
         order_map = self.env['product.rental.tenure']._tenure_duration_ordering_map()
@@ -73,6 +77,48 @@ class ProductTemplate(models.Model):
                     product.website_rental_pricing_timezone = product.resource_ids[:1].tz or product.resource_ids[:1].calendar_id.tz
                 else:
                     product.website_rental_pricing_timezone = None
+
+    @api.depends('rental_fixed_price')
+    @api.depends_context('website_id', 'uid')
+    def _compute_website_rental_base_price(self):
+        website = self.env['website'].browse(self._context['website_id'])
+        pricelist = website.get_current_pricelist()
+        partner = self.env.user.partner_id
+
+        tax_field = 'total_excluded' if self.user_has_groups('account.group_show_line_subtotals_tax_excluded') else 'total_included'
+        fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
+
+        for product_template in self:
+            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id), product_template, partner)
+            base_price = product_template.currency_id._convert(product_template.rental_fixed_price, pricelist.currency_id, company=website.company_id, date=fields.Date.today())
+            product_template.website_rental_base_price = taxes.compute_all(base_price, pricelist.currency_id, 1, product_template.product_variant_id, partner)[tax_field]
+
+    @api.depends('rental_fixed_price')
+    @api.depends_context('website_id', 'uid')
+    def _compute_website_rental_list_price(self):
+        website = self.env['website'].browse(self._context['website_id'])
+        pricelist = website.get_current_pricelist()
+        partner = self.env.user.partner_id
+
+        tax_field = 'total_excluded' if self.user_has_groups('account.group_show_line_subtotals_tax_excluded') else 'total_included'
+        fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
+
+        price_list = [p.currency_id._convert(p.rental_fixed_price, pricelist.currency_id, company=website.company_id, date=fields.Date.today()) for p in self]
+        products = [p.product_variant_id for p in self]
+        converted_price_data_list = pricelist._rental_apply_pricelist(products, price_list, quantity=1.0)
+
+        result = {}
+        for product_template, base_price, list_price in zip(self, price_list, converted_price_data_list):
+            price, discount = pricelist.get_pricelist_discount(base_price, list_price, product=product_template.product_variant_id, date=False)
+            if discount:
+                result[product_template.id] = list_price  # base price with discount applied
+            else:
+                result[product_template.id] = price  # base price without discount applied
+
+        for product_template in self:
+            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id), product_template, partner)
+            base_price = result.get(product_template.id, product_template.rental_fixed_price)
+            product_template.website_rental_list_price = taxes.compute_all(base_price, pricelist.currency_id, 1, product_template.product_variant_id, partner)[tax_field]
 
     # -------------------------------------------------------------------------
     # Calendar
