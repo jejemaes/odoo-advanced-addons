@@ -39,7 +39,7 @@
                 <field name="is_rental" invisible="1"/>
                 <group attrs="{'invisible': [('is_rental', '=', False)]}">
                     <group>
-                        <field name="product_id" attrs="{'required': [('display_type', '=', False)], 'readonly': [('product_updatable', '=', False)]}" options="{'no_open': True}" context="{'can_be_rented': True}"/>
+                        <field name="product_id" attrs="{'required': [('display_type', '=', False)], 'readonly': [('product_updatable', '=', False)]}" options="{'no_open': True, 'no_create': True}"/>
                         <field name="product_rental_tracking" invisible="1"/>
                         <label for="rental_start_date" string="Date"/>
                         <div class="o_row">

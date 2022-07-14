@@ -55,6 +55,8 @@ class ProductTemplate(models.Model):
                 elif product.rental_tenure_type == 'duration':
                     tenures = product.rental_tenure_ids.sorted(lambda t: (order_map.get(t.duration_uom, 0), t.duration_value), reverse=True)
                     product.rental_min_duration_unit = tenures[-1].duration_uom
+                else:
+                    product.rental_min_duration_unit = False
 
     @api.depends('rental_tracking', 'resource_ids')
     def _compute_website_rental_display_mode(self):

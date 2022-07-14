@@ -187,6 +187,12 @@ class SaleOrderLine(models.Model):
                 if self.product_id.rental_tracking == 'use_resource':
                     qty = len(self.resource_ids)
 
+                if not self.order_id.pricelist_id:
+                    return {'warning': {
+                        'title': _('Wrong Customer or Pricelist'),
+                        'message': _("Please set a Customer and a Pricelist on the Sales Order.")
+                    }}
+
                 pricing_data = self.product_id.get_rental_price(self.rental_start_date, self.rental_stop_date, self.order_id.pricelist_id.id, quantity=qty)
                 self.discount = pricing_data[self.product_id.id]['discount']
                 self.price_unit = self.env['account.tax']._fix_tax_included_price_company(pricing_data[self.product_id.id]['price_list'], self.product_id.taxes_id, self.tax_id, self.company_id)
