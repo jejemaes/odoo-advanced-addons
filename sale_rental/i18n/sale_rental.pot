@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-23 13:10+0000\n"
-"PO-Revision-Date: 2021-09-23 13:10+0000\n"
+"POT-Creation-Date: 2022-07-14 20:31+0000\n"
+"PO-Revision-Date: 2022-07-14 20:31+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -153,11 +153,6 @@ msgid "Analytic Account"
 msgstr ""
 
 #. module: sale_rental
-#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__duration
-msgid "Any Duration"
-msgstr ""
-
-#. module: sale_rental
 #: code:addons/sale_rental/models/rental_tenure.py:0
 #, python-format
 msgid "At least one day musmt be selected for the tenure."
@@ -241,7 +236,6 @@ msgstr ""
 #. module: sale_rental
 #: model:ir.actions.act_window,name:sale_rental.rental_create_sale_order_action_multi
 #: model:ir.model.fields.selection,name:sale_rental.selection__rental_link_sale_order__link_mode__new
-#: model_terms:ir.ui.view,arch_db:sale_rental.rental_booking_view_form
 msgid "Create Sales Order"
 msgstr ""
 
@@ -292,6 +286,11 @@ msgstr ""
 #. module: sale_rental
 #: model:ir.model.fields,help:sale_rental.field_sale_order_line__product_uom_id
 msgid "Default unit of measure used for all stock operations."
+msgstr ""
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_view_form_inherit
+msgid "Delivered"
 msgstr ""
 
 #. module: sale_rental
@@ -360,8 +359,22 @@ msgstr ""
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/product_template.py:0
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_fixed_price
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_fixed_price
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__fixed
+#, python-format
+msgid "Fixed Price"
+msgstr ""
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/product_template.py:0
 #, python-format
 msgid "Free"
+msgstr ""
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_view_form_inherit
+msgid "Generate Rental"
 msgstr ""
 
 #. module: sale_rental
@@ -440,6 +453,7 @@ msgid "Link Mode"
 msgstr ""
 
 #. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.rental_booking_view_form
 #: model_terms:ir.ui.view,arch_db:sale_rental.rental_create_sale_order_view_form
 msgid "Link to Sales Order"
 msgstr ""
@@ -490,8 +504,25 @@ msgid "Number of Weekdays"
 msgstr ""
 
 #. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__duration
+msgid "Per Duration"
+msgstr ""
+
+#. module: sale_rental
 #: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__weekday
 msgid "Per Week Day"
+msgstr ""
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid "Please set a Customer and a Pricelist on the Sales Order."
+msgstr ""
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_product_product__rental_fixed_price
+#: model:ir.model.fields,help:sale_rental.field_product_template__rental_fixed_price
+msgid "Price used for any rental period."
 msgstr ""
 
 #. module: sale_rental
@@ -512,7 +543,7 @@ msgid "Pricing explanation"
 msgstr ""
 
 #. module: sale_rental
-#: model:ir.actions.act_window,name:sale_rental.product_product_action_rental
+#: model:ir.actions.act_window,name:sale_rental.product_template_action_rental
 #: model:ir.model,name:sale_rental.model_product_product
 #: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__product_template_id
 #: model:ir.model.fields,field_description:sale_rental.field_rental_booking__resource_product_id
@@ -871,6 +902,12 @@ msgstr ""
 #. module: sale_rental
 #: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__weekday_ids
 msgid "Weekdays"
+msgstr ""
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid "Wrong Customer or Pricelist"
 msgstr ""
 
 #. module: sale_rental

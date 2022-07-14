@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-23 13:09+0000\n"
-"PO-Revision-Date: 2021-09-23 13:09+0000\n"
+"POT-Creation-Date: 2022-07-14 19:45+0000\n"
+"PO-Revision-Date: 2022-07-14 19:45+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -20,14 +20,14 @@ msgstr ""
 #: code:addons/sale_rental/models/product_template.py:0
 #, python-format
 msgid "%s * %s"
-msgstr "%s * %s"
+msgstr ""
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/product_template.py:0
 #: code:addons/sale_rental/models/product_template.py:0
 #, python-format
 msgid "%s * %s (%s)"
-msgstr "%s * %s (%s)"
+msgstr ""
 
 #. module: sale_rental
 #: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
@@ -48,8 +48,8 @@ msgid ""
 "<span attrs=\"{'invisible':[('base', '!=', 'list_price')]}\">Rent Price  -  "
 "</span>"
 msgstr ""
-"<span attrs=\"{'invisible':[('base', '!=', 'list_price')]}\">Prix de location  -  "
-"</span>"
+"<span attrs=\"{'invisible':[('base', '!=', 'list_price')]}\">Prix de "
+"location  -  </span>"
 
 #. module: sale_rental
 #: model_terms:ir.ui.view,arch_db:sale_rental.res_config_settings_view_form
@@ -62,7 +62,9 @@ msgstr "<span class=\"o_form_label\">Temps de sécurité par défaut</span>"
 #, python-format
 msgid ""
 "A Product should be set, as the resource is linked to a product template."
-msgstr "Un article doit être assigné, car la ressource est lié à un modèle d'article."
+msgstr ""
+"Un article doit être assigné, car la ressource est lié à un modèle "
+"d'article."
 
 #. module: sale_rental
 #: model:ir.model.fields,help:sale_rental.field_product_product__description_rental
@@ -73,22 +75,28 @@ msgstr "Une description d'article pour sa location."
 #. module: sale_rental
 #: model:ir.model.constraint,message:sale_rental.constraint_product_rental_tenure_duration_uom_required_tenure_type
 msgid "A duration UoM is required for a tenure of 'duration' type."
-msgstr "Une durée UdM est requise pour un prix de location par durée temporelle."
+msgstr ""
+"Une durée UdM est requise pour un prix de location par durée temporelle."
 
 #. module: sale_rental
 #: model:ir.model.constraint,message:sale_rental.constraint_product_rental_tenure_duration_valure_required_tenure_type
 msgid "A duration value is required for a tenure of 'duration' type."
-msgstr "Une valeur de durée est requise pour un prix de location par durée temporelle."
+msgstr ""
+"Une valeur de durée est requise pour un prix de location par durée "
+"temporelle."
 
 #. module: sale_rental
 #: model:ir.model.constraint,message:sale_rental.constraint_product_rental_tenure_duration_combinaition
 msgid "A product can not have multi tenure defined for the same duration."
-msgstr "Un article ne peut avoir plusieurs prix de location pour la même durée."
+msgstr ""
+"Un article ne peut avoir plusieurs prix de location pour la même durée."
 
 #. module: sale_rental
 #: model:ir.model.constraint,message:sale_rental.constraint_product_template_rental_tenure_type_required
 msgid "A rental product needs a rental tenure type."
-msgstr "Un article louable a besoin d'une méthode de configuration de prix de location."
+msgstr ""
+"Un article louable a besoin d'une méthode de configuration de prix de "
+"location."
 
 #. module: sale_rental
 #: model:ir.model.constraint,message:sale_rental.constraint_product_template_rental_tracking_required
@@ -108,18 +116,22 @@ msgstr "Un article louable sans suivi a besoin d'un calendrier de location."
 #. module: sale_rental
 #: model:ir.model.constraint,message:sale_rental.constraint_sale_order_line_rental_start_date_required_for_rental
 msgid "A rental sale item requires a start date."
-msgstr "Une ligne de bon de commande pour une location a besoin d'une date de début."
+msgstr ""
+"Une ligne de bon de commande pour une location a besoin d'une date de début."
 
 #. module: sale_rental
 #: model:ir.model.constraint,message:sale_rental.constraint_sale_order_line_rental_stop_date_required_for_rental
 msgid "A rental sale item requires a stop date."
-msgstr "Une ligne de bon de commande pour une location a besoin d'une date de fin."
+msgstr ""
+"Une ligne de bon de commande pour une location a besoin d'une date de fin."
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/sale_order.py:0
 #, python-format
 msgid "A rental sale line must be linked to a rental product."
-msgstr "Une ligne de bon de commande pour une location doit être liée à un article louable."
+msgstr ""
+"Une ligne de bon de commande pour une location doit être liée à un article "
+"louable."
 
 #. module: sale_rental
 #: model:ir.model.fields,help:sale_rental.field_sale_order_line__qty_delivered_method
@@ -158,11 +170,6 @@ msgstr "Temps de sécurité d'après location"
 #: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__analytic_account_id
 msgid "Analytic Account"
 msgstr "Compte Analytique"
-
-#. module: sale_rental
-#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__duration
-msgid "Any Duration"
-msgstr "N'importe quelle durée"
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/rental_tenure.py:0
@@ -218,7 +225,7 @@ msgstr "Annuler"
 #: model_terms:ir.ui.view,arch_db:sale_rental.report_saleorder_document_inherit_sale_stock
 #: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
 msgid "Code"
-msgstr "Code"
+msgstr ""
 
 #. module: sale_rental
 #: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__commercial_partner_id
@@ -243,7 +250,6 @@ msgstr "Créer un bon de commande depuis une location"
 #. module: sale_rental
 #: model:ir.actions.act_window,name:sale_rental.rental_create_sale_order_action_multi
 #: model:ir.model.fields.selection,name:sale_rental.selection__rental_link_sale_order__link_mode__new
-#: model_terms:ir.ui.view,arch_db:sale_rental.rental_booking_view_form
 msgid "Create Sales Order"
 msgstr "Faire une commande"
 
@@ -279,7 +285,7 @@ msgstr "Client du bon de commande"
 #: model_terms:ir.ui.view,arch_db:sale_rental.rental_create_sale_order_view_form
 #: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_view_form_inherit
 msgid "Date"
-msgstr "Date"
+msgstr ""
 
 #. module: sale_rental
 #: model:ir.model.fields.selection,name:sale_rental.selection__product_rental_tenure__duration_uom__day
@@ -297,6 +303,11 @@ msgid "Default unit of measure used for all stock operations."
 msgstr ""
 
 #. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_view_form_inherit
+msgid "Delivered"
+msgstr "Délivré"
+
+#. module: sale_rental
 #: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__partner_shipping_id
 #: model_terms:ir.ui.view,arch_db:sale_rental.report_saleorder_document_inherit_sale_stock
 #: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_portal_content
@@ -311,7 +322,7 @@ msgstr "Adresse de livraison de la location courante"
 #. module: sale_rental
 #: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
 msgid "Description"
-msgstr "Description"
+msgstr ""
 
 #. module: sale_rental
 #: model:ir.model.fields,field_description:sale_rental.field_rental_link_sale_order__discount
@@ -362,9 +373,23 @@ msgstr "Premier prix de location"
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/product_template.py:0
+#: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_fixed_price
+#: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_fixed_price
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__fixed
+#, python-format
+msgid "Fixed Price"
+msgstr "Prix Fixe"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/product_template.py:0
 #, python-format
 msgid "Free"
 msgstr "Gratuit"
+
+#. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.sale_order_view_form_inherit
+msgid "Generate Rental"
+msgstr "Génerer les locations"
 
 #. module: sale_rental
 #: model:ir.model.fields,help:sale_rental.field_rental_link_sale_order__rental_pricing_explanation
@@ -442,9 +467,10 @@ msgid "Link Mode"
 msgstr ""
 
 #. module: sale_rental
+#: model_terms:ir.ui.view,arch_db:sale_rental.rental_booking_view_form
 #: model_terms:ir.ui.view,arch_db:sale_rental.rental_create_sale_order_view_form
 msgid "Link to Sales Order"
-msgstr ""
+msgstr "Attacher à un bon de commande"
 
 #. module: sale_rental
 #: model_terms:ir.ui.view,arch_db:sale_rental.product_pricelist_item_view_form
@@ -464,7 +490,7 @@ msgstr "Marge Min."
 #. module: sale_rental
 #: model:ir.model.fields,field_description:sale_rental.field_product_pricelist_item__applicable_on
 msgid "Mode"
-msgstr "Mode"
+msgstr ""
 
 #. module: sale_rental
 #: model:ir.model.fields.selection,name:sale_rental.selection__product_rental_tenure__duration_uom__month
@@ -489,12 +515,29 @@ msgstr "Nombre de location"
 #. module: sale_rental
 #: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__weekday_count
 msgid "Number of Weekdays"
-msgstr "Number de jours"
+msgstr "Nombre de jours de semaine"
+
+#. module: sale_rental
+#: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__duration
+msgid "Per Duration"
+msgstr "Par Durée"
 
 #. module: sale_rental
 #: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tenure_type__weekday
 msgid "Per Week Day"
 msgstr "Par jours de semaine"
+
+#. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid "Please set a Customer and a Pricelist on the Sales Order."
+msgstr "Merci d'ajouter un client et une liste de prix sur le bon de commande."
+
+#. module: sale_rental
+#: model:ir.model.fields,help:sale_rental.field_product_product__rental_fixed_price
+#: model:ir.model.fields,help:sale_rental.field_product_template__rental_fixed_price
+msgid "Price used for any rental period."
+msgstr "Prix utilisé pour n'importe quelle période de location."
 
 #. module: sale_rental
 #: model:ir.model,name:sale_rental.model_product_pricelist
@@ -514,7 +557,7 @@ msgid "Pricing explanation"
 msgstr "Explication du prix de location"
 
 #. module: sale_rental
-#: model:ir.actions.act_window,name:sale_rental.product_product_action_rental
+#: model:ir.actions.act_window,name:sale_rental.product_template_action_rental
 #: model:ir.model,name:sale_rental.model_product_product
 #: model:ir.model.fields,field_description:sale_rental.field_product_rental_tenure__product_template_id
 #: model:ir.model.fields,field_description:sale_rental.field_rental_booking__resource_product_id
@@ -746,7 +789,7 @@ msgstr "Nom du tarif de location"
 msgid ""
 "The Sale Item should be linked to rental bookings, as the product tracked "
 "resources."
-msgstr ""
+msgstr "La ligne du bon de commande doit être liées à des locations car le produit est traqué."
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/sale_order.py:0
@@ -754,7 +797,7 @@ msgstr ""
 msgid ""
 "The Sale Item should be linked to resources as the product is tracked for "
 "rentings."
-msgstr ""
+msgstr "La ligne de bon de commande doit être liée à des resources car le produit est traqué."
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/sale_order.py:0
@@ -762,7 +805,7 @@ msgstr ""
 msgid ""
 "The Sale Item should not be linked to rental bookings as the line is not a "
 "rental one."
-msgstr ""
+msgstr "La ligne de bon de commande ne doit pas être liée à des locations car le produit n'est pas louable."
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/sale_order.py:0
@@ -770,7 +813,9 @@ msgstr ""
 msgid ""
 "The Sale Item should not be linked to resources as the line is not a rental "
 "one."
-msgstr "La ligne de bon de commande ne doit pas être liée à des ressources car elle n'est pas une location."
+msgstr ""
+"La ligne de bon de commande ne doit pas être liée à des ressources car elle "
+"n'est pas une location."
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/sale_order.py:0
@@ -779,7 +824,9 @@ msgstr "La ligne de bon de commande ne doit pas être liée à des ressources ca
 msgid ""
 "The Sale Item should not be linked to resources as the product is no tracked"
 " for rentings."
-msgstr "La ligne de bon de commande ne doit pas être liée à des ressources car son article ne suit pas les ressources."
+msgstr ""
+"La ligne de bon de commande ne doit pas être liée à des ressources car son "
+"article ne suit pas les ressources."
 
 #. module: sale_rental
 #: code:addons/sale_rental/models/rental_tenure.py:0
@@ -815,7 +862,9 @@ msgstr "La ressource doit être liée à un modèle d'article."
 msgid ""
 "This amount is expressed in the currency of the pricelist, or (fallback) in "
 "product currency."
-msgstr "Ce montant est exprimé dans la devise de la liste de prix, ou celle da société de l'article."
+msgstr ""
+"Ce montant est exprimé dans la devise de la liste de prix, ou celle da "
+"société de l'article."
 
 #. module: sale_rental
 #: model_terms:ir.ui.view,arch_db:sale_rental.product_product_view_form_rental
@@ -826,7 +875,7 @@ msgstr "Cette note est ajoutée au bon de commande et facture."
 #: model:ir.model.fields,field_description:sale_rental.field_product_product__rental_tz
 #: model:ir.model.fields,field_description:sale_rental.field_product_template__rental_tz
 msgid "Timezone"
-msgstr "Timezone"
+msgstr ""
 
 #. module: sale_rental
 #: model:ir.model.fields.selection,name:sale_rental.selection__product_template__rental_tracking__use_resource
@@ -866,12 +915,20 @@ msgid "Weekdays"
 msgstr "Jours de semaine"
 
 #. module: sale_rental
+#: code:addons/sale_rental/models/sale_order.py:0
+#, python-format
+msgid "Wrong Customer or Pricelist"
+msgstr ""
+
+#. module: sale_rental
 #: code:addons/sale_rental/wizard/create_sale_order.py:0
 #, python-format
 msgid ""
 "You can not create a Sales Order, since your resource is not linked to a "
 "product."
-msgstr "Vous ne pouvez pas créer de bon de commande car la ressource n'est pas liée un produit."
+msgstr ""
+"Vous ne pouvez pas créer de bon de commande car la ressource n'est pas liée "
+"un produit."
 
 #. module: sale_rental
 #: code:addons/sale_rental/wizard/create_sale_order.py:0
