@@ -15,7 +15,7 @@
             </p>
         </field>
         <field name="context">
-            {'search_default_my': 0}
+            {}
         </field>
     </record>
 

@@ -19,8 +19,8 @@ class ProductTemplate(models.Model):
     can_be_rented = fields.Boolean('Can be Rented', default=False, help="Specify if the product can be rent in a sales order line.", copy=True)
     description_rental = fields.Text('Rental Description', translate=True, help="A description of the Product to rent it.")
     rental_tenure_type = fields.Selection([
-        ('fixed', 'Fixed Duration'),
-        ('duration', 'Any Duration'),
+        ('fixed', 'Fixed Price'),
+        ('duration', 'Per Duration'),
         ('weekday', 'Per Week Day'),
     ], string="Tenure Duration", default=False, copy=True)
     rental_fixed_price = fields.Float("Fixed Price", default=1.0, help="Price used for any rental period.")
