@@ -6,14 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-23 10:57+0000\n"
-"PO-Revision-Date: 2021-09-23 10:57+0000\n"
+"POT-Creation-Date: 2022-07-14 20:31+0000\n"
+"PO-Revision-Date: 2022-07-14 20:31+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.products_item
+msgid "/ For any duration"
+msgstr ""
 
 #. module: website_sale_rental
 #: model_terms:ir.ui.view,arch_db:website_sale_rental.product
@@ -23,6 +28,11 @@ msgstr ""
 #. module: website_sale_rental
 #: model_terms:ir.ui.view,arch_db:website_sale_rental.product
 msgid "<i class=\"fa fa-shopping-cart\"/> Add to Cart"
+msgstr ""
+
+#. module: website_sale_rental
+#: model_terms:ir.ui.view,arch_db:website_sale_rental.product_rental_price_details
+msgid "<strong>For any duration: </strong>"
 msgstr ""
 
 #. module: website_sale_rental
@@ -75,8 +85,27 @@ msgid "Display price without pricelist applied"
 msgstr ""
 
 #. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_product__website_rental_list_price
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template__website_rental_list_price
+msgid "Displayed fixed rental price with pricelist applied"
+msgstr ""
+
+#. module: website_sale_rental
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_product__website_rental_base_price
+#: model:ir.model.fields,field_description:website_sale_rental.field_product_template__website_rental_base_price
+msgid "Displayed fixed rental price without pricelist applied"
+msgstr ""
+
+#. module: website_sale_rental
 #: model:ir.model.fields.selection,name:website_sale_rental.selection__product_template__rental_select_overlap_mode__only_draft
 msgid "Draft renting can be selected"
+msgstr ""
+
+#. module: website_sale_rental
+#. openerp-web
+#: code:addons/website_sale_rental/static/src/js/website_sale_rental.js:0
+#, python-format
+msgid "Ends on "
 msgstr ""
 
 #. module: website_sale_rental
@@ -185,7 +214,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website_sale_rental.product_rental_price_details
 msgid ""
 "Rental Pricing\n"
-"                    <i class=\"fa fa-info-circle\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Those prices are computed as you rent only 1 time unit. Taxes and discount are applied on the combinaison of tenures.\"/>"
+"                <i class=\"fa fa-info-circle\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Those prices are computed as you rent only 1 time unit. Taxes and discount are applied on the combinaison of tenures.\"/>"
 msgstr ""
 
 #. module: website_sale_rental

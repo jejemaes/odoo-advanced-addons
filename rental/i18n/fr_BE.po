@@ -1,0 +1,682 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* rental
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-14 19:56+0000\n"
+"PO-Revision-Date: 2022-07-14 19:56+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: rental
+#: code:addons/rental/models/rental.py:0
+#, python-format
+msgid "%s / %s"
+msgstr ""
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.res_config_settings_view_form
+msgid "<span class=\"o_form_label\">Default Rental Agreement</span>"
+msgstr "<span class=\"o_form_label\">Contract de Location par défaut</span>"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_form
+msgid "<span class=\"o_form_label\">From</span>"
+msgstr "<span class=\"o_form_label\">De</span>"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_form
+msgid "<span class=\"o_form_label\">To</span>"
+msgstr "<span class=\"o_form_label\">A</span>"
+
+#. module: rental
+#: model:ir.model.constraint,message:rental.constraint_resource_calendar_leaves_resource_id_required
+msgid "A rental time entry requires a resource."
+msgstr "Une location nécéssite une ressource."
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__activity_ids
+msgid "Activities"
+msgstr "Activités"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__activity_type_icon
+msgid "Activity Type Icon"
+msgstr ""
+
+#. module: rental
+#: model:ir.actions.act_window,name:rental.rental_agreement_action
+#: model:ir.model.fields,field_description:rental.field_rental_booking__agreement_id
+msgid "Agreement"
+msgstr "Contract"
+
+#. module: rental
+#: model:ir.ui.menu,name:rental.rental_menu_config_agreement
+msgid "Agreements"
+msgstr "Contracts et Conditions"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de Pièces Jointes"
+
+#. module: rental
+#: model:ir.model.fields.selection,name:rental.selection__rental_booking__state__cancel
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_form
+msgid "Cancel"
+msgstr "Annulé"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__resource_color
+msgid "Color"
+msgstr "Couleur"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__state_color
+msgid "Color State"
+msgstr "Couleur du status"
+
+#. module: rental
+#: model:ir.model,name:rental.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__company_id
+#: model:ir.model.fields,field_description:rental.field_rental_booking__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: rental
+#: model:ir.model,name:rental.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de config"
+
+#. module: rental
+#: model:ir.ui.menu,name:rental.rental_menu_config
+msgid "Configuration"
+msgstr ""
+
+#. module: rental
+#: model_terms:ir.actions.act_window,help:rental.rental_booking_action_rental
+msgid "Create a rental order for one of your resource material."
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__create_uid
+#: model:ir.model.fields,field_description:rental.field_rental_booking__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__create_date
+#: model:ir.model.fields,field_description:rental.field_rental_booking__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__partner_id
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "Customer"
+msgstr "Client"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.res_config_settings_view_form
+msgid "Default agreement for rental product"
+msgstr "Contract de location par défault pour les produits louables"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__partner_shipping_id
+msgid "Delivery Address"
+msgstr "Adresse de livraison"
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__partner_shipping_id
+msgid "Delivery address for current booking."
+msgstr "Adresse de livraison pour la réservation"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__display_name
+#: model:ir.model.fields,field_description:rental.field_rental_booking__display_name
+#: model:ir.model.fields,field_description:rental.field_res_company__display_name
+#: model:ir.model.fields,field_description:rental.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:rental.field_resource_calendar_leaves__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: rental
+#: model:ir.model.fields.selection,name:rental.selection__rental_booking__state__done
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_form
+msgid "Done"
+msgstr "Fait"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__duration_days
+msgid "Duration (days)"
+msgstr "Durée (en jours)"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__duration_hours
+msgid "Duration (hours)"
+msgstr "Durée (en heures)"
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__duration_days
+msgid ""
+"Duration expressed in days, calculated with the working calendar (if set)."
+msgstr "Durée exprimée en jours, calculée avec le calendrier de travail (si spécifié)."
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__duration_hours
+msgid ""
+"Duration expressed in hours, calculated with the working calendar (if set)."
+msgstr "Durée exprimée en heures, calculée avec le calendrier de travail (si spécifié)."
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__date_to
+msgid "End Date"
+msgstr "Date de fin"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__resource_id
+msgid "Equipment"
+msgstr "Equipement"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__file
+msgid "File"
+msgstr "Fichier"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_channel_ids
+msgid "Followers (Channels)"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_kanban
+msgid "From"
+msgstr "De"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "Future Bookings"
+msgstr "Réservations Futures"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__id
+#: model:ir.model.fields,field_description:rental.field_rental_booking__id
+#: model:ir.model.fields,field_description:rental.field_res_company__id
+#: model:ir.model.fields,field_description:rental.field_res_config_settings__id
+#: model:ir.model.fields,field_description:rental.field_resource_calendar_leaves__id
+msgid "ID"
+msgstr "Id"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__message_needaction
+#: model:ir.model.fields,help:rental.field_rental_booking__message_unread
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__resource_id
+msgid ""
+"If empty, this is a generic time off for the company. If a resource is set, "
+"the time off is only for this resource"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__note
+msgid "Internal Notes"
+msgstr "Note Interne"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__is_published
+msgid "Is Published"
+msgstr "Est publiée"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement____last_update
+#: model:ir.model.fields,field_description:rental.field_rental_booking____last_update
+#: model:ir.model.fields,field_description:rental.field_res_company____last_update
+#: model:ir.model.fields,field_description:rental.field_res_config_settings____last_update
+#: model:ir.model.fields,field_description:rental.field_resource_calendar_leaves____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__write_uid
+#: model:ir.model.fields,field_description:rental.field_rental_booking__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__write_date
+#: model:ir.model.fields,field_description:rental.field_rental_booking__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_main_attachment_id
+msgid "Main Attachment"
+msgstr ""
+
+#. module: rental
+#: model:res.groups,name:rental.group_rental_manager
+msgid "Manager"
+msgstr "Manager"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr ""
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "My Bookings"
+msgstr "Mes locations"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: rental
+#: code:addons/rental/models/rental.py:0 code:addons/rental/models/rental.py:0
+#, python-format
+msgid "New"
+msgstr "Nouveau"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_agreement__note
+msgid "Note"
+msgstr "Note"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__message_needaction_counter
+msgid "Number of messages which requires an action"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__overlap_count
+msgid "Number of rental overlapping"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__message_unread_counter
+msgid "Number of unread messages"
+msgstr ""
+
+#. module: rental
+#: code:addons/rental/models/rental.py:0
+#, python-format
+msgid "Only draft or cancelled bookings can be removed."
+msgstr "Seulement les réservations en brouillon ou annulées peuvent être supprimées."
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_form
+msgid "Overlap(s)"
+msgstr ""
+
+#. module: rental
+#: code:addons/rental/models/rental.py:0
+#, python-format
+msgid "Overlap(s) of %s"
+msgstr ""
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_form
+msgid "Pick Up"
+msgstr "Livrer"
+
+#. module: rental
+#: model:ir.model.fields.selection,name:rental.selection__rental_booking__state__picked_up
+msgid "Picked Up"
+msgstr "Livré"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__name
+msgid "Reason"
+msgstr "Raison"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__code
+msgid "Reference"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields.selection,name:rental.selection__resource_calendar_leaves__time_type__rental
+#: model:ir.ui.menu,name:rental.rental_menu_root
+#: model_terms:ir.ui.view,arch_db:rental.res_config_settings_view_form
+msgid "Rental"
+msgstr "Locations"
+
+#. module: rental
+#: model:ir.model,name:rental.model_rental_agreement
+#: model:ir.model.fields,field_description:rental.field_res_company__rental_agreement_id
+#: model:ir.model.fields,field_description:rental.field_res_config_settings__rental_agreement_id
+msgid "Rental Agreement"
+msgstr "Contract de location"
+
+#. module: rental
+#: model:ir.actions.act_window,name:rental.rental_booking_action_rental
+msgid "Rental Bookings"
+msgstr "Locations"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__rental_confirmed
+#: model:ir.model.fields,field_description:rental.field_resource_calendar_leaves__rental_confirmed
+msgid "Rental Confirmed"
+msgstr "Location confirmée"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_calendar
+msgid "Rental Orders"
+msgstr "Locations"
+
+#. module: rental
+#: model:ir.model,name:rental.model_rental_booking
+msgid "Rental Reservation"
+msgstr "Location"
+
+#. module: rental
+#: model:ir.model.fields.selection,name:rental.selection__rental_booking__state__draft
+msgid "Request"
+msgstr "Demande"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_form
+msgid "Reserve"
+msgstr "Réserver"
+
+#. module: rental
+#: model:ir.model.fields.selection,name:rental.selection__rental_booking__state__reserved
+msgid "Reserved"
+msgstr "Réservé"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_form
+msgid "Reset to draft"
+msgstr "Remettre en brouillon"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "Resource"
+msgstr "Ressource"
+
+#. module: rental
+#: model:ir.model,name:rental.model_resource_calendar_leaves
+msgid "Resource Time Off Detail"
+msgstr "Détails des congés de la ressource"
+
+#. module: rental
+#: model:ir.actions.act_window,name:rental.resource_resource_action_rental
+#: model:ir.ui.menu,name:rental.rental_menu_rental_resource
+#: model:ir.ui.menu,name:rental.rental_menu_resource
+msgid "Resources"
+msgstr "Ressources"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__user_id
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "Responsible"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__activity_user_id
+msgid "Responsible User"
+msgstr "Utilisateur Responsable"
+
+#. module: rental
+#: model:ir.model.fields.selection,name:rental.selection__rental_booking__state__returned
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_form
+msgid "Returned"
+msgstr "Retourné"
+
+#. module: rental
+#: model:ir.ui.menu,name:rental.rental_menu_booking
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_gantt
+msgid "Schedule"
+msgstr "Horaire"
+
+#. module: rental
+#: model:ir.actions.act_window,name:rental.rental_action_config
+#: model:ir.ui.menu,name:rental.rental_menu_config_settings
+msgid "Settings"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__date_from
+msgid "Start Date"
+msgstr "Date de début"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "State"
+msgstr "Status"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__state
+msgid "Status"
+msgstr "Status"
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: rental
+#: model:res.groups,comment:rental.group_rental_user_all
+msgid ""
+"The user will have access to all records of everyone in the rental "
+"application."
+msgstr ""
+
+#. module: rental
+#: model:res.groups,comment:rental.group_rental_user
+msgid "The user will have access to his own data in the rental application."
+msgstr ""
+
+#. module: rental
+#: model:res.groups,comment:rental.group_rental_manager
+msgid ""
+"The user will have an access to the rental configuration, reports nd all the"
+" rental orders."
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__resource_time_id
+msgid "Time Entry"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.constraint,message:rental.constraint_rental_booking_resource_time_unique
+msgid "Time Entry can only be linked to one Rental."
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__time_type
+#: model:ir.model.fields,field_description:rental.field_resource_calendar_leaves__time_type
+msgid "Time Type"
+msgstr "Type de temps"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "Title"
+msgstr "Titre"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_kanban
+msgid "To"
+msgstr "A"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "To Be Returned"
+msgstr "A retourner"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "To Deliver"
+msgstr "A livrer"
+
+#. module: rental
+#: model_terms:ir.ui.view,arch_db:rental.rental_booking_view_search
+msgid "To Mark As Done"
+msgstr "A marquer comme terminé"
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_unread
+msgid "Unread Messages"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__message_unread_counter
+msgid "Unread Messages Counter"
+msgstr ""
+
+#. module: rental
+#: model:res.groups,name:rental.group_rental_user_all
+msgid "User: All Documents"
+msgstr ""
+
+#. module: rental
+#: model:res.groups,name:rental.group_rental_user
+msgid "User: Own Documents Only"
+msgstr ""
+
+#. module: rental
+#: model:ir.model.fields,help:rental.field_rental_booking__time_type
+#: model:ir.model.fields,help:rental.field_resource_calendar_leaves__time_type
+msgid ""
+"Whether this should be computed as a time off or as work time (eg: "
+"formation)"
+msgstr ""
+"Si cela doit être calculé en tant que congé ou en tant que temps de travail "
+"(ex : formation)"
+
+#. module: rental
+#: model:ir.ui.menu,name:rental.rental_menu_resource_calendar
+msgid "Working Calendar"
+msgstr "Calendrier de travail"
+
+#. module: rental
+#: model:ir.model.fields,field_description:rental.field_rental_booking__calendar_id
+msgid "Working Hours"
+msgstr "Heures de Travail"
+
+#. module: rental
+#: code:addons/rental/models/rental.py:0
+#, python-format
+msgid "You can not cancel a picked up booking. It needs to be returned first."
+msgstr "Vous ne pouvez pas annuler une réservation livrée. Elle doit d'abord être retournée."
