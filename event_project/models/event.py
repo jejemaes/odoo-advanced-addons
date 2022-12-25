@@ -13,7 +13,7 @@ class EventType(models.Model):
     use_project_mode = fields.Selection([
         ('new_project', 'Create a New Project'),
         ('existing_project', 'Existing Project'),
-    ], string="Project Usage Mode")
+    ], string="Project Mode")
 
     # existing project
     project_id = fields.Many2one('project.project', string="Project", ondelete="set null")

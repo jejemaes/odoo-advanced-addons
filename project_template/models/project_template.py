@@ -90,7 +90,7 @@ class ProjectTemplateTask(models.Model):
     ], default='0', string="Priority")
     sequence = fields.Integer(string='Sequence', default=10,
         help="Gives the sequence order when displaying a list of tasks.")
-    user_id = fields.Many2one('res.users', string='Default Responsible')
+    user_ids = fields.Many2many('res.users', string='Default Responsibles')
     company_id = fields.Many2one('res.company', related='project_template_id.company_id')
     color = fields.Integer('Color Index')
 
@@ -129,4 +129,4 @@ class ProjectTemplateTask(models.Model):
         return self.env['project.task']._convert_to_write(result)
 
     def _prepare_task_value_fields(self):
-        return ['name', 'description', 'priority', 'sequence', 'color', 'user_id', 'tag_ids']
+        return ['name', 'description', 'priority', 'sequence', 'color', 'user_ids', 'tag_ids']

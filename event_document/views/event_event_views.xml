@@ -10,9 +10,6 @@
         <field name="inherit_id" ref="event.view_event_form"/>
         <field name="priority">20</field>
         <field name="arch" type="xml">
-            <xpath expr="//notebook/page[@name='advanced_settings']" position="attributes">
-                <attribute name="invisible">0</attribute>
-            </xpath>
             <xpath expr="//notebook/page[@name='advanced_settings']/group[@name='advanced_settings_general']" position="inside">
                 <group string="Documents">
                     <field name="document_folder_id"/>
@@ -33,38 +30,12 @@
         <field name="inherit_id" ref="event.view_event_type_form"/>
         <field name="priority">15</field>
         <field name="arch" type="xml">
-            <xpath expr="//sheet" position="inside">
-                <h2>Documents</h2>
-                <div class="row mt16 o_settings_container" name="event_type_document">
-                    <div class="col-12 col-lg-6 o_setting_box" name="use_document_folder">
-                        <div class="o_setting_left_pane">
-                            <field name="use_document_folder"/>
-                        </div>
-                        <div class="o_setting_right_pane">
-                            <label for="use_document_folder"/>
-                            <div class="row">
-                                <div class="col-lg-8 text-muted">
-                                    Generate a document folder for events of this template when they arrive in a stage that required a folder.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-6 o_setting_box" name="document_default_tags">
-                        <div class="o_setting_left_pane"></div>
-                        <div class="o_setting_right_pane">
-                            <label for="document_tag_ids" string="Default Document Tags"/>
-                            <div class="row">
-                                <div class="col-lg-12 text-muted">
-                                    Document attached to event will have those tags
-                                </div>
-                                <div class="col-12 mt16">
-                                    <field name="document_tag_ids" widget="many2many_tags" options="{'no_create': True, 'color_field': 'color'}"/>
-                                    <field name="document_selectable_tag_ids" invisible="1"/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <xpath expr="//notebook/page[@name='advanced_settings']/group[@name='advanced_settings_general']" position="inside">
+                <group string="Documents">
+                    <field name="use_document_folder"/>
+                    <field name="document_tag_ids" widget="many2many_tags" options="{'no_create': True, 'color_field': 'color'}" attrs="{'invisible': [('use_document_folder', '=', False)]}"/>
+                    <field name="document_selectable_tag_ids" invisible="1"/>
+                </group>
             </xpath>
         </field>
         <field name="groups_id" eval="[(4, ref('event_document.group_document_specific_event'))]"/>
@@ -77,17 +48,15 @@
         <field name="name">event.stage.view.form.inherit.event.advanced</field>
         <field name="model">event.stage</field>
         <field name="inherit_id" ref="event.event_stage_view_form"/>
-        <field name="priority">15</field>
+        <field name="priority">30</field>
         <field name="arch" type="xml">
-            <xpath expr="//sheet" position="inside">
-                <group string="Documents" name="document_section">
-                    <group>
-                        <field name="document_folder_required"/>
-                    </group>
-                </group>
+            <xpath expr="//group[@name='generate_data_settings']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//group[@name='generate_data_settings']" position="inside">
+                <field name="document_folder_required"/>
             </xpath>
         </field>
-        <field name="groups_id" eval="[(4, ref('event_document.group_document_specific_event'))]"/>
     </record>
 
 </odoo>

@@ -14,7 +14,7 @@
     'version': '1.0',
     'application': False,
     'depends': ['event'],
-    'auto_install': True,
+    'auto_install': False,
     'data': [
         'views/event_event_views.xml',
         'views/event_type_views.xml',
