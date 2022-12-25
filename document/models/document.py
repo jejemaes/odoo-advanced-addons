@@ -36,7 +36,7 @@ class Document(models.Model):
     name = fields.Char(related='attachment_id.name', inherited=True, readonly=True)  # as it now contents the filename (with the extension required to server file properly), better to make it readonly
     url = fields.Char(related='attachment_id.url', inherited=True, readonly=False)
     description = fields.Text(related='attachment_id.description', inherited=True, readonly=False)
-    type = fields.Text(related='attachment_id.type', inherited=True, readonly=False)
+    type = fields.Selection(related='attachment_id.type', inherited=True, readonly=False)
     company_id = fields.Many2one(related='attachment_id.company_id', inherited=True, readonly=True, required=True)
     filename = fields.Char("Filename", compute='_compute_filename', help="Name of the file of this one is donwloaded")
     access_token = fields.Char(related='attachment_id.access_token', inherited=True, default=_default_access_token)  # all documents will have an access token on their attachment

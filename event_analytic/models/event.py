@@ -7,7 +7,7 @@ from odoo.exceptions import ValidationError
 class EventType(models.Model):
     _inherit = 'event.type'
 
-    use_analytic = fields.Boolean("Track Costs", default=False, help="Track costs with an analytic account")
+    use_analytic = fields.Boolean("Track Costs", default=False, help="Track the costs of your event through an analytic account. It will be generated depending on the event stage configuration.")
     analytic_group_id = fields.Many2one('account.analytic.group', string="Analytic Category", help="Generate a analytic account on event creation with this category.")
 
 

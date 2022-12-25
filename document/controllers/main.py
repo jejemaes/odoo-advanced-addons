@@ -39,7 +39,9 @@ class ShareRoute(http.Controller):
     @http.route('/document/upload_file', type='http', methods=['POST'], auth="user")
     def document_upload_file(self, ufile, **kwargs):
         # default folder
-        default_folder_id = kwargs.get('folder_id', request.env['document.document'].default_get(['folder_id'])['folder_id'])
+        default_folder_id = kwargs.get('folder_id')
+        if not default_folder_id:
+            default_folder_id = request.env['document.document'].default_get(['folder_id'])['folder_id']
         if not default_folder_id:
             default_folder_id = request.env['document.folder'].search([], limit=1, order='sequence ASC').id
 

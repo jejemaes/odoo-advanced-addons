@@ -20,5 +20,6 @@
         'views/event_ticket_views.xml',
         'views/event_templates.xml',
         'views/event_type_views.xml',
+        'report/event_event_templates.xml',
     ],
 }
