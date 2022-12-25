@@ -1,9 +1,9 @@
-odoo.define('documents.DocumentsKanbanRecord', function (require) {
+odoo.define('document.DocumentKanbanRecord', function (require) {
 'use strict';
 
 const KanbanRecord = require('web.KanbanRecord');
 
-const DocumentsKanbanRecord = KanbanRecord.extend({
+const DocumentKanbanRecord = KanbanRecord.extend({
     events: Object.assign({}, KanbanRecord.prototype.events, {
         'click .oe_kanban_previewer': '_onImageClicked',
     }),
@@ -22,6 +22,6 @@ const DocumentsKanbanRecord = KanbanRecord.extend({
     },
 });
 
-return DocumentsKanbanRecord;
+return DocumentKanbanRecord;
 
 });

@@ -6,51 +6,33 @@
         <field name="model">event.type</field>
         <field name="inherit_id" ref="event_analytic.event_type_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='event_type_analytic_account']" position="inside">
-                <div class="col-12 col-lg-6 o_setting_box">
-                    <div class="o_setting_left_pane">
-                        <field name="use_project"/>
-                    </div>
-                    <div class="o_setting_right_pane">
-                        <label for="use_project"/>
-                        <div class="row">
-                            <div class="col-lg-8 text-muted">
-                                Create a project with tasks to help you organize your work for the event.
-                            </div>
-                        </div>
-                        <div class="row mt16" attrs="{'invisible': [('use_project', '=', False)]}">
-                            <div class="col-lg-8">
-                                <label for="use_project_mode" string="Mode"/>
-                                <field name="use_project_mode" attrs="{'required': [('use_project', '=', True)]}"/>
-                            </div>
-                        </div>
-                        <div class="row mt16" attrs="{'invisible': [('use_project_mode', '!=', 'new_project')]}">
-                            <div name="event_new_project_details">
-                                <div class="col-lg-12 col-12">
-                                    <label for="project_start_date_delay" string="Start Date"/>
-                                    <field name="project_start_date_delay" class="oe_inline col-1" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
-                                    <field name="project_start_date_unit" class="oe_inline" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
-                                    <field name="project_start_date_trigger" class="oe_inline ml-2" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
-                                </div>
-                                <div class="col-lg-12 col-12">
-                                    <label for="project_stop_date_delay" string="Expiration Date"/>
-                                    <field name="project_stop_date_delay" class="oe_inline col-1" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
-                                    <field name="project_stop_date_unit" class="oe_inline" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
-                                    <field name="project_stop_date_trigger" class="oe_inline ml-2" nolabel="1" attrs="{'required': [('use_project', '=', True)]}"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt16" attrs="{'invisible': [('use_project_mode', '!=', 'existing_project')]}">
-                            <div name="event_existing_project_details">
-                                <div class="col-lg-12 col-12">
-                                    <label for="project_id" string="Project"/>
-                                    <field name="project_id" options="{'no_create': True}"/>
-                                </div>
-                            </div>
+            <xpath expr="//notebook/page[@name='advanced_settings']/group[@name='advanced_settings_general']" position="inside">
+                <group string="Project" name="event_type_project">
+                    <field name="use_project"/>
+                    <field name="use_project_mode" attrs="{'invisible': [('use_project', '=', False)], 'required': [('use_project', '=', True)]}"/>
+
+                    <field name="project_id" options="{'no_create': True}" attrs="{'invisible': [('use_project_mode', '!=', 'existing_project')], 'required': [('use_project_mode', '=', 'existing_project')]}"/>
+
+                    <label for="project_start_date_delay" string="Start Date" attrs="{'invisible': [('use_project_mode', '!=', 'new_project')]}"/>
+                    <div name="project_start_date" attrs="{'invisible': [('use_project_mode', '!=', 'new_project')]}">
+                        <field name="project_start_date_delay" class="oe_inline col-2" attrs="{'required': [('use_project_mode', '=', 'new_project')]}"/>
+                        <div class="oe_inline" style="display: inline;">
+                            <field name="project_start_date_unit" class="oe_inline" attrs="{'required': [('use_project_mode', '=', 'new_project')]}"/>
+                            <field name="project_start_date_trigger" class="oe_inline" attrs="{'required': [('use_project_mode', '=', 'new_project')]}"/>
                         </div>
                     </div>
-                </div>
+
+                    <label for="project_stop_date_delay" string="Expiration Date" attrs="{'invisible': [('use_project_mode', '!=', 'new_project')]}"/>
+                    <div name="project_end_date" attrs="{'invisible': [('use_project_mode', '!=', 'new_project')]}">
+                        <field name="project_stop_date_delay" class="oe_inline col-2" attrs="{'required': [('use_project_mode', '=', 'new_project')]}"/>
+                        <div class="oe_inline" style="display: inline;">
+                            <field name="project_stop_date_unit" class="oe_inline" attrs="{'required': [('use_project_mode', '=', 'new_project')]}"/>
+                            <field name="project_stop_date_trigger" class="oe_inline" attrs="{'required': [('use_project_mode', '=', 'new_project')]}"/>
+                        </div>
+                    </div>
+                </group>
             </xpath>
+
         </field>
     </record>
 

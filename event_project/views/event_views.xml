@@ -6,8 +6,10 @@
         <field name="model">event.event</field>
         <field name="inherit_id" ref="event_analytic.event_event_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='analytic_account_id']" position="after">
-				<field name="project_id" options="{'no_create': True}"/>
+            <xpath expr="//notebook/page[@name='advanced_settings']/group[@name='advanced_settings_general']" position="inside">
+                <group string="Project">
+                    <field name="project_id"/>
+                </group>
             </xpath>
             <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                 <button name="action_view_project" type="object" class="oe_stat_button" icon="fa-puzzle-piece" attrs="{'invisible': [('project_id', '=', False)]}">
@@ -26,9 +28,12 @@
         <field name="name">event.stage.view.form.inherit.event.advanced</field>
         <field name="model">event.stage</field>
         <field name="inherit_id" ref="event.event_stage_view_form"/>
-        <field name="priority">15</field>
+        <field name="priority">25</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='analytic_account_required']" position="after">
+            <xpath expr="//group[@name='generate_data_settings']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//group[@name='generate_data_settings']" position="inside">
                 <field name="project_required"/>
             </xpath>
         </field>

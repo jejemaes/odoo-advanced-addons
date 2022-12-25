@@ -1,12 +1,14 @@
-odoo.define('documents.DocumentsKanbanController', function (require) {
+odoo.define('document.DocumentKanbanController', function (require) {
 'use strict';
 
-const MailDocumentViewer = require('mail.DocumentViewer');
+const MailDocumentViewer = require('@mail/js/document_viewer')[Symbol.for("default")];
+
 const KanbanController = require('web.KanbanController');
 
 const fileUploadMixin = require('web.fileUploadMixin');
 const { _t, qweb } = require('web.core');
 
+console.log('=========', MailDocumentViewer);
 
 var DocumentViewer = MailDocumentViewer.extend({
 
@@ -17,7 +19,7 @@ var DocumentViewer = MailDocumentViewer.extend({
 });
 
 
-var DocumentsKanbanController = KanbanController.extend(fileUploadMixin, {
+var DocumentKanbanController = KanbanController.extend(fileUploadMixin, {
     buttons_template: 'DocumentKanbanView.buttons',
     events: Object.assign({}, KanbanController.prototype.events, fileUploadMixin.events, {
         'click .o-kanban-button-new-document': '_onCreateNewDocument',
@@ -132,13 +134,12 @@ var DocumentsKanbanController = KanbanController.extend(fileUploadMixin, {
         const result = xhr.status === 200
             ? JSON.parse(xhr.response)
             : {
-                error: _.str.sprintf(_t("status code: %s </br> message: %s"), xhr.status, xhr.response)
+                error: _.str.sprintf(_t("status code: %s, message: %s"), xhr.status, xhr.response)
             };
         if (result.error) {
-            this.do_notify(_t("Error"), result.error, true);
-        }
-        if (result.success) {
-            this.do_notify(false, result.success, false);
+            this.displayNotification({ title: _t("Error"), message: result.error, sticky: true });
+        } else if (result.ids && result.ids.length > 0) {
+            this._selectedRecordIds = result.ids;
         }
         fileUploadMixin._onUploadLoad.apply(this, arguments);
     },
@@ -172,6 +173,6 @@ var DocumentsKanbanController = KanbanController.extend(fileUploadMixin, {
 
 });
 
-return DocumentsKanbanController;
+return DocumentKanbanController;
 
 });

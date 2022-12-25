@@ -32,12 +32,12 @@
     <!--
         Make the phone mandatory on registration
     -->
-    <template id="registration_attendee_details_questions" inherit_id="website_event.registration_attendee_details" name="Registration Attendee Details with questions">
-        <xpath expr="//input[@ t-attf-name='#{counter}-phone']/.." position="replace">
+    <template id="registration_attendee_details" inherit_id="website_event.registration_attendee_details" name="Registration Attendee Details with questions">
+        <xpath expr="//input[@t-attf-name='#{counter}-phone']/.." position="replace">
             <div class="col-lg my-2">
-                <label>Phone <small t-if="not ticket['ticket'].event_id.registration_phone_mandatory">(Optional)</small></label>
-                <input class="form-control" type="tel" t-attf-name="#{counter}-phone" t-if="not ticket['ticket'].event_id.registration_phone_mandatory"/>
-                <input class="form-control" type="tel" t-attf-name="#{counter}-phone" required="This field is mandatory." t-if="ticket['ticket'].event_id.registration_phone_mandatory"/>
+                <label>Phone <small t-if="not event.registration_phone_mandatory">(Optional)</small></label>
+                <input class="form-control" type="tel" t-attf-name="#{counter}-phone" t-if="not event.registration_phone_mandatory" t-att-value="default_first_attendee.get('phone', '') if counter == 1 else ''"/>
+                <input class="form-control" type="tel" t-attf-name="#{counter}-phone" required="This field is mandatory." t-if="event.registration_phone_mandatory" t-att-value="default_first_attendee.get('phone', '') if counter == 1 else ''"/>
             </div>
         </xpath>
     </template>

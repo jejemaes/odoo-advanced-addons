@@ -2,8 +2,8 @@
 from dateutil.relativedelta import relativedelta
 
 from odoo import fields
-from odoo.addons.project_advanced.tests.common import TestProjectCommon
 from odoo.exceptions import UserError
+from odoo.addons.project_template.tests.common import TestProjectCommon
 
 
 class TestProjectTemplate(TestProjectCommon):

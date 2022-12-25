@@ -1,12 +1,12 @@
-odoo.define('documents.DocumentsKanbanRenderer', function (require) {
+odoo.define('document.DocumentKanbanRenderer', function (require) {
 'use strict';
 
-const DocumentsKanbanRecord = require('documents.DocumentsKanbanRecord');
+const DocumentKanbanRecord = require('document.DocumentKanbanRecord');
 const KanbanRenderer = require('web.KanbanRenderer');
 
-const DocumentsKanbanRenderer = KanbanRenderer.extend({
+const DocumentKanbanRenderer = KanbanRenderer.extend({
     config: Object.assign({}, KanbanRenderer.prototype.config, {
-        KanbanRecord: DocumentsKanbanRecord,
+        KanbanRecord: DocumentKanbanRecord,
     }),
 
     /**
@@ -18,6 +18,6 @@ const DocumentsKanbanRenderer = KanbanRenderer.extend({
     },
 });
 
-return DocumentsKanbanRenderer;
+return DocumentKanbanRenderer;
 
 });

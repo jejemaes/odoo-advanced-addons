@@ -7,39 +7,23 @@
         <field name="inherit_id" ref="event.view_event_type_form"/>
         <field name="priority">15</field>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='event_type_attendees_tickets']" position="before">
-                <div class="col-6 o_setting_box" name="event_type_attendees_registration">
-                    <div class="o_setting_left_pane">
-                        <field name="use_registration"/>
-                    </div>
-                    <div class="o_setting_right_pane">
-                        <label for="use_registration"/>
-                        <div class="row">
-                            <div class="col-lg-8 text-muted">
-                                Allow people to register to the event. This activate the attendees managment.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 o_setting_box" name="event_type_attendees_qrcode" attrs="{'invisible': [('use_registration', '=', False)]}">
-                    <div class="o_setting_left_pane">
-                        <field name="use_qrcode"/>
-                    </div>
-                    <div class="o_setting_right_pane">
-                        <label for="use_qrcode"/>
-                        <div class="row">
-                            <div class="col-lg-8 text-muted">
-                                Add a QRCode to confirm the attendee on the registration badge
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <xpath expr="//field[@name='tag_ids']/.." position="after">
+                <field name="use_registration"/>
             </xpath>
-            <xpath expr="//div[@name='event_type_attendees_tickets']" position="attributes">
+            <xpath expr="//group/group[2]" position="attributes">
                 <attribute name="attrs">{'invisible': [('use_registration', '=', False)]}</attribute>
             </xpath>
-            <xpath expr="//div[@name='event_type_attendees_auto_confirm']" position="attributes">
+            <xpath expr="//field[@name='event_type_ticket_ids']/.." position="attributes">
                 <attribute name="attrs">{'invisible': [('use_registration', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="advanced_settings" string="Advanced Settings">
+                    <group name="advanced_settings_general">
+                        <group string="Various Options">
+                            <field name="use_qrcode" attrs="{'invisible': [('use_registration', '=', False)]}"/>
+                        </group>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
