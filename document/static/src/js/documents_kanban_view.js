@@ -1,24 +1,32 @@
-odoo.define('documents.DocumentsKanbanView', function (require) {
+odoo.define('document.DocumentKanbanView', function (require) {
 'use strict';
 
-const DocumentsKanbanController = require('documents.DocumentsKanbanController');
-const DocumentsKanbanRenderer = require('documents.DocumentsKanbanRenderer');
+/**
+ * This file defines the DocumentsKanbanView, a JS extension of the KanbanView
+ * to deal with documents.
+ *
+ * Warning: there is no groupby menu in this view as it doesn't support the
+ * grouped case. Its elements assume that the data isn't grouped.
+ */
+
+const DocumentKanbanController = require('document.DocumentKanbanController');
+const DocumentKanbanRenderer = require('document.DocumentKanbanRenderer');
 
 const KanbanView = require('web.KanbanView');
 const viewRegistry = require('web.view_registry');
 
 const { _lt } = require('web.core');
 
-const DocumentsKanbanView = KanbanView.extend({
+const DocumentKanbanView = KanbanView.extend({
     config: Object.assign({}, KanbanView.prototype.config, {
-        Controller: DocumentsKanbanController,
-        Renderer: DocumentsKanbanRenderer,
+        Controller: DocumentKanbanController,
+        Renderer: DocumentKanbanRenderer,
     }),
-    display_name: _lt('Documents Kanban'),
 });
 
-viewRegistry.add('document_kanban', DocumentsKanbanView);
+viewRegistry.add('document_kanban', DocumentKanbanView);
 
-return DocumentsKanbanView;
+return DocumentKanbanView;
 
 });
+;

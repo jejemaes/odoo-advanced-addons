@@ -4,21 +4,32 @@
     <!--
         Extend the existing templates
     -->
-    <template id="report_registration_badge" inherit_id="event.event_registration_report_template_badge" priority="1">
-        <xpath expr="//div[@id='o_event_name']" position="after">
-            <div class="col-12" t-if="o.event_id.use_qrcode">
+   <template id="event_report_template_foldable_badge" inherit_id="event.event_report_template_foldable_badge" priority="1">
+        <xpath expr="//div[hasclass('o_event_foldable_badge_top')][1]" position="inside">
+            <div t-if="event.use_qrcode">
                 <div class="text-center justify-content-center">
-                    <img t-attf-src="data:image/png;base64,#{o.qrcode}" alt="QRCode" class="img-fluid" style="max-width:50%;"/>&amp;nbsp;
+                    <t t-if="attendee">
+                        <img t-attf-src="data:image/png;base64,#{attendee.qrcode}" alt="QRCode" class="img-fluid" style="max-width:50%;"/>&amp;nbsp;
+                    </t>
+                    <t t-elif="not attendee">
+                        <h1 class="text-center mt0"><i class="fa-2x fa fa-qrcode" title="QRCode" role="img" aria-label="QRCode"/></h1>
+                    </t>
                 </div>
             </div>
         </xpath>
     </template>
 
-    <template id="report_event_template_badge" inherit_id="event.event_event_report_template_badge" priority="1">
-        <xpath expr="//div[@id='o_event_attendee_name']" position="after">
-            <div class="col-12" t-if="event.use_qrcode">
-                <div style="background: lightgrey; width:300px;" class="text-center">
-                    <h1 class="text-center mt0"><i class="fa-2x fa fa-qrcode" title="QRCode" role="img" aria-label="QRCode"/></h1>
+    <template id="event_report_template_full_page_ticket" inherit_id="event.event_report_template_full_page_ticket" priority="1">
+        <xpath expr="//div[@t-field='event.ticket_instructions']" position="after">
+            <div t-if="event.use_qrcode">
+                <div class="page oe_structure"/>
+                <div class="text-center justify-content-center">
+                    <t t-if="attendee">
+                        <img t-attf-src="data:image/png;base64,#{attendee.qrcode}" alt="QRCode" class="img-fluid" style="max-width:50%;"/>&amp;nbsp;
+                    </t>
+                    <t t-elif="not attendee">
+                        <h1 class="text-center mt0"><i class="fa-2x fa fa-qrcode" title="QRCode" role="img" aria-label="QRCode"/></h1>
+                    </t>
                 </div>
             </div>
         </xpath>
@@ -27,76 +38,69 @@
     <!--
         Simple Event Badge
     -->
+    <template id="event_registration_report_template_simple_badge_page">
+        <div class="page">
+            <div class="row text-center">
+                <div class="col-12">
+                    <span t-if="attendee">
+                        <img t-if="event.organizer_id.company_id.logo_web" t-att-src="image_data_uri(event.organizer_id.company_id.logo_web)" style="max-height:1cm; max-width:4cm;" alt="Logo"/>
+                    </span>
+                    <h3 t-field="event.name"/>
 
-    <template id="event_registration_report_template_badge">
-        <t t-call="web.basic_layout">
-            <t t-foreach="docs" t-as="o">
-                <div class="page">
-                    <div class="row text-center">
-                        <div class="col-12">
-                            <t t-if="o.event_id.event_logo">
-                                <div t-field="o.event_id.event_logo"/>
-                            </t>
-                            <span t-if="not o.event_id.event_logo and o.event_id.organizer_id.company_id.logo_web and o.event_id.organizer_id.is_company">
-                                <img t-att-src="image_data_uri(o.event_id.organizer_id.company_id.logo_web)" style="max-height:1cm; max-width:4cm;" alt="Logo"/>
-                            </span>
-                            <h3 t-field="o.event_id.name"/>
-                            <h6>From <span itemprop="startDate" t-field="o.event_id.with_context(tz=o.event_id.date_tz).date_begin" t-options='{"hide_seconds": True}'> </span> <i>to</i> <span itemprop="endDate" t-field="o.event_id.with_context(tz=o.event_id.date_tz).date_end" t-options='{"hide_seconds": True}'> </span></h6>
-                            <h4 t-field="o.name"/>
-                            <h4 t-if="o.event_ticket_id" t-field="o.event_ticket_id.name"/>
-                        </div>
-                    </div>
-                    <div t-if="o.event_id.use_qrcode" class="row justify-content-md-center justify-content-lg-center">
-                        <div class="col-12">
-                            <div class="text-center justify-content-center" t-if="o.event_id.use_qrcode">
-                                <img t-attf-src="data:image/png;base64,#{o.qrcode}" alt="QRCode" class="img-fluid" style="max-width:320px"/>&amp;nbsp;
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col-12">
-                            <div t-field="o.event_id.badge_front"></div>
-                        </div>
+                    <t t-if="attendee">
+                        <h4 t-field="attendee.name"/>
+                        <h4 t-if="attendee.event_ticket_id" t-field="attendee.event_ticket_id.name"/>
+                    </t>
+                    <t t-else="">
+                        <h4>John Doe</h4>
+                        <h4>Ticket Type Name</h4>
+                    </t>
+                </div>
+            </div>
+            <div class="row justify-content-md-center">
+                <div class="col col-3 text-right">
+                    From <span itemprop="startDate" t-field="event.with_context(tz=event.date_tz).date_begin" t-options='{"hide_seconds": True}'> </span>
+                    <br/><i>to</i> <span itemprop="endDate" t-field="event.with_context(tz=event.date_tz).date_end" t-options='{"hide_seconds": True}'> </span>
+                </div>
+                <div class="col col-3 text-left">
+                    <t t-if="event.address_id" t-call="event.event_report_template_formatted_event_address"/>
+                    <p t-if="not event.address_id">This exact place is kept secret</p>
+                </div>
+            </div>
+            <div t-if="event.use_qrcode" class="row justify-content-md-center justify-content-lg-center">
+                <div class="col-12">
+                    <div class="text-center justify-content-center">
+                        <t t-if="attendee">
+                            <img t-attf-src="data:image/png;base64,#{attendee.qrcode}" alt="QRCode" class="img-fluid" style="max-width:300px"/>&amp;nbsp;
+                        </t>
+                        <t t-if="not attendee">
+                            <h1 class="text-center mt0"><i class="fa-2x fa fa-qrcode" title="QRCode" role="img" aria-label="QRCode"/></h1>
+                        </t>
                     </div>
                 </div>
+            </div>
+            <div t-field="event.ticket_instructions" class="o_event_full_page_extra_instructions px-2 pt-3 text-center"></div>
+        </div>
+    </template>
+
+    <template id="event_registration_report_template_simple_badge">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="attendee">
+                <t t-set="event" t-value="attendee.event_id.with_context(tz=attendee.event_id.date_tz)"/>
+                <t t-call="event_advanced.event_registration_report_template_simple_badge_page"/>
             </t>
         </t>
     </template>
 
-    <template id="event_event_report_template_badge">
+    <template id="event_event_report_template_simple_badge">
         <t t-call="web.basic_layout">
-            <div class="page">
-                <t t-foreach="docs" t-as="o">
-                    <div class="page">
-                        <div class="row text-center">
-                            <div class="col-12">
-                                <t t-if="o.event_logo">
-                                    <div t-field="o.event_logo"/>
-                                </t>
-                                <span t-if="not o.event_logo and o.organizer_id.company_id.logo_web and o.organizer_id.is_company">
-                                    <img t-att-src="image_data_uri(o.organizer_id.company_id.logo_web)" style="max-height:1cm; max-width:4cm;" alt="Logo"/>
-                                </span>
-                                <h3 t-field="o.name"/>
-                                <h6>From <span itemprop="startDate" t-field="o.with_context(tz=o.date_tz).date_begin" t-options='{"hide_seconds": True}'> </span> <i>to</i> <span itemprop="endDate" t-field="o.with_context(tz=o.date_tz).date_end" t-options='{"hide_seconds": True}'> </span></h6>
-                                <h4>Attendee Name</h4>
-                            </div>
-                        </div>
-                        <div t-if="o.use_qrcode" class="row justify-content-md-center justify-content-lg-center">
-                            <div class="col-12">
-                                <div style="background: lightgrey; width:300px; height:300px; margin:auto">
-                                    <h1 class="text-center"><i class="fa-2x fa fa-qrcode" title="QRCode" role="img" aria-label="QRCode"/></h1>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row justify-content-center">
-                            <div class="col-12">
-                                <div t-field="o.badge_front"></div>
-                            </div>
-                        </div>
-                    </div>
-                </t>
-            </div>
+            <t t-foreach="docs" t-as="event">
+                <t t-set="event" t-value="event._set_tz_context()"/>
+                <t t-set="main_object" t-value="event"/>
+                <t t-call="event_advanced.event_registration_report_template_simple_badge_page"/>
+            </t>
         </t>
     </template>
+
 
 </odoo>

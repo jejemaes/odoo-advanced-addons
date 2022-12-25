@@ -14,7 +14,7 @@
                 <attribute name="attrs">{'invisible': [('use_registration', '=', False)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='use_qrcode']" position="after">
-                <field name="registration_phone_mandatory"/>
+                <field name="registration_phone_mandatory" attrs="{'invisible': [('use_registration', '=', False)]}"/>
                 <field name="website_hide_event_location"/>
             </xpath>
         </field>
