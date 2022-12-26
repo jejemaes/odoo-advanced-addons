@@ -6,11 +6,14 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="website_sale.product_template_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='shop']" position="attributes">
-                <attribute name="attrs">{'invisible': ['&amp;', ('sale_ok','=',False), ('can_be_rented','=', False)]}</attribute>
+            <xpath expr="//notebook/page[@name='sales']" position="attributes">
+                <attribute name="attrs">{'invisible': [('sale_ok', '=', False), ('can_be_rented', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='shop']" position="attributes">
+                <attribute name="attrs">{'invisible': [('sale_ok', '=', False), ('can_be_rented', '=', False)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='is_published']" position="attributes">
-                <attribute name="attrs">{'invisible': ['&amp;', ('sale_ok','=',False), ('can_be_rented','=', False)]}</attribute>
+                <attribute name="attrs">{'invisible': ['&amp;', ('sale_ok', '=', False), ('can_be_rented', '=', False)]}</attribute>
             </xpath>
         </field>
     </record>
