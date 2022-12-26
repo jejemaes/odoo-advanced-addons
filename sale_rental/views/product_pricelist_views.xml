@@ -9,47 +9,16 @@
         <field name="inherit_id" ref="product.product_pricelist_item_form_view"/>
         <field name="model">product.pricelist.item</field>
         <field name="arch" type="xml">
-            <xpath expr="//h1" position="after">
+            <xpath expr="//group[@name='pricelist_rule_computation']" position="before">
                 <group>
                     <field name="applicable_on" widget="radio" options="{'horizontal': true}"/>
                 </group>
             </xpath>
-            <xpath expr="//group[@name='pricelist_rule_base']" position="attributes">
+            <xpath expr="//field[@name='base']" position="attributes">
                 <attribute name="attrs">{'invisible': [('applicable_on', '=', 'rent')]}</attribute>
             </xpath>
-            <xpath expr="//group[@name='pricelist_rule_base']" position="after">
-                <group name="pricelist_rule_base_rental" attrs="{'invisible': [('applicable_on', '=', 'sale')]}">
-                    <field name="fixed_price" attrs="{'invisible':[('compute_price', '!=', 'fixed')]}"/>
-                    <label for="percent_price" attrs="{'invisible':[('compute_price', '!=', 'percentage')]}"/>
-                    <div attrs="{'invisible':[('compute_price', '!=', 'percentage')]}">
-                    <field name="percent_price"
-                        class="oe_inline"
-                        attrs="{'invisible':[('compute_price', '!=', 'percentage')]}"/>
-                      %%
-                    </div>
-                </group>
-            </xpath>
-            <xpath expr="//group[@name='pricelist_rule_advanced']" position="attributes">
+            <xpath expr="//field[@name='base']" position="attributes">
                 <attribute name="attrs">{'invisible': ['|', ('compute_price', '!=', 'formula'), ('applicable_on', '=', 'rent')]}</attribute>
-            </xpath>
-            <xpath expr="//group[@name='pricelist_rule_advanced']" position="after">
-                <group name="pricelist_rule_advanced_rental" col="6" attrs="{'invisible':['|', ('applicable_on', '=', 'sale'), ('compute_price', '!=', 'formula')]}" groups="product.group_sale_pricelist">
-                  <label for="base" string="New Price = "/>
-                  <div>
-                      <span attrs="{'invisible':[('base', '!=', 'list_price')]}">Rent Price  -  </span>
-                  </div>
-                  <label for="price_discount"/>
-                  <div class="o_row">
-                      <field name="price_discount"/>
-                      <span>%%</span>
-                  </div>
-                  <label string=" + " for="price_surcharge"/>
-                  <field name="price_surcharge" nolabel="1"/>
-
-                  <field name="price_round" string="Rounding Method"/>
-                  <field name="price_min_margin" string="Min. Margin"/>
-                  <field name="price_max_margin" string="Max. Margin"/>
-              </group>
             </xpath>
         </field>
     </record>

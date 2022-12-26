@@ -18,10 +18,10 @@
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='options']" position="inside">
-                <div>
+                <span class="d-inline-block">
                     <field name="can_be_rented"/>
                     <label for="can_be_rented"/>
-                </div>
+                </span>
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Rental" name="rental" attrs="{'invisible': [('can_be_rented', '=', False)]}">
@@ -35,19 +35,10 @@
                         </group>
                         <group string="Resources" attrs="{'invisible': [('rental_tracking', '!=', 'use_resource')]}">
                             <field name="rental_tz" attrs="{'required': [('rental_tracking', '=', 'use_resource')]}"/>
-                            <field name="resource_ids" attrs="{'required': [('rental_tracking', '=', 'use_resource')]}" nolabel="1" context="{'default_resource_type': 'material'}" readonly="1">
-                                <tree>
-                                    <field name="name"/>
-                                    <field name="calendar_id"/>
-                                    <field name="user_id"/>
-                                </tree>
-                            </field>
+                            <field name="resource_ids" context="{'default_resource_type': 'material'}" readonly="1" widget="many2many_tags"/>
                         </group>
                         <group string="Calendar" attrs="{'invisible': [('rental_tracking', '!=', 'no')]}">
                             <field name="rental_calendar_id" attrs="{'required': [('rental_tracking', '=', 'no')], 'invisible': [('rental_tracking', '!=', 'no')]}"/>
-                        </group>
-                        <group string="Invoicing" name="rental_invoicing" attrs="{'invisible': [('sale_ok', '=', True)]}">
-                            <field name="invoice_policy" widget="radio"/>
                         </group>
                     </group>
                     <group string="Rental Pricing" attrs="{'invisible': [('rental_tenure_type', '!=', 'fixed')]}">

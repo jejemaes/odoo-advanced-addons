@@ -49,10 +49,17 @@
                     </div>
                     <group>
                         <group>
-                            <div class="o_row">
+                           <!--  <div class="o_row">
                                 <span class="o_form_label">From</span> <field name="date_from" class="oe_inline"/>
                                 <span class="o_form_label">To</span> <field name="date_to" class="oe_inline"/>
                             </div>
+ -->
+                            <div class="o_row">
+                                <field name="date_from" widget="daterange" nolabel="1" class="oe_inline" options="{'related_end_date': 'date_to'}"/>
+                                <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>
+                                <field name="date_to" widget="daterange" nolabel="1" class="oe_inline" options="{'related_start_date': 'date_from'}"/>
+                            </div>
+
                         </group>
                     </group>
                     <group>
@@ -230,7 +237,7 @@
                         </group>
                     </group>
                     <group>
-                        <field name="note"/>
+                        <field name="content"/>
                     </group>
                 </sheet>
             </form>

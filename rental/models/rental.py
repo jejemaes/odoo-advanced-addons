@@ -31,11 +31,11 @@ class RentalBooking(models.Model):
 
     resource_time_id = fields.Many2one('resource.calendar.leaves', string="Time Entry", required=True, domain=[('time_type', '=', 'rental')], auto_join=True, ondelete='cascade')
     time_type = fields.Selection(related='resource_time_id.time_type', inherited=True, default='rental')
-    resource_id = fields.Many2one(related='resource_time_id.resource_id', inherited=True, tracking=True, domain=[('resource_type', '=', 'material')], states={'reserved': [('readonly', True)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]}, string="Equipment", required=True)
+    resource_id = fields.Many2one(related='resource_time_id.resource_id', inherited=True, tracking=True, domain=[('resource_type', '=', 'material')], states={'reserved': [('readonly', True)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]}, string="Equipment", required=True, readonly=False)
     resource_color = fields.Integer(related='resource_time_id.resource_id.color', readonly=True)
 
-    date_from = fields.Datetime(default=_default_date_from, inherited=True, related='resource_time_id.date_from', tracking=True, states={'reserved': [('readonly', False)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]})
-    date_to = fields.Datetime(default=_default_date_to, inherited=True, related='resource_time_id.date_from', tracking=True, states={'reserved': [('readonly', False)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]})
+    date_from = fields.Datetime(default=_default_date_from, inherited=True, related='resource_time_id.date_from', tracking=True, states={'reserved': [('readonly', False)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]}, readonly=False)
+    date_to = fields.Datetime(default=_default_date_to, inherited=True, related='resource_time_id.date_to', tracking=True, states={'reserved': [('readonly', False)], 'picked_up': [('readonly', True)], 'returned': [('readonly', True)], 'done': [('readonly', True)]}, readonly=False)
 
     code = fields.Char('Reference', readonly=True)
     partner_id = fields.Many2one('res.partner', string='Customer', required=True, copy=False, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", tracking=True)
@@ -125,7 +125,8 @@ class RentalBooking(models.Model):
                     values['code'] = self.env['ir.sequence'].with_context(force_company=values['company_id']).next_by_code('rental.booking') or _('New')
                 else:
                     values['code'] = self.env['ir.sequence'].next_by_code('rental.booking') or _('New')
-        return super(RentalBooking, self).create(value_list)
+        res = super(RentalBooking, self).create(value_list)
+        return res
 
     def unlink(self):
         if any(rental.state not in ['draft', 'cancel'] for rental in self):
@@ -177,5 +178,5 @@ class RentalAgreement(models.Model):
     name = fields.Char("Name", required=True)
     file = fields.Binary("File", attachment=True)
     company_id = fields.Many2one('res.company', "Company", default=lambda self: self.env.company)
-    note = fields.Text("Note")
+    content = fields.Html("Content")
     is_published = fields.Boolean('Is Published', copy=False, default=True)

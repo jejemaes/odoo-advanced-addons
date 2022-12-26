@@ -64,7 +64,7 @@ class WebsiteSaleRental(http.Controller):
 
         # aplpy taxes if needed
         fpos = request.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
-        taxes = fpos.map_tax(product_tmpl.sudo().taxes_id.filtered(lambda x: x.company_id == request.website.company_id), product_tmpl, partner)
+        taxes = fpos.map_tax(product_tmpl.sudo().taxes_id.filtered(lambda x: x.company_id == request.website.company_id))
         tax_field = 'total_excluded' if request.env.user.user_has_groups('account.group_show_line_subtotals_tax_excluded') else 'total_included'
         price = taxes.compute_all(price, pricelist.currency_id, 1, product, partner)[tax_field]
 
