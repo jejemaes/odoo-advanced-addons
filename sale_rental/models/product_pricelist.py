@@ -222,3 +222,32 @@ class PricelistItem(models.Model):
     def _onchange_compute_price_on_rental(self):
         if self.applicable_on == 'rent':
             self.base = 'list_price'
+
+    @api.depends('applicable_on')
+    def _compute_rule_tip(self):
+        rent_rules = self.filtered(lambda rule: rule.applicable_on == 'rent')
+        sale_rules = self.filtered(lambda rule: rule.applicable_on != 'rent')
+
+        rent_rules.rule_tip = False
+        for item in rent_rules:
+            if item.compute_price != 'formula':
+                continue
+            base_amount = 100
+            discount_factor = (100 - item.price_discount) / 100
+            discounted_price = base_amount * discount_factor
+            if item.price_round:
+                discounted_price = tools.float_round(discounted_price, precision_rounding=item.price_round)
+            surcharge = tools.format_amount(item.env, item.price_surcharge, item.currency_id)
+            item.rule_tip = _(
+                "Rent Price with a %(discount)s %% discount and %(surcharge)s extra fee\n"
+                "Example: %(amount)s * %(discount_charge)s + %(price_surcharge)s → %(total_amount)s",
+                discount=item.price_discount,
+                surcharge=surcharge,
+                amount=tools.format_amount(item.env, 100, item.currency_id),
+                discount_charge=discount_factor,
+                price_surcharge=surcharge,
+                total_amount=tools.format_amount(
+                    item.env, discounted_price + item.price_surcharge, item.currency_id),
+            )
+
+        super(PricelistItem, sale_rules)._compute_rule_tip()

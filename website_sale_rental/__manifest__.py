@@ -15,12 +15,17 @@ Rent your machines and other resources for money to your customer through your e
     'data': [
         'security/ir.model.access.csv',
         'security/website_sale_rental_security.xml',
-        'views/assets.xml',
         'views/website_sale_templates.xml',
         'views/product_template_views.xml',
-        #'views/sale_order_views.xml',
-        #'report/sale_order_report_templates.xml',
     ],
     'installable': True,
     'auto_install': True,
+    'assets': {
+        'web.assets_frontend': [
+            'website_sale_rental/static/src/js/website_sale_rental.js',
+        ],
+        'web.assets_qweb': [
+            'website_sale_rental/static/src/xml/website_sale_rental_modal.xml',
+        ],
+    }
 }

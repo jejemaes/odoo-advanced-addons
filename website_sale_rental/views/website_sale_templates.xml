@@ -55,7 +55,7 @@
         <xpath expr="//p[@t-else=''][hasclass('alert-warning')]" position="replace">
             <p t-elif="product.sale_ok" class="alert alert-warning">This product has no valid combination.</p>
         </xpath>
-        <xpath expr="//p[@t-field='product.description_sale']/.." position="after">
+        <xpath expr="//div[@id='product_attributes_simple']" position="after">
             <t t-if="product.can_be_rented">
                 <hr t-if="product.sale_ok"/>
                 <t t-call="website_sale_rental.product_rental_price_details"/>

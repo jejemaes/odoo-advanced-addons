@@ -28,7 +28,7 @@ class ProductRentalTenure(models.Model):
         price_data_map = self._get_tenure_grouped_by_template()
         for product_template, tenures in price_data_map.items():
             fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
-            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id), product_template, partner)
+            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id))
 
             for tenure in tenures:
                 base_price = product_template.currency_id._convert(tenure.base_price, pricelist.currency_id, company=website.company_id, date=fields.Date.today())
@@ -67,7 +67,7 @@ class ProductRentalTenure(models.Model):
         result = {}
         for product_template, tenures in price_data_map.items():
             fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
-            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id), product_template, partner)
+            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id))
 
             for tenure in tenures:
                 list_price = price_list_tenure_map.get(tenure.id, 0)
