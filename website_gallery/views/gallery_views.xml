@@ -98,9 +98,9 @@
                                     </div>
                                     <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                     <ul class="mt-3">
-                                        <li t-if="record.image_count.raw_value"><i class="fa fa-camera"/> <t t-esc="record.image_count.raw_value"/></li>
-                                        <li t-if="record.date.value"><i class="fa fa-calendar"/> <field name="date"/></li>
-                                        <li t-if="record.user_id.value"><i class="fa fa-user"/> <field name="user_id"/></li>
+                                        <li t-if="record.image_count.raw_value"><i class="fa fa-camera" title="Pictures"/> <t t-esc="record.image_count.raw_value"/></li>
+                                        <li t-if="record.date.value"><i class="fa fa-calendar" title="Date"/> <field name="date"/></li>
+                                        <li t-if="record.user_id.value"><i class="fa fa-user" title="Author"/> <field name="user_id"/></li>
                                     </ul>
                                 </div>
                             </div>
