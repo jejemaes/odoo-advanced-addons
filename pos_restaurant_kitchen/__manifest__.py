@@ -16,7 +16,6 @@ refreshing kanban view.
     'data': [
         'security/pos_restaurant_kitchen_security.xml',
         'security/ir.model.access.csv',
-        'views/assets.xml',
         'views/pos_order_views.xml',
         'views/pos_config_views.xml',
         'views/pos_restaurant_kitchen_views.xml',
@@ -26,4 +25,14 @@ refreshing kanban view.
     'installable': True,
     'application': False,
     'auto_install': False,
+    'assets': {
+        'web.assets_backend': [
+            'pos_restaurant_kitchen/static/src/js/autorefresh_kanban_view.js',
+            'pos_restaurant_kitchen/static/src/js/printer_fix.js',
+            'pos_restaurant_kitchen/static/src/js/print_widget.js',
+        ],
+        'point_of_sale.assets': [
+            'pos_restaurant_kitchen/static/src/scss/pos_restaurant_kitchen.scss'
+        ]
+    }
 }
