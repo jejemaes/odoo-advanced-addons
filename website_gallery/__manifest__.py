@@ -8,7 +8,6 @@
     'version': '1.0',
     'depends': ['website'],
     'data': [
-        'views/assets.xml',
         'views/gallery_views.xml',
         'views/gallery_templates.xml',
         'security/ir.model.access.csv',
@@ -17,4 +16,13 @@
     ],
     'installable': True,
     'auto_install': False,
+    'assets': {
+        'web.assets_frontend': [
+            'website_gallery/static/src/scss/website_gallery_grid.scss',
+            'website_gallery/static/lib/jquery-magnific-popup/jquery.magnific-popup.min.js',
+            # Modal Gallery
+            'website_gallery/static/lib/lightbox2-2.11.1/css/lightbox.css',
+            'website_gallery/static/lib/lightbox2-2.11.1/js/lightbox.js',
+        ],
+    }
 }
