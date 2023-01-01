@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@id='category_reference']" position="before">
-                <div class="col-12 col-lg-6 o_setting_box" id="restaurant_kitchen" attrs="{'invisible': [('is_table_management', '=', False)]}">
+                <div class="col-12 col-lg-6 o_setting_box" id="restaurant_kitchen" attrs="{'invisible': [('module_pos_restaurant', '=', False)]}">
                     <div class="o_setting_left_pane">
                         <field name="is_kitchen_preparation"/>
                     </div>
