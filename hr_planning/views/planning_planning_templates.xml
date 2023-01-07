@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="planning_planning_page" name="Planning Page">
+        <t t-call="web.frontend_layout">
+            <div class="container" id="o_planning_widget" t-att-data-planning-token="planning.access_token">
+                <h1 align="center" class="m-3">Planning: <t t-esc="planning.name"/></h1>
+                <div align="center" t-if="planning_date_start and planning_date_stop">
+                    <div class="alert alert-info">
+                        Shifts from
+                        <t t-esc="format_datetime(planning_date_start, dt_format='E')"/>.
+                        <t t-esc="format_datetime(planning_date_start, dt_format='short')"/>
+                        to
+                        <t t-esc="format_datetime(planning_date_stop, dt_format='E')"/>.
+                        <t t-esc="format_datetime(planning_date_stop, dt_format='short')"/>
+                    </div>
+                </div>
+
+                <t t-call="planning.planning_shift_notification"/>
+
+                <!-- Planning description -->
+                <div t-if="planning.description" class="o_planning_description_section mt-3 mb-3">
+                    <span t-field="planning.description"/>
+                </div>
+
+                <!-- Calendar for assigned shift -->
+                <div class="o_planning_calendar_section">
+                    <t t-if="assigned_shifts_data">
+                        <script>
+                            window.planning_calendar_data = {
+                                'planning_min_dt': "<t t-raw="str(planning_date_start)"/>",
+                                'planning_max_dt': "<t t-raw="str(planning_date_stop)"/>",
+                                'assigned_shifts_data': <t t-raw="json.dumps(assigned_shifts_data)"/>,
+                                'locale': "<t t-esc="locale"/>",
+                            };
+                        </script>
+                        <div class="o_calendar_widget"/>
+                        <t t-call="planning.planning_calendar_modal"/>
+                    </t>
+                    <t t-else="">
+                        <div align="center" class="alert alert-info o_shift_info">
+                            There are no planning slot to display. Please, refer to your manager.
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Open shifts table -->
+                <div t-if="open_shifts_data" class="o_planning_openshift_section">
+                    <h3 align="center" class="m-3">Open Shifts Available</h3>
+                    <div t-if="not employee and planning.user_id" class="alert alert-info" align="center">
+                        To take a shift, please contact <a t-attf-href="mailto:#{planning.user_id.email}"><t t-esc="planning.user_id.name"/></a>.
+                        <t t-if="planning.is_collaborative">
+                            Or assign yourself by clicking and the "assign" button, and find your profile.
+                        </t>
+                    </div>
+                    <div>
+                        <table class="table table-borderless o_planning_openshift_table">
+                            <thead class="o_thead">
+                                <tr>
+                                    <th class="text-left">From</th>
+                                    <th class="text-left">To</th>
+                                    <th class="text-left">Role</th>
+                                    <th class="text-left">Note</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="o_tbody">
+                                <t t-foreach="open_shifts_data" t-as="shift_data">
+                                    <tr>
+                                        <td class="align-middle o_planning_autochange_date" t-att-data-date="shift_data['start_utc']">
+                                            <t t-esc="format_datetime(shift_data['start_utc'], dt_format='E')"/>.
+                                            <t t-esc="format_datetime(shift_data['start_utc'], dt_format='short')"/>
+                                        </td>
+                                        <td class="align-middle o_planning_autochange_date" t-att-data-date="shift_data['end_utc']">
+                                            <t t-esc="format_datetime(shift_data['end_utc'], dt_format='E')"/>.
+                                            <t t-esc="format_datetime(shift_data['end_utc'], dt_format='short')"/>
+                                        </td>
+                                        <td t-if="shift_data['role_name']" class="align-middle"><t t-esc="shift_data['role_name']"/></td>
+                                        <td class="align-middle"><t t-esc="shift_data['note']"/></td>
+                                        <td>
+                                            <t t-if="shift_data['can_self_assign']">
+                                                <div class="text-center float-right">
+                                                    <form t-att-action="shift_data['can_self_assign_url']" method="post">
+                                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                        <input type="hidden" name="message" value="assign"/>
+                                                        <button type="submit" class="btn btn-primary">Assign this shift to me</button>
+                                                    </form>
+                                                </div>
+                                            </t>
+                                            <t t-else="planning.is_collaborative">
+                                                <button class="btn btn-primary o_planning_collaborative_btn" t-att-data-shift-data="json.dumps(shift_data)" t-att-data-collaborative-url="planning_collaborative_employee_url">Assign this</button>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- notification sub template -->
+    <template id="planning_shift_notification" name="Shift notification">
+        <t t-if="message_slug">
+            <div t-if="message_slug == 'collaborative_assign'" align="center" class="alert alert-success alert-dismissible fade show" role="alert">
+                The shift has been successfully assigned.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+            <div t-if="message_slug == 'collaborative_unassign'" align="center" class="alert alert-success alert-dismissible fade show" role="alert">
+                The shift has been successfully unassigned.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+            <div t-if="message_slug == 'assign'" align="center" class="alert alert-success alert-dismissible fade show" role="alert">
+                You were successfully assigned this open shift.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+            <div t-if="message_slug == 'unassign'" align="center" class="alert alert-success alert-dismissible fade show" role="alert">
+                This shift is no longer assigned to you.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+            <div t-if="message_slug == 'already_assign'" align="center" class="alert alert-warning alert-dismissible fade show" role="alert">
+                This shift is already assigned to another employee.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+        </t>
+    </template>
+
+    <template id="planning_calendar_modal" name="Planning Calendar Modal">
+        <!-- fullcalendar event onclick Modal -->
+        <div class="modal fade" id="o_planning_calendar_modal" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0">
+                    <div class="modal-header modal-header-primary py-3 border-0 rounded-top text-light">
+                        <h5 class="modal-title"/>
+                        <button type="button" class="close text-light shadow-none" data-dismiss="modal">
+                            <span aria-label="Close">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <dl class="row mt-0 mb-0">
+                            <dt class="col-sm-4">Assignee</dt>
+                            <dd class="col-sm-8">
+                                <span id="employee"/>
+                                <div class="o_planning_collaborative_employee">
+                                    <input type="text" class="form-control" id="collaborativeEmployee" name="employee_id"/>
+                                </div>
+                            </dd>
+                            <dt class="col-sm-4">Start Date</dt>
+                            <dd class="col-sm-8" id="start"/>
+                            <dt class="col-sm-4">End Date</dt>
+                            <dd class="col-sm-8" id="stop"/>
+                            <dt class="col-sm-4">Role</dt>
+                            <dd class="col-sm-8" id="role_name"/>
+                            <dt class="col-sm-4">Description</dt>
+                            <dd class="col-sm-8" id="note"/>
+                            <div class="d-none" t-esc="shift_id" id="shift_uid"/>
+                        </dl>
+                    </div>
+
+                    <div class="modal-footer o_planning_modal_footer">
+                        <form id="modal_form_dismiss_shift" t-attf-action="/planning/#{planning.access_token}/" method="post">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="message" value="unassign"/>
+                            <button type="submit" class="btn btn-outline-danger">I am unavailable</button>
+                        </form>
+                        <form id="modal_form_collaborative_assign" t-attf-action="/planning/#{planning.access_token}/collaborative/assign/" method="post">
+                            <input type="hidden" name="employee_id" value=""/>
+                            <input type="hidden" name="shift_id" value=""/>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <button type="submit" class="btn btn-primary">Assign</button>
+                        </form>
+                        <form id="modal_form_collaborative_unassign" t-attf-action="/planning/#{planning.access_token}/collaborative/unassign/" method="post">
+                            <input type="hidden" name="shift_id" value=""/>
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <button type="submit" class="btn btn-outline-danger">Unassign</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</odoo>

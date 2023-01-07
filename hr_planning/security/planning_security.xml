@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<data noupdate="1">
+
+    <record id="planning_rule_internal_user_read" model="ir.rule">
+        <field name="name">Planning: internal user can read their own shifts only</field>
+        <field name="model_id" ref="planning.model_planning_shift"/>
+        <field name="domain_force">[('user_id', '=', user.id), ('last_publish_date', '!=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="groups" eval="[(4,ref('base.group_user'))]"/>
+    </record>
+
+    <record id="planning_rule_user_modify" model="ir.rule">
+        <field name="name">Planning: user can modify their own shifts</field>
+        <field name="model_id" ref="planning.model_planning_shift"/>
+        <field name="domain_force">[('user_id', '=', user.id), ('last_publish_date', '!=', False)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="groups" eval="[(4,ref('group_planning_user'))]"/>
+    </record>
+
+    <record id="planning_rule_user_is_published" model="ir.rule">
+        <field name="name">Planning: user can only see published shifts</field>
+        <field name="model_id" ref="planning.model_planning_shift"/>
+        <field name="domain_force">[('last_publish_date', '!=', False)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="groups" eval="[(4,ref('group_planning_user'))]"/>
+    </record>
+
+
+
+</data>
+
+</odoo>
