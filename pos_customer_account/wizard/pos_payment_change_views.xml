@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="pos_payment_change_view_form" model="ir.ui.view">
+        <field name="name">rpos.payment.change.view.form</field>
+        <field name="model">pos.payment.change</field>
+        <field name="arch" type="xml">
+            <form string="Change PoS Payment">
+                <group string="Changes">
+                    <field name="payment_method_id"/>
+                    <field name="pos_payment_ids" invisible="1"/>
+                    <field name="pos_payment_amount"/>
+                    <field name="pos_payment_count"/>
+                    <field name="currency_id" invisible="1"/>
+                </group>
+                <footer>
+                    <button string="Update Payments" type="object" name="action_change_payment_method" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel" type="object" class="btn btn-secondary oe_inline"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="pos_payment_change_action_partner" model="ir.actions.act_window">
+        <field name="name">Change PoS Payment</field>
+        <field name="res_model">pos.payment.change</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{
+            'default_partner_id': active_id,
+        }</field>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">form</field>
+    </record>
+
+</odoo>
