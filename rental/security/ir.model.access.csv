@@ -2,9 +2,9 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_rental_booking_user,rental.booking.user,model_rental_booking,rental.group_rental_user,1,1,1,0
 access_rental_booking_user_all,rental.booking.user.all,model_rental_booking,rental.group_rental_user_all,1,1,1,0
 access_rental_booking_manager,rental.booking.manager,model_rental_booking,rental.group_rental_manager,1,1,1,1
-access_resource_time_user,resource.time.user,model_resource_calendar_leaves,rental.group_rental_user,1,1,1,0
-access_resource_time_user_all,resource.time.user.all,model_resource_calendar_leaves,rental.group_rental_user_all,1,1,1,0
-access_resource_time_manager,resource.time.manager,resource.model_resource_calendar_leaves,rental.group_rental_manager,1,1,1,1
+access_resource_time_user,resource.time.user,model_resource_calendar_leaves,rental.group_rental_user,1,0,0,0
+access_resource_time_user_all,resource.time.user.all,model_resource_calendar_leaves,rental.group_rental_user_all,1,0,0,0
+access_resource_time_manager,resource.time.manager,resource.model_resource_calendar_leaves,rental.group_rental_manager,1,0,0,0
 access_resource_resource_rental_manager,resource.resource,resource.model_resource_resource,rental.group_rental_manager,1,1,1,1
 access_rental_agreement_public,rental.agreement.public,model_rental_agreement,base.group_public,1,0,0,0
 access_rental_agreement_user,rental.agreement.user,model_rental_agreement,base.group_user,1,0,0,0

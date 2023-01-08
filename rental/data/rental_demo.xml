@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="rental_agreement_basic" model="rental.agreement">
-        <field name="name">Rental Contract</field>
-        <field name="file" type="base64" file="rental/data/rental_agreement_sample.pdf"></field>
-    </record>
-
     <!--
         Rental bookings
     -->
@@ -15,7 +10,7 @@
         <field name="resource_id" ref="resource_resource_caravane"/>
         <field name="date_from" eval="time.strftime('%Y-%m-01 00:00:00')"/>
         <field name="date_to" eval="time.strftime('%Y-%m-04 00:00:00')"/>
-        <field name="partner_id" ref="base.res_partner_18"/>
+        <field name="partner_id" ref="base.res_partner_4"/>
         <field name="user_id" ref="base.user_admin"/>
     </record>
 
@@ -66,7 +61,7 @@
         <field name="resource_id" ref="resource_resource_podium"/>
         <field name="date_from" eval="time.strftime('%Y-%m-04 00:00:00')"/>
         <field name="date_to" eval="time.strftime('%Y-%m-05 00:00:00')"/>
-        <field name="partner_id" ref="base.res_partner_18"/>
+        <field name="partner_id" ref="base.res_partner_3"/>
         <field name="user_id" ref="base.user_demo"/>
     </record>
 
@@ -106,7 +101,7 @@
         <field name="resource_id" ref="resource_resource_podium"/>
         <field name="date_from" eval="time.strftime('%Y-%m-28 00:00:00')"/>
         <field name="date_to" eval="time.strftime('%Y-%m-29 00:00:00')"/>
-        <field name="partner_id" ref="base.res_partner_18"/>
+        <field name="partner_id" ref="base.res_partner_3"/>
         <field name="user_id" ref="base.user_demo"/>
     </record>
 

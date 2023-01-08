@@ -16,13 +16,14 @@
                 <group expand="0" string="Group By">
                     <filter string="Resource" name="group_by_resource_id" domain="[]" context="{'group_by': 'resource_id'}"/>
                     <filter string="Calendar" name="group_by_calendar_id" domain="[]" context="{'group_by': 'calendar_id'}"/>
+                    <filter string="Type" name="group_by_type" domain="[]" context="{'group_by': 'time_type'}"/>
                 </group>
             </search>
         </field>
     </record>
 
     <record id="resource_calendar_leaves_action_from_resource" model="ir.actions.act_window">
-        <field name="name">Leaves</field>
+        <field name="name">Calendar Entries</field>
         <field name="res_model">resource.calendar.leaves</field>
         <field name="view_mode">tree,calendar,form</field>
         <field name="search_view_id" ref="resource_calendar_leaves_view_search"/>
@@ -31,7 +32,7 @@
             'default_resource_id': active_id,
             'default_time_type': 'leave'
         }</field>
-        <field name="domain">[('time_type', 'in', ['leave'])]</field>
+        <field name="domain">[]</field>
     </record>
 
     <record id="resource.resource_calendar_leaves_action_from_calendar" model="ir.actions.act_window">
@@ -64,7 +65,7 @@
                     <div class="oe_button_box" name="button_box">
                         <button name="%(resource_calendar_leaves_action_from_resource)d" type="action"
                             class="oe_stat_button" icon="fa-calendar">
-                            <field name="leaves_count" widget="statinfo" string="Leaves"/>
+                            <field name="leaves_count" widget="statinfo" string="Calendar Entries"/>
                         </button>
                         <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
                             <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>

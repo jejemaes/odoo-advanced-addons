@@ -62,7 +62,7 @@ class ProjectCreateSalesOrder(models.TransientModel):
     @api.depends('rental_booking_id')
     def _compute_auto_confirm(self):
         for wizard in self:
-            if wizard.rental_booking_id.state in ['reserved', 'picked_up', 'returned', 'done']:
+            if wizard.rental_booking_id.state in ['confirmed', 'done']:
                 wizard.auto_confirm = True
             else:
                 wizard.auto_confirm = False
