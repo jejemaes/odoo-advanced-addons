@@ -22,7 +22,7 @@ class Resource(models.Model):
 
     @api.depends('calendar_id')
     def _compute_leaves_count(self):
-        domain = expression.AND([self.env['resource.calendar.leaves'].get_leave_domain(), [('resource_id', 'in', self.ids)]])
+        domain = [('resource_id', 'in', self.ids)]
         grouped_data = self.env['resource.calendar.leaves'].read_group(domain, ['resource_id'], ['resource_id'])
         mapped_data = {db['resource_id'][0]: db['resource_id_count'] for db in grouped_data}
         for resource in self:

@@ -116,14 +116,6 @@
         <field name="perm_unlink" eval="True"/>
     </record>
 
-    <!-- Resource Time Rules -->
-    <record id="resource_time_rule_user" model="ir.rule">
-        <field name="name">Rental: Resource Time (user)</field>
-        <field name="model_id" ref="resource.model_resource_calendar_leaves"/>
-        <field name="domain_force">[('time_type','=', 'rental')]</field>
-        <field name="groups" eval="[(4, ref('rental.group_rental_user'))]"/>
-    </record>
-
     <!-- Rental Agreement Rules -->
     <record id="rental_agreement_rule_multi_company" model="ir.rule">
         <field name="name">Rental Agreement Multi-company</field>
