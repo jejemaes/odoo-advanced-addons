@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="pos_payment_view_list" model="ir.ui.view">
+        <field name="name">pos.payment.list</field>
+        <field name="model">pos.payment</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_payment_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount']" position="after">
+                <groupby name="partner_id">
+                    <button name="action_pay_late_pos_payment" type="object" string="Mark as paid"/>
+                </groupby>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_pos_payment_search" model="ir.ui.view">
+        <field name="name">pos.payment.search</field>
+        <field name="model">pos.payment</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_payment_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pos_order_id']" position="after">
+                <field name="partner_id"/>
+                <filter name="pay_later" string="Pay Later" domain="[('payment_method_type', '=', 'pay_later')]"/>
+            </xpath>
+            <xpath expr="//filter[@name='group_by_payment_method']" position="after">
+                <filter name="group_by_partner_id" string="Customer" domain="[]" context="{'group_by':'partner_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="pos_payment_change_method_action" model="ir.actions.act_window">
+        <field name="name">Mark as Paid</field>
+        <field name="res_model">pos.payment.change</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="point_of_sale.model_pos_payment"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+    <record id="pos_payment_action_customer_account" model="ir.actions.act_window">
+        <field name="name">Customer Accounts</field>
+        <field name="res_model">pos.payment</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_id" eval="False"/>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_group_by_partner_id': 1, 'search_default_pay_later': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+                No orders found
+            </p><p>
+                To record new orders, start a new session.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_pos_payment"
+        parent="point_of_sale.menu_point_of_sale"
+        action="pos_payment_action_customer_account"
+        sequence="50"
+        groups="point_of_sale.group_pos_manager,point_of_sale.group_pos_user"
+    />
+
+</odoo>
