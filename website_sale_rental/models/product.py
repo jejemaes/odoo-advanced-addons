@@ -140,7 +140,7 @@ class ProductTemplate(models.Model):
         if self.rental_tracking == 'use_resource' and self.resource_ids:
             resource = self.resource_ids[:1]
             bookings = self.env['rental.booking'].search([('state', '!=', 'cancel'), ('resource_id', '=', resource.id), ('date_from', '<=', end_dt), ('date_to', '>=', start_dt)])
-            bookings_list = [(fields.Datetime.to_string(booking.date_from), fields.Datetime.to_string(booking.date_to), 'confirmed' if booking.state in ['reserved', 'picked_up', 'returned', 'done'] else 'draft') for booking in bookings]
+            bookings_list = [(fields.Datetime.to_string(booking.date_from), fields.Datetime.to_string(booking.date_to), 'confirmed' if booking.state in ['confirmed', 'done'] else 'draft') for booking in bookings]
         return bookings_list
 
     # -------------------------------------------------------------------------

@@ -9,13 +9,13 @@
         <field name="name">rental.booking.tree</field>
         <field name="model">rental.booking</field>
         <field name="arch" type="xml">
-        	<tree decoration-info="state=='done'" decoration-muted="state=='cancel'">
+        	<tree>
                 <field name="name"/>
         		<field name="resource_id" context="{'default_resource_type': 'material'}"/>
         		<field name="partner_id"/>
         		<field name="date_from"/>
         		<field name="date_to"/>
-                <field name="state" invisible="1"/>
+                <field name="state" decoration-success="state == 'confirmed'" decoration-info="state == 'draft'" widget="badge"/>
         	</tree>
         </field>
     </record>
@@ -26,13 +26,11 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button string="Reserve" type="object" name="action_reserve" attrs="{'invisible': [('state', '!=', 'draft')]}" class="oe_highlight"/>
-                    <button string="Pick Up" type="object" name="action_pick_up" attrs="{'invisible': [('state', '!=', 'reserved')]}" class="oe_highlight"/>
-                    <button string="Returned" type="object" name="action_return" attrs="{'invisible': [('state', '!=', 'picked_up')]}" class="oe_highlight"/>
-                    <button string="Done" type="object" name="action_done" attrs="{'invisible': [('state', '!=', 'returned')]}" class="oe_highlight"/>
+                    <button string="Confirm" type="object" name="action_confirm" attrs="{'invisible': [('state', '!=', 'draft')]}" class="oe_highlight"/>
+                    <button string="Done" type="object" name="action_done" attrs="{'invisible': [('state', '!=', 'confirmed')]}" class="oe_highlight"/>
                     <button string="Cancel" type="object" name="action_cancel" attrs="{'invisible': [('state', '=', 'cancel')]}"/>
                     <button string="Reset to draft" type="object" name="action_reset" attrs="{'invisible': [('state', '!=', 'cancel')]}"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,reserved,done,cancel"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done,cancel"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -49,11 +47,6 @@
                     </div>
                     <group>
                         <group>
-                           <!--  <div class="o_row">
-                                <span class="o_form_label">From</span> <field name="date_from" class="oe_inline"/>
-                                <span class="o_form_label">To</span> <field name="date_to" class="oe_inline"/>
-                            </div>
- -->
                             <div class="o_row">
                                 <field name="date_from" widget="daterange" nolabel="1" class="oe_inline" options="{'related_end_date': 'date_to'}"/>
                                 <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>
@@ -109,10 +102,9 @@
                                     <span class="o_kanban_record_title">
                                         <strong><field name="code"/></strong> / <t t-esc="record.name.value"/>
                                         <t t-if="record.state.raw_value == 'draft'"><t t-set="state_css">badge-light</t></t>
-                                        <t t-if="record.state.raw_value == 'reserved'"><t t-set="state_css">badge-info</t></t>
-                                        <t t-if="record.state.raw_value == 'picked_up'"><t t-set="state_css">badge-warning</t></t>
-                                        <t t-if="record.state.raw_value == 'returned'"><t t-set="state_css">badge-dark</t></t>
+                                        <t t-if="record.state.raw_value == 'confirmed'"><t t-set="state_css">badge-info</t></t>
                                         <t t-if="record.state.raw_value == 'done'"><t t-set="state_css">badge-success</t></t>
+                                        <t t-if="record.state.raw_value == 'cancel'"><t t-set="state_css">badge-dark</t></t>
                                         <span t-attf-class="badge badge-pill #{state_css} float-right"> <t t-esc="record.state.value"/></span>
                                     </span>
                                 </div>
@@ -183,9 +175,11 @@
                 <separator/>
                 <filter string="Future Bookings" name="future" domain="[('date_from', '&gt;=', context_today().strftime('%%Y-%%m-%%d 00:00:00'))]"/>
                 <separator/>
-                <filter name="to_deliver" string="To Deliver" domain="[('state', '=', 'reserved'), ('date_from','&lt;', (context_today() + datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d') )]"/>
-                <filter name="to_be_returned" string="To Be Returned" domain="[('state', '=', 'picked_up'), ('date_to','&lt;', (context_today() + datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d') )]"/>
-                <filter name="to_mark_done" string="To Mark As Done" domain="[('state', '=', 'returned'), ('date_to','&lt;', (context_today() + datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d') )]"/>
+                <filter name="to_confirm" string="To confirm" domain="[('state', '=', 'draft')]"/>
+                <filter name="to_mark_done" string="To Mark as Done" domain="[('state', '=', 'confirmed')]"/>
+                <separator/>
+                <filter name="next_week" string="Next Week" domain="[('date_to','&gt;', context_today().strftime('%%Y-%%m-%%d 00:00:00')), ('date_to','&lt;', (context_today() + datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d'))]"/>
+                <filter name="next_month" string="Next Month" domain="[('date_to','&gt;', context_today().strftime('%%Y-%%m-%%d 00:00:00')), ('date_to','&lt;', (context_today() + datetime.timedelta(days=31)).strftime('%%Y-%%m-%%d'))]"/>
                 <separator/>
                 <field name="name" string="Title" filter_domain="['|', ('name','ilike',self), ('code','ilike',self)]"/>
                 <field name="resource_id"/>
@@ -212,7 +206,6 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
-                <field name="is_published"/>
                 <field name="create_date"/>
             </tree>
         </field>
@@ -231,8 +224,6 @@
                     </div>
                     <group>
                         <group>
-                            <field name="file"/>
-                            <field name="is_published"/>
                             <field name="create_date"/>
                         </group>
                     </group>

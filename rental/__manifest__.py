@@ -13,6 +13,7 @@ Rent your machines and other resources, manage your calendar and confirm the ren
     'depends': ['web_gantt', 'resource_advanced', 'mail'],
     'data': [
         'data/sequence_data.xml',
+        'data/resource_data.xml',
         'security/rental_security.xml',
         'security/ir.model.access.csv',
         'views/res_config_settings_views.xml',

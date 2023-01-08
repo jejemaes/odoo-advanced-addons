@@ -123,7 +123,7 @@ class TestSaleRentalTenurePerDay(TestCommonSaleRentalNoChart):
         self.assertEqual(sale_line.product_uom_qty, len(resource_ids), "The ordered quantity is the total of resources")
         self.assertEqual(sale_line.resource_ids.ids, resource_ids, "The resources should be linked to the sale line")
 
-        self.assertEqual(set(self.sale_order.rental_booking_ids.mapped('state')), set(['reserved']), "All rental bookings should be in reserved state")
+        self.assertEqual(set(self.sale_order.rental_booking_ids.mapped('state')), set(['confirmed']), "All rental bookings should be in confirmed state")
         self.assertEqual(booking1.date_from, start_dt)
         self.assertEqual(booking1.date_to, stop_dt)
         self.assertEqual(booking2.date_from, start_dt)
@@ -140,8 +140,8 @@ class TestSaleRentalTenurePerDay(TestCommonSaleRentalNoChart):
         self.assertEqual(sale_line.product_uom_qty, len(resource_ids), "The ordered quantity is the total of resources")
         self.assertEqual(sale_line.resource_ids.ids, resource_ids, "The resources should be linked to the sale line")
 
-        self.assertEqual(booking1.state, 'picked_up', "Rental booking 1 is picked up")
-        self.assertEqual(booking2.state, 'reserved', "Rental booking 2 is pstill reserved")
+        self.assertEqual(booking1.state, 'confirmed', "Rental booking 1 is picked up")
+        self.assertEqual(booking2.state, 'confirmed', "Rental booking 2 is pstill reserved")
         self.assertEqual(booking1.date_from, start_dt)
         self.assertEqual(booking1.date_to, stop_dt)
         self.assertEqual(booking2.date_from, start_dt)

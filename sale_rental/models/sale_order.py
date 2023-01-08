@@ -69,9 +69,9 @@ class SaleOrder(models.Model):
         }
 
     def action_draft(self):
-        """ When resetting the SO, the none picked up bookings should be reset too """
+        """ When resetting the SO, the draft and confirmed rental should be reset too """
         result = super(SaleOrder, self).action_draft()
-        self.mapped('order_line').filtered(lambda l: l.is_rental).mapped('rental_booking_ids').sudo().filtered(lambda b: b.state != 'picked_up').action_reset()
+        self.mapped('order_line').filtered(lambda l: l.is_rental).mapped('rental_booking_ids').sudo().filtered(lambda b: b.state != 'done').action_reset()
         return result
 
     def action_quotation_send(self):
@@ -93,9 +93,9 @@ class SaleOrder(models.Model):
         return result
 
     def action_cancel(self):
-        """ When cancelling the SO, the none picked up bookings should be cancelled too """
+        """ When cancelling the SO, all bookings should be cancelled too """
         result = super(SaleOrder, self).action_cancel()
-        self.mapped('order_line').filtered(lambda l: l.is_rental).mapped('rental_booking_ids').sudo().filtered(lambda b: b.state != 'picked_up').action_cancel()
+        self.mapped('order_line').filtered(lambda l: l.is_rental).mapped('rental_booking_ids').sudo().action_cancel()
         return result
 
     def action_generate_rental_booking(self):
@@ -136,7 +136,7 @@ class SaleOrderLine(models.Model):
         super(SaleOrderLine, self)._compute_qty_delivered()
 
         lines_by_rental = self.filtered(lambda sol: sol.qty_delivered_method == 'rental')
-        mapping = lines_by_rental._get_delivered_quantity_by_rental([('state', 'in', ['picked_up', 'returned', 'done'])])
+        mapping = lines_by_rental._get_delivered_quantity_by_rental([('state', 'in', ['confirmed', 'done'])])
         for line in lines_by_rental:
             line.qty_delivered = mapping.get(line.id, 0.0)
 
@@ -276,7 +276,7 @@ class SaleOrderLine(models.Model):
         return lines
 
     def unlink(self):
-        bookings = self.sudo().mapped('rental_booking_ids').filtered(lambda b: b.state in ['draft', 'reserved', 'cancel'])
+        bookings = self.sudo().mapped('rental_booking_ids').filtered(lambda b: b.state in ['draft', 'cancel'])
         result = super(SaleOrderLine, self).unlink()
         bookings.unlink()
         return result
@@ -343,6 +343,6 @@ class SaleOrderLine(models.Model):
             'partner_id': self.order_partner_id.id,
             'partner_shipping_id': self.order_id.partner_shipping_id.id,
             'user_id': resource.user_id.id or self.order_id.user_id.id,
-            'state': 'draft' if self.state in ['draft', 'sent']  else 'reserved',
+            'state': 'draft' if self.state in ['draft', 'sent']  else 'confirmed',
             'agreement_id': self.product_id.rental_agreement_id.id if self.product_id.rental_agreement_id else False,
         }
