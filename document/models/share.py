@@ -135,14 +135,17 @@ class DocumentShare(models.Model):
     def get_concerned_documents(self):
         result = {}
         for share in self:
+            documents = self.env['document.document']
             if share.content_type == 'domain':
                 domain = literal_eval(share.domain)
-                documents = self.env['document.document'].search(domain)
+                documents |= self.env['document.document'].search(domain)
                 if share.action == 'downloadupload':
-                    documents += share.document_ids
-                result[share.id] = documents
+                    documents |= share.document_ids
             elif share.content_type == 'ids':
-                result[share.id] = share.document_ids
+                documents |= share.document_ids
+            # document request can not be shared. They are save in the share selection, but they
+            # will be shared only when a file is uploaded.
+            result[share.id] = documents.filtered(lambda doc: doc.document_type != 'request')
         return result
 
     def get_document_default_values(self):
