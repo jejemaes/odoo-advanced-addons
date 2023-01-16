@@ -9,7 +9,8 @@
                 Create
             </button>
             <div class="dropdown-menu o_document_kanban_btn_list_dropdown" aria-labelledby="o_document_kanban_btn_list">
-                <a class="dropdown-item o-kanban-button-new" data-handler="attachment">File</a>
+                <a class="dropdown-item o-kanban-button-new" data-default-type="file">File</a>
+                <a class="dropdown-item o-kanban-button-new" data-default-type="url">Url</a>
             </div>
         </div>
     </t>

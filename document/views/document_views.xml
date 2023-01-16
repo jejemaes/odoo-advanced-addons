@@ -11,9 +11,9 @@
             <tree>
                 <field name="name"/>
                 <field name="folder_id"/>
-                <field name="type"/>
                 <field name="owner_id" widget="many2one_avatar_user"/>
                 <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="document_type"/>
                 <field name="create_date"/>
                 <field name="company_id" groups="base.group_multi_company"/>
             </tree>
@@ -26,21 +26,20 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button type="object" name="action_download" string="Access" class="oe_highlight" attrs="{'invisible': [('url', '=', False)]}"/>
-                    <button type="object" name="action_download" string="Download" class="oe_highlight" attrs="{'invisible': [('type', '!=', 'binary')]}"/>
-                    <button type="object" name="action_share" string="Share"/>
-                    <button type="object" name="action_toggle_lock" string="Lock" attrs="{'invisible': [('lock_uid', '!=', False)]}"/>
-                    <button type="object" name="action_toggle_lock" string="Unlock" attrs="{'invisible': [('lock_uid', '=', False)]}"/>
+                    <button type="object" name="action_download" string="Open" class="oe_highlight" attrs="{'invisible': ['|', ('document_type', '!=', 'url'), ('url', '=', False)]}"/>
+                    <button type="object" name="action_download" string="Download" class="oe_highlight" attrs="{'invisible': [('document_type', '!=', 'file')]}"/>
+                    <button type="object" name="action_share" string="Share" attrs="{'invisible': [('document_type', '=', 'request')]}"/>
+                    <button type="object" name="action_toggle_lock" string="Lock" attrs="{'invisible': ['|', ('lock_uid', '!=', False), ('document_type', '=', 'request')]}"/>
+                    <button type="object" name="action_toggle_lock" string="Unlock" attrs="{'invisible': ['|', ('lock_uid', '=', False), ('document_type', '=', 'request')]}"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_related_record" type="object" class="oe_stat_button" icon="fa-external-link" attrs="{'invisible': ['|', ('res_id', '=', False), ('res_model', 'in', [False, 'document.document'])]}">
+                        <button name="action_related_record" type="object" class="oe_stat_button" icon="fa-external-link" attrs="{'invisible': ['|', ('res_id', '=', False), ('res_model', '=', False)]}">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_text">Related <br/> Record</span>
                             </div>
                         </button>
                     </div>
-                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
                     <field name="thumbnail" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
                     <div class="oe_title" aria-label="Name">
                         <label for="name" class="oe_edit_only"/>
@@ -50,25 +49,29 @@
                         </h1>
                     </div>
                     <field name="is_locked" invisible="1"/>
-                    <field name="active" invisible="1"/>
                     <field name="res_id" invisible="1"/>
                     <field name="res_model" invisible="1"/>
-                    <field name="handler" invisible="1"/>
-                    <group name="handler_attachment" attrs="{'invisible': [('handler', '!=', 'attachment')]}">
+                    <group groups="base.group_no_one">
+                        <field name="document_type" widget="radio" options="{'horizontal': True}" invisible="context.get('default_document_type')"/>
+                    </group>
+                    <group name="document_data_type_file" attrs="{'invisible': [('document_type', '!=', 'file')]}">
                         <group>
-                            <field name="type"/>
-                            <field name="datas" string="File" filename="name" attrs="{'invisible':[('type','=','url')], 'readonly': [('is_locked', '=', True)], 'required': [('handler', '=', 'attachment'), ('type', '=', 'binary')]}"/>
-                            <field name="url" attrs="{ 'invisible' : [('type', '!=', 'url')], 'readonly': [('is_locked', '=', True)], 'required': [('type', '=', 'url')]}"/>
+                            <field name="content_b64" string="File" attrs="{'readonly': [('is_locked', '=', True)], 'required': [('document_type', '=', 'file')]}"/>
+                        </group>
+                    </group>
+                    <group name="document_data_type_url" attrs="{'invisible': [('document_type', '!=', 'url')]}">
+                        <group>
+                            <field name="url" attrs="{'readonly': [('is_locked', '=', True)], 'required': [('document_type', '=', 'url')]}"/>
                         </group>
                     </group>
                     <group name="document_infos">
                         <group>
                             <field name="folder_id" attrs="{'readonly': [('is_locked', '=', True)]}"/>
                             <field name="selectable_tag_ids" invisible="1"/>
-                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}" domain="[('id', 'in', selectable_tag_ids)]" context="{'hierarchical_naming': True}"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}" domain="[('id', 'in', selectable_tag_ids)]" context="{'hierarchical_naming': True}" attrs="{'readonly': [('is_locked', '=', True)]}"/>
                         </group>
                         <group>
-                            <field name="owner_id" attrs="{'readonly': [('is_locked', '=', True)]}"/>
+                            <field name="owner_id"/>
                             <field name="partner_id"/>
                             <field name="lock_uid" readonly="1" attrs="{'invisible': [('lock_uid', '=', False)]}"/>
                         </group>
@@ -76,7 +79,7 @@
                     <notebook>
                         <page string="Description">
                             <group>
-                                <field name="description" nolabel="1"/>
+                                <field name="description" nolabel="1" attrs="{'readonly': [('is_locked', '=', True)]}"/>
                             </group>
                         </page>
                         <page string="Extra Infos">
@@ -86,9 +89,9 @@
                                     <field name="create_uid"/>
                                 </group>
                                 <group groups="base.group_no_one">
-                                    <field name="company_id" groups="base.group_multi_company"/>
-                                    <field name="file_size" attrs="{ 'invisible' : [('type', '!=', 'binary')]}"/>
+                                    <field name="filesize" attrs="{'invisible' : [('document_type', '!=', 'file')]}"/>
                                     <field name="mimetype"/>
+                                    <field name="company_id" groups="base.group_multi_company" />
                                 </group>
                             </group>
                         </page>
@@ -114,12 +117,10 @@
                 <field name="owner_id"/>
                 <field name="lock_uid"/>
                 <field name="attachment_id"/><!-- Needed for the document view-->
-                <field name="type"/>
+                <field name="document_type"/>
                 <field name="create_uid"/>
                 <field name="url"/>
                 <field name="create_date"/>
-                <field name="active"/>
-                <field name="checksum"/>
                 <field name="thumbnail_url"/>
                 <field name="is_previewable"/>
                 <field name="name"/>
@@ -149,7 +150,7 @@
                                     <t t-if="record.thumbnail_url.raw_value">
                                         <img t-att-src="record.thumbnail_url.raw_value" alt="Thumbnail" class="o_attachment_image"/>
                                     </t>
-                                    <t t-elif="record.type.raw_value == 'url'">
+                                    <t t-elif="record.document_type.raw_value == 'url'">
                                         <div class="o_url_image fa fa-link fa-3x text-muted" aria-label="Image is a link"/>
                                     </t>
                                     <t t-else="">
@@ -166,7 +167,7 @@
                                         <field name="name" class="o_text_overflow"/>
                                     </div>
                                     <div>
-                                        <t t-if="record.type.raw_value == 'url'">
+                                        <t t-if="record.document_type.raw_value == 'url'">
                                             <span class="o_document_url">
                                                 <i class="fa fa-globe" aria-label="Document url">
                                                     <a t-att-href="record.url.raw_value" target="blank"><t t-esc="record.url.raw_value"/></a>
@@ -214,38 +215,32 @@
         <field name="arch" type="xml">
             <search string="Documents">
                 <field name="name" filter_domain="[('name','ilike',self)]" string="Document"/>
-                <field name="create_date"/>
 
-                <field name="tag_ids"/>
                 <field name="folder_id"/>
-                <field name="index_content"/>
                 <field name="owner_id"/>
                 <field name="partner_id" string="Contact"/>
                 <field name="create_uid" string="Created by"/>
-                <field name="type"/>
 
-                <filter name="my_documents_filter" string="My Document(s)" domain="[('create_uid','=',uid)]"/>
+                <filter name="my_documents_filter" string="My Document(s)" domain="[('owner_id','=',uid)]"/>
                 <filter name="my_favorites_filter" string="My Favorite(s)" domain="[('favorite_user_ids', 'in', uid)]"/>
                 <separator/>
-                <filter name="url_filter" string="URL" domain="[('type', '=', 'url')]"/>
-                <filter name="binary_filter" string="Stored" domain="[('type', '=', 'binary')]"/>
+                <filter name="url_filter" string="URL" domain="[('document_type', '=', 'url')]"/>
+                <filter name="binary_filter" string="Files" domain="[('document_type', '=', 'file')]"/>
                 <separator/>
                 <filter name="activities_my" string="My Activities" domain="[('activity_ids.user_id', '=', uid)]"/>
                 <separator/>
-                <filter name="activities_overdue" string="Late Activities" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" help="Show all records which has next action date is before today"/>
-                <filter name="activities_today" string="Today Activities" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
-                <filter name="activities_upcoming"  string="Future Activities" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter invisible="1" name="activities_overdue" string="Late Activities" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" help="Show all records which has next action date is before today"/>
+                <filter invisible="1" name="activities_today" string="Today Activities" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter invisible="1" name="activities_upcoming"  string="Future Activities" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
                 <separator/>
                 <filter name="pdf" string="PDF" domain="[('mimetype', 'ilike', 'pdf')]"/>
                 <filter name="img" string="Image" domain="[('mimetype', 'ilike', 'image')]"/>
                 <filter name="video" string="Video" domain="[('mimetype', 'ilike', 'video')]"/>
                 <filter name="doc" string="Doc" domain="[('mimetype', 'ilike', '.doc')]"/>
-                <separator/>
-                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
 
                 <group expand="0" string="Group By">
                     <filter name="owner_groupby" string="Owner" domain="[]" context="{'group_by':'create_uid'}"/>
-                    <filter name="type_groupby" string="Type" domain="[]" context="{'group_by':'type'}" groups="base.group_no_one"/>
+                    <filter name="type_groupby" string="Type" domain="[]" context="{'group_by':'document_type'}" groups="base.group_no_one"/>
                     <filter name="company_groupby" string="Company" domain="[]" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
                     <filter name="create_date_groupby" string="Creation Date" domain="[]" context="{'group_by':'create_date'}"/>
                 </group>
