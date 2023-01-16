@@ -9,19 +9,10 @@ const fileUploadMixin = require('web.fileUploadMixin');
 const { _t, qweb } = require('web.core');
 
 
-var DocumentViewer = MailDocumentViewer.extend({
-
-    init(parent, attachments, activeAttachmentID) {
-        this._super(...arguments);
-        this.modelName = 'document.document';
-    },
-});
-
-
 var DocumentKanbanController = KanbanController.extend(fileUploadMixin, {
     buttons_template: 'DocumentKanbanView.buttons',
     events: Object.assign({}, KanbanController.prototype.events, fileUploadMixin.events, {
-        'click .o-kanban-button-new-document': '_onCreateNewDocument',
+        'click .o-kanban-button-new': '_onCreateNewDocument',
         'click .o-kanban-button-upload-document': '_onClickUploadDocument',
     }),
     custom_events: Object.assign({}, KanbanController.prototype.custom_events, fileUploadMixin.custom_events, {
@@ -47,38 +38,42 @@ var DocumentKanbanController = KanbanController.extend(fileUploadMixin, {
         ev.stopPropagation();
         const documents = ev.data.recordList;
         const recordId = ev.data.recordId;
-        const documentViewer = new DocumentViewer(this, documents, recordId);
+
+        // convert document into pseudo attachment in order to call /web/content with right data (url hardcoded in documentViewer template....)
+        const attachments = documents.map(doc => {
+            return Object.assign({
+                'id': doc.attachment_id.res_id, // strange obj relation
+                'name': doc.name,
+                'url': doc.url,
+                'type': doc.document_type,
+                'mimetype': doc.mimetype,
+                'fileType': doc.mimetype,
+                'filename': doc.name,
+            });
+        });
+
+        const currentDocument = _.filter(documents, function (document) {
+            return document.id == recordId;
+        })[0];
+
+        const documentViewer = new MailDocumentViewer(this, attachments, currentDocument.attachment_id.res_id);
         await documentViewer.appendTo(this.$('.o_documents_view'));
-    },
-
-    renderButtons: function ($node) {
-        this._super(...arguments);
-
-        // hide dropdown if empty
-        if (this.$buttons) { // if user has not the 'create' access right, buttons are undefined
-            if (this.$buttons.find('.o_document_kanban_btn_list_dropdown > a').length === 0) {
-                this.$buttons.find('#o_document_kanban_btn_list').hide();
-            } else {
-                this.$buttons.on('click', '.o_document_kanban_btn_list_dropdown > a.o-kanban-button-new', this._onButtonNew.bind(this));
-            }
-        }
     },
     /**
      * Handler to open form view with correct default document handler in context
      *
      **/
     _onCreateNewDocument: function(ev) {
-        const handler = $(ev.currentTarget).data('handler');
+        const defaultType = $(ev.currentTarget).data('default-type');
         this.do_action({
             type: 'ir.actions.act_window',
             views: [[false, 'form']],
             res_model: this.modelName,
             context: {
-                default_handler: handler,
+                default_document_type: defaultType,
             }
         });
     },
-
 
     /**
      * Upload Document Mixin

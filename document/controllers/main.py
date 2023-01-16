@@ -41,7 +41,7 @@ class ShareRoute(http.Controller):
         # default folder
         default_folder_id = kwargs.get('folder_id')
         if not default_folder_id:
-            default_folder_id = request.env['document.document'].default_get(['folder_id'])['folder_id']
+            default_folder_id = request.env['document.document'].default_get(['folder_id']).get('folder_id')
         if not default_folder_id:
             default_folder_id = request.env['document.folder'].search([], limit=1, order='sequence ASC').id
 
@@ -78,8 +78,7 @@ class ShareRoute(http.Controller):
                 datas = base64.encodebytes(ufile.read())
                 vals = {
                     'name': ufile.filename,
-                    'mimetype': mimetype,
-                    'datas': datas,
+                    'content_b64': datas,
                     'folder_id': default_folder.id,
                 }
                 if tag_ids:
@@ -111,7 +110,7 @@ class ShareRoute(http.Controller):
                 'share': share,
                 'share_access_token': access_token,
                 'documents': documents,
-                'at_least_binary': 'binary' in documents.mapped('type'),
+                'at_least_binary': 'file' in documents.mapped('document_type'),
             }
             return request.render('document.page_document_share', params)
         return response
@@ -156,7 +155,7 @@ class ShareRoute(http.Controller):
             document = request.env['document.document'].sudo().browse(document_id)
             status, headers, content = request.env['ir.http'].binary_content(
                 xmlid=None, model='ir.attachment', id=document.attachment_id.id, field='datas', unique=False, filename=document.filename,
-                filename_field='name', download=True, mimetype=document.mimetype, access_token=document.sudo().access_token
+                filename_field='name', download=True, mimetype=document.attachment_id.mimetype, access_token=document.attachment_id.access_token
             )
             if status != 200:
                 return request.env['ir.http']._response_by_status(status, headers, content)
@@ -187,11 +186,9 @@ class ShareRoute(http.Controller):
                 data = file.read()
                 document_values.update({
                     'name': file.filename,
-                    'mimetype': file.content_type,
-                    'datas': base64.b64encode(data),
+                    'filename': file.filename,
+                    'content_b64': base64.b64encode(data),
                     'description': file.filename,
-                    'company_id': share.company_id.id,
-                    'active': True,
                 })
                 document_value_list.append(document_values)
 
@@ -231,9 +228,9 @@ class ShareRoute(http.Controller):
         try:
             with zipfile.ZipFile(stream, 'w') as zip_file:
                 for document in documents:
-                    if document.type == 'binary':
+                    if document.document_type == 'file':
                         filename = document.filename
-                        zip_file.writestr(filename, base64.b64decode(document.datas), compress_type=zipfile.ZIP_DEFLATED)
+                        zip_file.writestr(filename, base64.b64decode(document.content_b64), compress_type=zipfile.ZIP_DEFLATED)
         except zipfile.BadZipfile:
             logger.exception("BadZipfile exception: trying to download document share %s", name)
 

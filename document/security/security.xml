@@ -39,13 +39,8 @@
             <field name="name">Documents.document: readonly rule</field>
             <field name="model_id" ref="model_document_document"/>
             <field name="groups" eval="[(4, ref('base.group_user'))]"/>
-            <field name="domain_force">[
-                '&amp;',
-                    ('folder_id.read_group_ids', 'in', [g.id for g in user.groups_id]),
-                    '|',
-                        ('folder_id.user_specific', '=', False),
-                        ('owner_id', '=', user.id)
-                ]
+            <field name="domain_force">
+                [('folder_id.read_group_ids', 'in', [g.id for g in user.groups_id])]
             </field>
             <field name="perm_read" eval="1"/>
             <field name="perm_create" eval="0"/>

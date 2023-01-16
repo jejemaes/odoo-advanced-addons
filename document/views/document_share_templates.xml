@@ -63,7 +63,7 @@
                                     <time><b t-field="attachment.write_date" t-options="{'format':'MMM d, yyyy'}"/></time> •
                                     <small class="mb0">
                                         <b>
-                                            <t t-if="'url' not in attachment.type">
+                                            <t t-if="'url' not in attachment.document_type">
                                                 <t t-call="document.format_file_size"/>
                                             </t>
                                             <t t-else="">URL</t>
@@ -72,7 +72,7 @@
                                 </div>
                             </div>
                             <div class="d-flex flex-column flex-nowrap justify-content-between text-right">
-                                <a t-att-href="share._get_download_document_url(attachment.id)" target="new" t-att-title="'Download ' + attachment.name"><i t-attf-class="fa #{'url' not in attachment.type and 'fa-download' or 'fa-link'}"/></a>
+                                <a t-att-href="share._get_download_document_url(attachment.id)" target="new" t-att-title="'Download ' + attachment.name"><i t-attf-class="fa #{'url' not in attachment.document_type and 'fa-download' or 'fa-link'}"/></a>
                             </div>
                         </article>
                     </div>
@@ -102,10 +102,10 @@
 
     <!-- Utils -->
     <template id="format_file_size" name="Format file size">
-        <t t-set="G" t-value="int(attachment.file_size/1000000000)"/>
-        <t t-set="M" t-value="int(attachment.file_size/1000000) - G*1000"/>
-        <t t-set="K" t-value="int(attachment.file_size/1000) - M*1000 - G*1000000"/>
-        <t t-set="B" t-value="attachment.file_size - K*1000 - M*1000000 - G*1000000000"/>
+        <t t-set="G" t-value="int(attachment.filesize/1000000000)"/>
+        <t t-set="M" t-value="int(attachment.filesize/1000000) - G*1000"/>
+        <t t-set="K" t-value="int(attachment.filesize/1000) - M*1000 - G*1000000"/>
+        <t t-set="B" t-value="attachment.filesize - K*1000 - M*1000000 - G*1000000000"/>
 
         <b t-if="G"><t t-esc="G"/> <b>Gb</b></b>
         <b t-elif="M"><t t-esc="M"/> <b>Mb</b></b>
