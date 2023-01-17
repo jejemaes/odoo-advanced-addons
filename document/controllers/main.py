@@ -24,7 +24,7 @@ from odoo.addons.web.controllers.main import Binary
 logger = logging.getLogger(__name__)
 
 
-class ShareRoute(http.Controller):
+class DocumentRoute(http.Controller):
 
     # ------------------------------------------------------------------
     # Backend Action
@@ -38,6 +38,12 @@ class ShareRoute(http.Controller):
 
     @http.route('/document/upload_file', type='http', methods=['POST'], auth="user")
     def document_upload_file(self, ufile, **kwargs):
+        document_id = kwargs.get('document_id')
+        if not document_id:
+            return self._document_upload_files(ufile, **kwargs)
+        return self._document_upload_request_file(ufile, **kwargs)
+
+    def _document_upload_files(self, ufile, kwargs):
         # default folder
         default_folder_id = kwargs.get('folder_id')
         if not default_folder_id:
@@ -89,6 +95,26 @@ class ShareRoute(http.Controller):
                 result = {'error': str(e)}
         documents = request.env['document.document'].create(vals_list)
         return json.dumps(result)
+
+    def _document_upload_request_file(self, ufile, **kwargs):
+        try:
+            document_id = int(kwargs.get('document_id'))
+            document = request.env['document.document'].browse(document_id)
+        except ValueError:
+            return json.dumps({'error': "Incorrect document ID received."})
+
+        if document.document_type != 'request':
+            return json.dumps({'error': "The document is not a request."})
+
+        try:
+            files = request.httprequest.files.getlist('ufile')
+            datas = base64.encodebytes(files[0].read())
+            document.set_request_file(datas)
+            result = {'success': _("File uploaded as %s") % (document.name,)}
+            return json.dumps(result)
+        except IndexError:
+            return json.dumps({'error': "No file uploaded."})
+
 
     # ------------------------------------------------------------------
     # Frontend Page

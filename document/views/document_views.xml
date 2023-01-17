@@ -146,9 +146,12 @@
                                 </div>
                             </div>
                             <div class="o_kanban_image h-100">
-                                <div t-attf-class="o_kanban_image_wrapper h-100 #{record.is_previewable.raw_value ? 'oe_kanban_previewer' : ''}">
+                                <div t-attf-class="o_kanban_image_wrapper h-100 #{record.is_previewable.raw_value ? 'oe_kanban_previewer' : ''} #{record.document_type.raw_value == 'request' ? 'oe_kanban_upload' : ''}">
                                     <t t-if="record.thumbnail_url.raw_value">
                                         <img t-att-src="record.thumbnail_url.raw_value" alt="Thumbnail" class="o_attachment_image"/>
+                                    </t>
+                                    <t t-elif="record.document_type.raw_value == 'request'">
+                                        <div class="o_url_image fa fa-upload fa-3x text-muted" aria-label="Upload Image"/>
                                     </t>
                                     <t t-elif="record.document_type.raw_value == 'url'">
                                         <div class="o_url_image fa fa-link fa-3x text-muted" aria-label="Image is a link"/>
@@ -226,6 +229,7 @@
                 <separator/>
                 <filter name="url_filter" string="URL" domain="[('document_type', '=', 'url')]"/>
                 <filter name="binary_filter" string="Files" domain="[('document_type', '=', 'file')]"/>
+                <filter name="request_filter" string="Requests" domain="[('document_type', '=', 'request')]"/>
                 <separator/>
                 <filter name="activities_my" string="My Activities" domain="[('activity_ids.user_id', '=', uid)]"/>
                 <separator/>

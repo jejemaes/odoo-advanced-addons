@@ -16,9 +16,9 @@ var DocumentKanbanController = KanbanController.extend(fileUploadMixin, {
         'click .o-kanban-button-upload-document': '_onClickUploadDocument',
     }),
     custom_events: Object.assign({}, KanbanController.prototype.custom_events, fileUploadMixin.custom_events, {
-        kanban_image_clicked: '_onKanbanImageClicked'
+        kanban_image_clicked: '_onKanbanImageClicked',
+        set_request_file: '_onSetRequestFile',
     }),
-
     /**
      * @override
     */
@@ -59,20 +59,31 @@ var DocumentKanbanController = KanbanController.extend(fileUploadMixin, {
         const documentViewer = new MailDocumentViewer(this, attachments, currentDocument.attachment_id.res_id);
         await documentViewer.appendTo(this.$('.o_documents_view'));
     },
+    async _onSetRequestFile(ev) {
+        ev.stopPropagation();
+        this._uploadFilesHandler(false)(ev);
+    },
     /**
      * Handler to open form view with correct default document handler in context
      *
      **/
     _onCreateNewDocument: function(ev) {
         const defaultType = $(ev.currentTarget).data('default-type');
-        this.do_action({
-            type: 'ir.actions.act_window',
-            views: [[false, 'form']],
-            res_model: this.modelName,
-            context: {
-                default_document_type: defaultType,
-            }
-        });
+        const self = this;
+        if (defaultType == 'request') {
+            this.do_action('document.action_document_request', {
+                'on_close': function() {self.trigger_up('reload');}
+            });
+        } else {
+            this.do_action({
+                type: 'ir.actions.act_window',
+                views: [[false, 'form']],
+                res_model: this.modelName,
+                context: {
+                    default_document_type: defaultType,
+                }
+            });
+        }
     },
 
     /**
@@ -160,6 +171,7 @@ var DocumentKanbanController = KanbanController.extend(fileUploadMixin, {
         }
 
         return {
+            document_id: recordId,
             folder_id: selectedFolderId || '',
             tag_ids: selectedTagIds,
         };
