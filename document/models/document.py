@@ -76,7 +76,7 @@ class Document(models.Model):
     @api.depends('mimetype')
     def _compute_thumbnail(self):
         for document in self:
-            if document.mimetype in self._get_thumbnail_mimetypes():
+            if document.mimetype in self._get_thumbnail_mimetypes() and document.content_b64:
                 image = ImageProcess(document.content_b64)
                 width, height = image.image.size
                 square_size = width if width > height else height
@@ -180,6 +180,8 @@ class Document(models.Model):
             if document.document_type == 'file':
                 document.filesize = document.attachment_id.file_size
             elif document.document_type in ['url', 'request']:
+                document.filesize = None
+            else:
                 document.filesize = None
 
     @api.depends('document_type', 'attachment_id.description')
@@ -359,3 +361,14 @@ class Document(models.Model):
             data['url'] = self.url
             data['datas'] = None
         return data
+
+    def set_request_file(self, data_b64):
+        if self.document_type != 'request':
+            raise UserError(_("The file can be set only on request document."))
+
+        self.write({
+            'content_b64': data_b64,
+            'document_type': 'file',
+        })
+        self.env['mail.activity'].search([('res_model', '=', self._name), ('res_id', '=', self.id), ('activity_type_id.category', '=', 'upload_file')]).unlink()
+        return True

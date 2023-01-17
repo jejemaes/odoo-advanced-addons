@@ -14,6 +14,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'wizard/document_attach_record_views.xml',
+        'wizard/document_request_views.xml',
         'wizard/document_create_record_views.xml',
         'views/res_config_settings_views.xml',
         'views/document_views.xml',
