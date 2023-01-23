@@ -16,7 +16,7 @@ class SaleOrder(models.Model):
 
     @api.depends('rental_booking_ids')
     def _compute_rental_count(self):
-        grouped_data = self.env['rental.booking'].read_group([('sale_order_id', 'in', self.ids)], ['sale_order_id'], ['sale_order_id'])
+        grouped_data = self.env['rental.booking'].sudo().read_group([('sale_order_id', 'in', self.ids)], ['sale_order_id'], ['sale_order_id'])
         mapped_data = {db['sale_order_id'][0]: db['sale_order_id_count'] for db in grouped_data}
         for order in self:
             order.rental_count = mapped_data.get(order.id, 0)
