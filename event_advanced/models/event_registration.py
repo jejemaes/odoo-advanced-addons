@@ -6,8 +6,9 @@ import logging
 import qrcode
 import uuid
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.addons.http_routing.models.ir_http import slug
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -21,6 +22,13 @@ class EventRegistration(models.Model):
     access_token = fields.Char(default=_default_access_token, readonly=True, copy=False, index=True)
     qrcode_url = fields.Char("Url", compute='_compute_qrcode_url')
     qrcode = fields.Binary("QR Code", compute='_compute_qrcode', attachment=False, store=False, readonly=True)
+
+    event_registration_multi_qty = fields.Boolean(related='event_id.registration_multi_qty', readonly=True)
+    qty = fields.Integer(
+        string="Quantity",
+        required=True,
+        default=1,
+    )
 
     _sql_constraints = [
         ('access_token_event_uniq', 'unique(access_token)', "access_token should be unique")
@@ -62,6 +70,16 @@ class EventRegistration(models.Model):
         else:
             super(EventRegistration, self)._init_column(column_name)
 
+    @api.constrains("qty")
+    def _check_attendees_qty(self):
+        for registration in self:
+            if (
+                not registration.event_registration_multi_qty
+                and registration.qty > 1
+            ):
+                raise ValidationError(
+                    _("You can not add quantities if you not active the option. Allow multiple attendees per registration in event")
+                )
 
     @api.model
     def register_attendee(self, access_token, event_id):

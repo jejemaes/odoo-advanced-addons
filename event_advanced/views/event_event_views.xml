@@ -32,7 +32,9 @@
                     </group>
                 </page>
             </xpath>
-
+            <xpath expr="//field[@name='auto_confirm']" position="after">
+                <field name="registration_multi_qty" attrs="{'invisible': [('use_registration', '=', False)]}"/>
+            </xpath>
         </field>
     </record>
 

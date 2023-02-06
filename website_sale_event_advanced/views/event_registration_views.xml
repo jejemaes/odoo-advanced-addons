@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="event_registration_view_tree" model="ir.ui.view">
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="payment_status" optional="show"/>
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <button name="action_mark_as_paid" string="Mark as Paid" type="object" icon="fa-dollar" attrs="{'invisible': [('is_paid', '=', True)]}"/>
+                <button name="action_mark_as_unpaid" string="Mark as Not Paid" type="object" icon="fa-dollar" attrs="{'invisible': [('is_paid', '=', False)]}"/>
+                <field name="is_paid" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+ 	<record id="event_registration_view_form" model="ir.ui.view">
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <button name="action_mark_as_paid" string="Mark as Paid" type="object" attrs="{'invisible': [('is_paid', '=', True)]}"/>
+                <button name="action_mark_as_unpaid" string="Mark as Not Paid" type="object" attrs="{'invisible': [('is_paid', '=', False)]}"/>
+                <field name="is_paid" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="event_registration_view_search" model="ir.ui.view">
+        <field name="name">event.registration.search</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_registration_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='createmonth']" position="after">
+                <filter string="Payment Status" name="group_by_payment_status" domain="[]" context="{'group_by':'payment_status'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
