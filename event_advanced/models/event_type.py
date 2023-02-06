@@ -9,6 +9,7 @@ class EventType(models.Model):
 
     use_qrcode = fields.Boolean("Use QRCode", help="Badge will contain a QRCode to scan to mark the customer as attended.")
     use_registration = fields.Boolean("Allow Registration", default=True, help="Check this to allow people to register to the event and activate the attendees management")
+    registration_multi_qty = fields.Boolean("Allow Quantity on Registration", help="Allow multiple attendee on one registration (instead of one registration per customer).")
 
     @api.onchange('use_registration')
     def _onchange_use_registration(self):
@@ -16,3 +17,4 @@ class EventType(models.Model):
             self.use_qrcode = False
             self.has_seats_limitation = False
             self.auto_confirm = False
+            self.registration_multi_qty = False

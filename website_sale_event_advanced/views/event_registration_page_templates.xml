@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!--
+        Indication for pre-order ticket
+    -->
+    <template id="registration_template" inherit_id="website_event.registration_template">
+        <xpath expr="//t[@t-if='ticket.description']" position="after">
+            <t t-if="ticket.online_pre_order">
+                <small class="text-info"><i class="fa fa-info-circle"/> Pre-order it, pay it later.</small>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

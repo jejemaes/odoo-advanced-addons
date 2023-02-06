@@ -40,6 +40,13 @@
                 <input class="form-control" type="tel" t-attf-name="#{counter}-phone" required="This field is mandatory." t-if="event.registration_phone_mandatory" t-att-value="default_first_attendee.get('phone', '') if counter == 1 else ''"/>
             </div>
         </xpath>
+        <xpath expr="//div[hasclass('modal-body')]/div[hasclass('row')]" position="inside">
+            <div class="col-lg my-2" t-if="'registration_qty' in ticket">
+                <label>Quantity</label>
+                <input class="form-control" type="text" t-attf-name="#{counter}-qty" required="This field is required"
+                    t-att-value="ticket['registration_qty']" readonly="1"/>
+            </div>
+        </xpath>
     </template>
 
 </odoo>
