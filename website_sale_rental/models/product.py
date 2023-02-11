@@ -91,7 +91,7 @@ class ProductTemplate(models.Model):
         fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
 
         for product_template in self:
-            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id), product_template, partner)
+            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id))
             base_price = product_template.currency_id._convert(product_template.rental_fixed_price, pricelist.currency_id, company=website.company_id, date=fields.Date.today())
             product_template.website_rental_base_price = taxes.compute_all(base_price, pricelist.currency_id, 1, product_template.product_variant_id, partner)[tax_field]
 
@@ -118,7 +118,7 @@ class ProductTemplate(models.Model):
                 result[product_template.id] = price  # base price without discount applied
 
         for product_template in self:
-            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id), product_template, partner)
+            taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id))
             base_price = result.get(product_template.id, product_template.rental_fixed_price)
             product_template.website_rental_list_price = taxes.compute_all(base_price, pricelist.currency_id, 1, product_template.product_variant_id, partner)[tax_field]
 
