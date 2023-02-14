@@ -43,7 +43,7 @@ class DocumentRoute(http.Controller):
             return self._document_upload_files(ufile, **kwargs)
         return self._document_upload_request_file(ufile, **kwargs)
 
-    def _document_upload_files(self, ufile, kwargs):
+    def _document_upload_files(self, ufile, **kwargs):
         # default folder
         default_folder_id = kwargs.get('folder_id')
         if not default_folder_id:
