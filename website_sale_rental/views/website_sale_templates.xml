@@ -46,24 +46,21 @@
         Product Page
     -->
     <template id="product" inherit_id="website_sale.product" name="Rental eShop: rental price and description">
-        <xpath expr="//form[@action='/shop/cart/update']" position="attributes">
-            <attribute name="t-if">product.sale_ok</attribute>
-        </xpath>
-        <xpath expr="//p[@t-field='product.description_sale']/.." position="attributes">
+        <xpath expr="//p[@t-field='product.description_sale']" position="attributes">
             <attribute name="t-if">product.sale_ok</attribute>
         </xpath>
         <xpath expr="//p[@t-else=''][hasclass('alert-warning')]" position="replace">
             <p t-elif="product.sale_ok" class="alert alert-warning">This product has no valid combination.</p>
         </xpath>
         <xpath expr="//div[@id='product_attributes_simple']" position="after">
-            <t t-if="product.can_be_rented">
+            <div t-if="product.can_be_rented" id="product_rental_prices">
                 <hr t-if="product.sale_ok"/>
                 <t t-call="website_sale_rental.product_rental_price_details"/>
                 <div class="text-muted" t-field="product.description_rental"/>
                 <button class="btn btn-primary btn-lg mt16 o_website_sale_rental_btn" type="button" t-att-data-mode="product.website_rental_display_mode">
                     <i class="fa fa-calendar"/> Rent me
                 </button>
-            </t>
+            </div>
         </xpath>
         <xpath expr="//div[@id='product_full_description']" position="after">
             <section t-if="product.can_be_rented" t-attf-class="container o_website_sale_rental_mode_#{product.website_rental_display_mode} mb16"
