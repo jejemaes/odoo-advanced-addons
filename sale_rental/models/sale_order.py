@@ -89,7 +89,7 @@ class SaleOrder(models.Model):
         rental_sale_lines = self.mapped('order_line').filtered(lambda l: l.is_rental)
 
         rental_sale_lines.sudo()._rental_booking_generation()
-        rental_sale_lines.mapped('rental_booking_ids').sudo().filtered(lambda b: b.state == 'draft').action_reserve()
+        rental_sale_lines.mapped('rental_booking_ids').sudo().filtered(lambda b: b.state == 'draft').action_confirm()
         return result
 
     def action_cancel(self):
