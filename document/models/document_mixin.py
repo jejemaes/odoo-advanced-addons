@@ -9,6 +9,19 @@ class DocumentMixin(models.AbstractModel):
     _description = "Document Mixin"
 
     # -----------------------------------------
+    # CRUD
+    # -----------------------------------------
+
+    def unlink(self):
+        """ Override unlink to delete records document through (res_model, res_id). """
+        record_ids = self.ids
+        result = super(DocumentMixin, self).unlink()
+        self.env['document.document'].sudo().search(
+            [('res_model', '=', self._name), ('res_id', 'in', record_ids)]
+        ).unlink()
+        return result
+
+    # -----------------------------------------
     # From record to document
     # -----------------------------------------
 
