@@ -89,11 +89,6 @@ class RentalBooking(models.Model):
         for shift in self:
             shift.overlap_count = overlap_ids_map.get(shift.id, 0)
 
-    @api.onchange('resource_id')
-    def onchange_resource(self):
-        if self.resource_id:
-            self.calendar_id = self.resource_id.calendar_id
-
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         if self.partner_id:
