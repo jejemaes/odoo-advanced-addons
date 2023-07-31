@@ -139,7 +139,7 @@ class Document(models.Model):
 
     @api.depends('document_type', 'attachment_id.datas')
     def _compute_content_b64(self):
-        for document in self:
+        for document in self.sudo():
             if document.document_type == 'file':
                 document.content_b64 = document.attachment_id.datas
             else:
