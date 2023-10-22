@@ -10,7 +10,7 @@
             <t t-set="body_classname" t-value="'o_document_body'"/>
 
             <div class="container">
-                <t t-raw="0"/>
+                <t t-out="0"/>
             </div>
         </t>
     </template>

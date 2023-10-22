@@ -32,8 +32,8 @@
                     <group>
                         <group>
                             <field name="name" placeholder="Name of the share link"/>
-                            <field name="content_type" groups="base.group_no_one"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="content_type"/>
+                            <field name="company_id"/>
                         </group>
                         <group>
                             <field name="document_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit': True}" attrs="{'invisible': [('content_type', '!=', 'ids')]}"/>
