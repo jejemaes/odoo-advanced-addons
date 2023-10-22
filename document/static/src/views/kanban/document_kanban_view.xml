@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="document.KanbanButtons" t-inherit="web.KanbanView.Buttons" t-inherit-mode="primary" owl="1">
+        <xpath expr="//button[hasclass('o-kanban-button-new')]" position="replace">
+            <div class="o-dropdown dropdown">
+                <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                    New
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <li><a class="dropdown-item" data-default-type="request" t-on-click.prevent="onCreateRecord" data-bounce-button="">Request</a></li>
+                    <li><a class="dropdown-item" data-default-type="file" t-on-click.prevent="onCreateRecord" data-bounce-button="">File</a></li>
+                    <li><a class="dropdown-item" data-default-type="url" t-on-click="onCreateRecord" data-bounce-button="">Url</a></li>
+                </ul>
+            </div>
+        </xpath>
+        <xpath expr="//t[@t-if='canCreate']" position="after">
+            <button type="button" class="d-none d-md-inline o_button_upload_document btn btn-primary mx-1" t-on-click.prevent="uploadDocument">
+                Upload
+            </button>
+        </xpath>
+        <xpath expr="//div" position="inside">
+            <input type="file" name="ufile" class="d-none" t-ref="fileInput" multiple="1" accept="*" t-on-change="onChangeFileInput" />
+        </xpath>
+    </t>
+</templates>

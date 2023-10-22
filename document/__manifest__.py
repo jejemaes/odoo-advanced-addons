@@ -26,11 +26,10 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'document/static/src/js/documents_kanban_record.js',
-            'document/static/src/js/documents_kanban_renderer.js',
-            'document/static/src/js/documents_kanban_controller.js',
-            'document/static/src/js/documents_kanban_view.js',
+            'document/static/src/file_viewer/*',  # backport from 17.0 (web/core/file_viewer)
             'document/static/src/scss/documents_kanban_view.scss',
+            'document/static/src/mixins/*.js',
+            'document/static/src/views/**/*',
         ],
         'web.assets_frontend': [
             'document/static/src/scss/document_frontent.scss',
