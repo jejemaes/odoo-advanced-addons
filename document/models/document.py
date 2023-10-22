@@ -7,13 +7,15 @@ import os
 import mimetypes
 import re
 import uuid
-
+import logging
 
 from odoo import api, fields, models, tools,  _
-from odoo.tools import ImageProcess
+from odoo.tools import image_process
 from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError, ValidationError
 from odoo.osv import expression
+
+logger = logging.getLogger()
 
 
 class Document(models.Model):
@@ -27,6 +29,12 @@ class Document(models.Model):
         return str(uuid.uuid4())
 
     @api.model
+    def _default_owner_id(self):
+        if self._context.get('default_document_type') == 'request':
+            return None
+        return self.env.user.id
+
+    @api.model
     def _default_tag_ids(self):
         return self.env.company.document_default_tag_ids.ids
 
@@ -37,14 +45,15 @@ class Document(models.Model):
         ('url', 'Url'),
     ], string="Type", default='file', required=True)
 
-    thumbnail = fields.Binary("Thumbnail", compute='_compute_thumbnail')
+    thumbnail = fields.Image("Thumbnail", compute='_compute_thumbnail',max_width=200, max_height=200)
     thumbnail_url = fields.Char("Thumbnail Url", compute='_compute_thumbnail_url')
     is_previewable = fields.Boolean("Is Previewable", compute='_compute_is_previewable')
 
-    owner_id = fields.Many2one('res.users', default=lambda self: self.env.user.id, string="Owner", tracking=True)
+    owner_id = fields.Many2one('res.users', default=_default_owner_id, string="Owner", tracking=True)
     partner_id = fields.Many2one('res.partner', string="Contact", ondelete="restrict", tracking=True)
     folder_id = fields.Many2one('document.folder', string="Folder", required=True, ondelete="restrict", tracking=True)
     favorite_user_ids = fields.Many2many('res.users', 'document_document_user_favorite_rel', 'document_id', 'user_id', string="Favorites")
+    is_favorite = fields.Boolean("Is Favorite", compute='_compute_is_favorite', inverse='_inverse_is_favorite')
     tag_ids = fields.Many2many('document.tag', 'document_tag_rel', string="Tags", default=_default_tag_ids)
     selectable_tag_ids = fields.Many2many('document.tag', compute='_compute_selectable_tag_ids')
     is_locked = fields.Boolean("Is Locked", compute='_compute_is_locked')
@@ -73,24 +82,19 @@ class Document(models.Model):
         ('attachment_unique', 'UNIQUE(attachment_id)', "Attachment can only be linked to one document."),
     ]
 
-    @api.depends('mimetype')
+    @api.depends('mimetype', 'content_b64')
     def _compute_thumbnail(self):
         for document in self:
-            if document.mimetype in self._get_thumbnail_mimetypes() and document.content_b64:
-                image = ImageProcess(document.content_b64)
-                width, height = image.image.size
-                square_size = width if width > height else height
-                image.crop_resize(square_size, square_size)
-                image.image = image.image.resize((128, 128))
-                document.thumbnail = image.image_base64(output_format='PNG')
+            if document.mimetype in self._get_image_mimetypes() and document.content_b64:
+                document.thumbnail = document.content_b64
             else:
-                document.thumbnail = False
+                document.thumbnail = None
 
     @api.depends('mimetype', 'checksum')
     def _compute_thumbnail_url(self):
         for document in self:
             thumbnail_url = False
-            if document.mimetype in self._get_thumbnail_mimetypes() and document.checksum:
+            if document.mimetype in self._get_image_mimetypes() and document.checksum:
                 thumbnail_url = '/web/image/%s?model=%s&field=thumbnail&unique=%s' % (document.id, document._name, document.checksum[-8])
             else:
                 if document.url:  # find the youtube video thumbnail
@@ -123,6 +127,22 @@ class Document(models.Model):
                     document.is_previewable = False
             else:
                 document.is_previewable = False
+
+    @api.depends('favorite_user_ids')
+    def _compute_is_favorite(self):
+        for document in self:
+            document.is_favorite = self.env.user in document.favorite_user_ids
+
+    def _inverse_is_favorite(self):
+        favorite_documents = not_favorite_documents = self.env['document.document'].sudo()
+        for document in self:
+            if self.env.user in document.favorite_user_ids:
+                favorite_documents |= document
+            else:
+                not_favorite_documents |= document
+
+        not_favorite_documents.write({'favorite_user_ids': [(4, self.env.uid)]})
+        favorite_documents.write({'favorite_user_ids': [(3, self.env.uid)]})
 
     @api.depends('folder_id', 'tag_ids')
     def _compute_selectable_tag_ids(self):
@@ -316,7 +336,7 @@ class Document(models.Model):
         if len(self) == 1:
             target_url = self.url
             if self.document_type == 'file':
-                target_url = "/web/content/%s?model=%s&field=datas&download=1" % (self.id, self._name)
+                target_url = "/web/content/%s?model=%s&field=content_b64&download=1" % (self.id, self._name)
         else:
             ids_as_string = [str(_id) for _id in self.ids]
             target_url = '/document/zip_download/%s' % (','.join(ids_as_string),)
@@ -340,7 +360,7 @@ class Document(models.Model):
     # -------------------------------------------------------------
 
     @api.model
-    def _get_thumbnail_mimetypes(self):
+    def _get_image_mimetypes(self):
         return ['image/gif', 'image/jpe', 'image/jpeg', 'image/jpg', 'image/gif', 'image/png']
 
     def _generate_record_values(self, model_name, subtype=False):

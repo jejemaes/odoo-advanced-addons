@@ -9,7 +9,7 @@ class RequestWizard(models.TransientModel):
     _description = "Document Request"
 
     name = fields.Char(required=True)
-    owner_id = fields.Many2one('res.users', required=True, string="Owner", default=lambda self: self.env.user.id)
+    owner_id = fields.Many2one('res.users', required=True, string="Owner")
     partner_id = fields.Many2one('res.partner', string="Contact")
     folder_id = fields.Many2one('document.folder', string="Folder", required=True)
     tag_ids = fields.Many2many('document.tag', string="Tags")

@@ -40,13 +40,13 @@
                         </group>
                     </group>
                     <group string="Description">
-                        <field name="description" nolabel="1"/>
+                        <field name="description" nolabel="1" colspan="2"/>
                     </group>
                     <group string="Tags">
-                        <field name="facet_ids" nolabel="1" context="{'default_folder_id': id, 'document_folder_form': True, 'hierarchical_naming': True}">
+                        <field name="facet_ids" context="{'default_folder_id': id, 'document_folder_form': True, 'hierarchical_naming': True}" colspan="2">
                             <tree>
                                 <field name="name"/>
-                                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                <field name="tag_ids" string="Tags" widget="many2many_tags" options="{'color_field': 'color'}"/>
                             </tree>
                         </field>
                     </group>

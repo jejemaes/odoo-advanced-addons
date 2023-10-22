@@ -6,20 +6,10 @@ import zipfile
 import io
 import logging
 
-import werkzeug
-import werkzeug.exceptions
-import werkzeug.routing
-import werkzeug.urls
-import werkzeug.utils
-from werkzeug.exceptions import Forbidden
-
-from ast import literal_eval
-
-from odoo import http, fields, models, _
+from odoo import http, _
+from odoo.exceptions import UserError
 from odoo.http import request, content_disposition
-from odoo.osv import expression
-from odoo.tools import pycompat, consteq
-from odoo.addons.web.controllers.main import Binary
+from odoo.tools import consteq, replace_exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +35,11 @@ class DocumentRoute(http.Controller):
 
     def _document_upload_files(self, ufile, **kwargs):
         # default folder
-        default_folder_id = kwargs.get('folder_id')
+        try:
+            default_folder_id = int(kwargs.get('folder_id'))
+        except ValueError:
+            default_folder_id = None
+
         if not default_folder_id:
             default_folder_id = request.env['document.document'].default_get(['folder_id']).get('folder_id')
         if not default_folder_id:
@@ -115,7 +109,6 @@ class DocumentRoute(http.Controller):
         except IndexError:
             return json.dumps({'error': "No file uploaded."})
 
-
     # ------------------------------------------------------------------
     # Frontend Page
     # ------------------------------------------------------------------
@@ -163,7 +156,7 @@ class DocumentRoute(http.Controller):
             thumbnail = request.env['document.document'].sudo().browse(document_id).thumbnail
             if thumbnail:
                 return base64.b64decode(thumbnail)
-            return Binary.placeholder()
+            return request.env['ir.binary']._placeholder()
         return response
 
     # ------------------------------------------------------------------
@@ -179,18 +172,17 @@ class DocumentRoute(http.Controller):
             # The idea is to serve the related ir.attachment, as Odoo support it
             # natively, but this required the attachment to have an access token.
             document = request.env['document.document'].sudo().browse(document_id)
-            status, headers, content = request.env['ir.http'].binary_content(
-                xmlid=None, model='ir.attachment', id=document.attachment_id.id, field='datas', unique=False, filename=document.filename,
-                filename_field='name', download=True, mimetype=document.attachment_id.mimetype, access_token=document.attachment_id.access_token
-            )
-            if status != 200:
-                return request.env['ir.http']._response_by_status(status, headers, content)
-            else:
-                content_base64 = base64.b64decode(content)
-                headers.append(('Content-Length', len(content_base64)))
-                response = request.make_response(content_base64, headers)
-            # if access_token:
-            #     response.set_cookie('fileToken', access_token)
+
+            with replace_exceptions(UserError, by=request.not_found()):
+                record = request.env['ir.binary']._find_record(xmlid=None, res_model='ir.attachment', res_id=document.attachment_id.id, access_token=document.attachment_id.access_token)
+                stream = request.env['ir.binary']._get_stream_from(record, field_name='datas', filename=document.filename, mimetype=document.attachment_id.mimetype)
+            send_file_kwargs = {'as_attachment': True}
+            send_file_kwargs['immutable'] = True
+            send_file_kwargs['max_age'] = http.STATIC_CACHE_LONG
+
+            response = stream.get_response(**send_file_kwargs)
+            response.headers['Content-Security-Policy'] = "default-src 'none'"
+
         return response
 
     @http.route(["/document/download/all/<int:share_id>/<access_token>"], type='http', auth='public')
