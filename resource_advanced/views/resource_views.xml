@@ -80,7 +80,8 @@
                         <group name="infos">
                             <field name="user_id" string="Responsible"/>
                             <field name="color" widget="color_picker"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                            <field name="company_id" invisible="1"/>
                         </group>
                         <group name="calendar_details">
                             <field name="calendar_id"/>
