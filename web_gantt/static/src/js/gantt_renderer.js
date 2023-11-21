@@ -1,409 +1,459 @@
-odoo.define('web_gantt.GanttRenderer', function (require) {
-"use strict";
+/** @odoo-module */
 
-var AbstractRenderer = require('web.AbstractRenderer');
-var core = require('web.core');
-var field_utils = require('web.field_utils');
-var time = require('web.time');
-var qweb = require('web.QWeb');
-var session = require('web.session');
-var utils = require('web.utils');
-var GanttUtils = require('web_gantt.GanttUtils');
+import { getBundle, loadBundle, loadJS } from "@web/core/assets";
+import { browser } from "@web/core/browser/browser";
+import { serializeDate, serializeDateTime } from "@web/core/l10n/dates";
+import { localization } from "@web/core/l10n/localization";
+import { evaluateExpr } from "@web/core/py_js/py";
+import { _t } from "@web/core/l10n/translation";
+import { useService } from "@web/core/utils/hooks";
+import { sprintf } from "@web/core/utils/strings";
+import { useDebounced } from "@web/core/utils/timing";
+import { Component, onWillUnmount, useEffect, useRef, onWillStart, onMounted, onWillUpdateProps, onWillDestroy} from "@odoo/owl";
+const { DateTime } = luxon;
 
-var _lt = core._lt;
-var QWeb = core.qweb;
 
-// Allowed decoration on the list's rows: bold, italic and bootstrap semantics classes
-var DECORATIONS = [
-    'decoration-danger',
-    // 'decoration-success',
-    'decoration-warning'
-];
+// server format expressed in DHX specification
+// https://docs.dhtmlx.com/gantt/desktop__date_format.html
+// so, we can use `serializeDate`
+const DHX_DATE_FORMAT = "%Y-%m-%d";
+const DHX_TIME_FORMAT = "%H:%i:%s";
+const DHX_DATETIME_FORMAT = `${DHX_DATE_FORMAT} ${DHX_TIME_FORMAT}`;
 
-return AbstractRenderer.extend({
-    className: "o_gantt_view",
-    events: {
-        'click .gantt_task_line': '_onTaskClick',
-    },
 
-    /**
-     * @overrie
-     */
-    init: function (parent, state, params) {
-        var self = this;
-        this._super.apply(this, arguments);
+const localesMapping = {
+    'ar_SY': 'ar', 'ca_ES': 'ca', 'zh_CN': 'cn', 'cs_CZ': 'cs', 'da_DK': 'da',
+    'de_DE': 'de', 'el_GR': 'el', 'es_ES': 'es', 'fi_FI': 'fi', 'fr_FR': 'fr',
+    'he_IL': 'he', 'hu_HU': 'hu', 'id_ID': 'id', 'it_IT': 'it', 'ja_JP': 'jp',
+    'ko_KR': 'kr', 'nl_NL': 'nl', 'nb_NO': 'no', 'pl_PL': 'pl', 'pt_PT': 'pt',
+    'ro_RO': 'ro', 'ru_RU': 'ru', 'sl_SI': 'si', 'sk_SK': 'sk', 'sv_SE': 'sv',
+    'tr_TR': 'tr', 'uk_UA': 'ua',
+    'ar': 'ar', 'ca': 'ca', 'zh': 'cn', 'cs': 'cs', 'da': 'da', 'de': 'de',
+    'el': 'el', 'es': 'es', 'fi': 'fi', 'fr': 'fr', 'he': 'he', 'hu': 'hu',
+    'id': 'id', 'it': 'it', 'ja': 'jp', 'ko': 'kr', 'nl': 'nl', 'nb': 'no',
+    'pl': 'pl', 'pt': 'pt', 'ro': 'ro', 'ru': 'ru', 'sl': 'si', 'sk': 'sk',
+    'sv': 'sv', 'tr': 'tr', 'uk': 'ua',
+};
 
-        this.fieldsInfo = params.fieldsInfo;
-        this.SCALES = params.SCALES;
-        this.useDateOnly = params.useDateOnly;
-        this.string = params.string;
-        this.canCreate = params.canCreate;
-        this.canEdit = params.canEdit;
-        this.canPlan = params.canPlan;
-        this.cellPrecisions = params.cellPrecisions;
-        this.colorField = params.colorField;
-        this.progressField = params.progressField;
-        this.decorations = this._extractDecorationAttrs(this.arch);
-        // this.collapseFirstLevel = params.collapseFirstLevel;
-        // this.thumbnails = params.thumbnails;
+export class GanttRenderer extends Component {
 
-        // unique identifier for the dhtmlxgantt lib
-        this.dhx_id = _.uniqueId('dhx_');
-        // events bound on lib
-        this.dhx_events = [];
-        // the global gantt instance
-        this.dhx_gantt = gantt;
-    },
-    /**
-     * @override
-     */
-    destroy: function () {
-        while (this.dhx_events.length) {
-            gantt.detachEvent(this.dhx_events.pop());
+    static props = {
+        model: Object,
+        openDialog: Function,
+        archInfo: Object,
+    };
+    static template = "web_gantt.GanttRenderer";
+
+	setup() {
+        this.model = this.props.model;
+        this.decorationMap = this.model.metaData.archInfo.decorationMap;
+        this.activeActions = this.model.metaData.archInfo.activeActions;
+        this.fieldInfos = this.model.metaData.fields;
+
+        // DHX Gantt Lib
+        this.dhxGantt = null;
+        this.dhxSetup = false;
+
+        // hooks
+        this.containerRef = useRef("container");
+        this.userService = useService("user");
+        this.onResize = useDebounced(this.renderGantt, 200);
+        this.debounceOnTaskClick = useDebounced(this._dhxOnTaskClick, 200);
+
+        // user lang
+        const currentLocale = this.userService.lang || 'en_US';
+        const currentShortLocale = currentLocale.split('_')[0];
+        const localeCode = localesMapping[currentLocale] || localesMapping[currentShortLocale];
+        const localeSuffix = localeCode !== undefined ? '_' + localeCode : '';
+
+        onWillStart(async () => {
+            await loadBundle({
+                jsLibs: [
+                    "/web_gantt/static/lib/dhtmlxGantt/codebase/dhtmlxgantt.js",
+                    "/web_gantt/static/lib/dhtmlxGantt/codebase/ext/dhtmlxgantt_click_drag.js",
+                    "/web_gantt/static/lib/dhtmlxGantt/codebase/locale/locale" + localeSuffix + ".js"
+                ],
+                cssLibs: [
+                    "/web_gantt/static/lib/dhtmlxGantt/codebase/dhtmlxgantt.css",
+                    "/web_gantt/static/lib/dhtmlxGantt/codebase/skins/dhtmlxgantt_material.css",
+                ],
+            });
+            this.dhxGantt = window.gantt; // since bundle is loaded
+        });
+
+        useEffect(() => this.renderGantt());
+        onMounted(this.onMounted);
+        onWillUnmount(this.onWillUnmount);
+    }
+
+    onMounted() {
+        // bind dhx events
+        this.onTaskDblClick = gantt.attachEvent("onTaskDblClick", function(id, e){
+            return false; // prevent lightbox to open
+        });
+        this.onTaskClick = this.dhxGantt.attachEvent("onTaskClick", this.debounceOnTaskClick.bind(this));
+        this.afterTaskDragEvent = this.dhxGantt.attachEvent("onAfterTaskDrag", this._dhxOnAfterTaskDrag.bind(this));
+
+        // refresh the gantt part when resizing window
+        browser.addEventListener("resize", this.onResize);
+    }
+
+    onWillUnmount() {
+        // Note: DO NOT destroy the gantt object (unbind events, clear data, out of DOM, ...)
+        // by calling `this.dhxGantt.destructor();`.
+
+        // unbind onMounted bindings
+        this.dhxGantt.detachEvent(this.onTaskClick);
+        this.dhxGantt.detachEvent(this.afterTaskDragEvent);
+        this.dhxGantt.detachEvent(this.onTaskDblClick);
+
+        // unbind the refreshing
+        browser.removeEventListener("resize", this.onResize);
+    }
+
+    //--------------------------------------------------------------------------
+    // Public
+    //--------------------------------------------------------------------------
+
+    get canCreate() {
+        return this.activeActions.create;
+    }
+    get canEdit() {
+        return this.activeActions.edit;
+    }
+
+    get progressField() {
+        return this.model.progressField;
+    }
+
+    get rows() {
+        const rows = [];
+
+        const serializerFunc = this.useDateOnly ? serializeDate : serializeDateTime;
+
+        const processNode = (node) => {
+            if (node.isGroup) {
+                rows.push({
+                    id: node.groupId,
+                    text: node.name,
+                    open: true,
+                    parent: node.parentGroupId,
+                    type: gantt.config.types.project,
+                    duration: 0, // this will set the "consolidation" pill according the child tasks. Anyway, we don't display it.
+                    context: node.context,
+                });
+                for (const subNode of node.childNodes || []) {
+                    processNode(subNode);
+                }
+            } else {
+                const parentId = node.parentGroupId;
+                for (const recordId of node.recordIds || []) {
+                    const record = this.model.recordMap[recordId];
+                    rows.push({
+                        id: _.uniqueId('record'),
+                        text: record.display_name,
+                        open: true,
+                        parent: node.parentGroupId,
+                        type: gantt.config.types.task,
+                        start_date: serializerFunc(record[this.model.dateStartField]),
+                        end_date: serializerFunc(record[this.model.dateStopField]),
+                        progress: this.progressField ? record[this.progressField] / 100 : null,
+                        // odoo stuffs
+                        color: this.model.colorField ? record[this.model.colorField] : null,
+                        context: node.context,
+                        record: record,
+                        evalContext: this._getEvalContext(record),
+                    });
+                }
+            }
+        };
+
+        for (const node of this.model.groupTree) {
+            processNode(node);
         }
-        this._super();
-    },
+        return rows;
+    }
+
+    get useDateOnly() {
+        return this.model.useDateOnly;
+    }
+
+    /**
+     * Instantiates a Chart (Chart.js lib) to render the graph according to
+     * the current config.
+     */
+    renderGantt() {
+        // Haskish way of setting the parent div size, as dhtmlx is using 'px' and not relative %. This
+        // is not responsive.
+        this.containerRef.el.style.height = `${document.body.clientHeight}px`;
+        this.containerRef.el.style.width = `${document.body.clientWidth}px`;
+
+        if (!this.dhxSetup){
+            this._setUpDhxGantt();
+            this._setUpDhxZoomScales();
+        }
+        // update range
+        this.dhxGantt.config.start_date = this.model.metaData.startDate;
+        this.dhxGantt.config.end_date = this.model.metaData.stopDate;
+
+        // init gantt and extensions
+        this.dhxGantt.init("gantt_wrapper");
+        this.dhxGantt.ext.zoom.setLevel(this.model.metaData.scale.id);
+        this.dhxGantt.clearAll(); // as the renderer is not destroy each refresh, we need to clear the data in DHX
+		this.dhxGantt.parse({
+			data: this.rows,
+			links: []
+		});
+    }
 
     //--------------------------------------------------------------------------
     // Private
     //--------------------------------------------------------------------------
+
     /**
-     * Extract the decoration attributes (e.g. decoration-danger) of a node. The
-     * condition is processed such that it is ready to be evaluated.
-     *
-     * @private
-     * @param {Object} the <gantt> node
-     * @returns {Object}
+     * @param {Object} record: alreay parsed record (date are luxon datetime)
+     * @retuns {Object}
      */
-    _extractDecorationAttrs: function (node) {
-        const decorations = {};
-        for (const [key, expr] of Object.entries(node.attrs)) {
-            if (DECORATIONS.includes(key)) {
-                const cssClass = key.replace('decoration-', 'o_gantt_decoration_');
-                decorations[cssClass] = py.parse(py.tokenize(expr));
-            }
+    _getEvalContext(record) {
+        const context = Object.assign({}, this.userService.context);
+        for (const [fieldName, value] of Object.entries(record)) {
+            context[fieldName] = value;
         }
-        return decorations;
-    },
-    _extractDecorationClasses: function (evalContext) {
-        var classes = ' ';
-        for (const [cssClass, expr] of Object.entries(this.decorations)) {
-            if (py.PY_isTrue(py.evaluate(expr, evalContext))) {
-                classes += cssClass;
-            }
-        }
-        return classes;
-    },
+        return context;
+    }
 
-    _ganttBindEvents: function () {
-        var self = this;
-        // prevent ligthbox on double click
-        this.dhx_events.push(gantt.attachEvent("onTaskDblClick", function(id, e){
-            return false; // prevent lightbox to open
-        }));
-        // allow edit
-        this.dhx_events.push(gantt.attachEvent("onAfterTaskDrag", function(id, mode, e){
-            var row = self.dhx_gantt.getTask(id);
-            if (_.contains(['resize', 'move'], mode)) {
-                var startDate = moment(row.start_date);
-                var stopDate = moment(row.end_date);
-
-                if (self.useDateOnly) { // only the date should add the offset in order to be sure to be in the correct day
-                    startDate = startDate.add(startDate.utcOffset(), 'minutes')
-                    stopDate = stopDate.add(stopDate.utcOffset(), 'minutes');
-                }
-
-                self.trigger_up('update_task_dates', { // events must send only UTC dates
-                    'resId': row.id,
-                    'start': moment.utc(startDate),
-                    'stop': moment.utc(stopDate),
-                });
-                return false; // prevent lightbox to open
-            }
-            if (mode === 'progress') {
-                self.trigger_up('update_task_progress', {
-                    'resId': row.id,
-                    'progress': row.progress * 100,
-                });
-            }
-        }));
-    },
-
-    _ganttConfig: function() {
-        var self = this;
+    /**
+     * @private
+     * note: setup is static, the config should not depends on model. It is not reloaded.
+     */
+    _setUpDhxGantt() {
         // time format
-        if (this.useDateOnly) {  // date
-            this.dhx_gantt.config.xml_date = "%Y-%m-%d";
-            this.dhx_gantt.config.date_format = "%Y-%m-%d";
-            this.dhx_gantt.config.duration_unit = "day";
-            this.dhx_gantt.config.duration_step = 1;
-            this.dhx_gantt.config.server_utc = false;
+        const { weekStart } = localization;
+        this.dhxGantt.config.start_on_monday = weekStart === 1;
+        if (this.model.useDateOnly) {  // date
+            this.dhxGantt.config.xml_date = DHX_DATE_FORMAT;
+            this.dhxGantt.config.date_format = DHX_DATE_FORMAT;
+            this.dhxGantt.config.duration_unit = "day";
+            this.dhxGantt.config.duration_step = 1;
+            this.dhxGantt.config.server_utc = true;
         } else { // datetime
-            this.dhx_gantt.config.xml_date = "%Y-%m-%d %H:%i:%s";
-            this.dhx_gantt.config.date_format = "%Y-%m-%d %H:%i:%s";
-            this.dhx_gantt.config.duration_unit = "minute";
-            this.dhx_gantt.config.duration_step = 15;
-            this.dhx_gantt.config.server_utc = true; // make the gantt lib use UTC dates as input and output
+            this.dhxGantt.config.xml_date = DHX_DATETIME_FORMAT;
+            this.dhxGantt.config.date_format = DHX_DATETIME_FORMAT;
+            this.dhxGantt.config.duration_unit = "minute";
+            this.dhxGantt.config.duration_step = 15;
+            this.dhxGantt.config.server_utc = true; // make the gantt lib use UTC dates as input and output
         }
 
         // ui
-        this.dhx_gantt.config.scale_height = 75;
-        this.dhx_gantt.config.autosize = "y";
-        this.dhx_gantt.config.columns = [{
+        this.dhxGantt.config.scale_height = 75;
+        this.dhxGantt.config.autosize = "y";
+        const columns = [{
             name: "text",
-            label: _lt("Gantt View"),
+            label: this.model.metaData.archInfo.viewTitle,
             tree: true,
             width: '*',
             resize: true,
         }];
-        this.dhx_gantt.config.initial_scroll = false;
-        this.dhx_gantt.config.preserve_scroll = true;
-        this.dhx_gantt.config.show_progress = !!this.progressField;
-
-        // drag options
-        this.dhx_gantt.config.drag_resize = this.canEdit; // allow resize gantt task
-        this.dhx_gantt.config.drag_move = this.canEdit; // allow moving gantt task
-        this.dhx_gantt.config.drag_progress = !!this.progressField && this.canEdit && !this.fieldsInfo[this.progressField].readonly; // allow changing progress
-        this.dhx_gantt.config.drag_links = false;
-        if (this.canCreate || this.canPlan) {
-            this.dhx_gantt.config.click_drag = {
-                callback: _.bind(this._ganttDrag, this),
-                singleRow: true
-            };
+        if (!!this.progressField) {
+            columns.push({
+                name:"progress",
+                label: _t("Progress"),
+                align:"right",
+                template:function(obj){ return sprintf('%s %', Math.round(obj.progress * 1000) / 10)}
+            });
         }
-
-        // scales
-        this.dhx_gantt.config.start_on_monday = moment().startOf("week").day();
-        this.dhx_gantt.config.scales = this._ganttGetScales();
-        this.dhx_gantt.config.start_date = this.state.startDate;
-        this.dhx_gantt.config.end_date = this.state.stopDate;
+        this.dhxGantt.config.columns = columns;
+        this.dhxGantt.config.initial_scroll = false;
+        this.dhxGantt.config.preserve_scroll = true;
+        this.dhxGantt.config.show_progress = !!this.progressField;
 
         // templates
-        this.dhx_gantt.templates.timeline_cell_class = function(row, date){
+        var self = this;
+        this.dhxGantt.templates.timeline_cell_class = function(row, date){
             var classes = '';
             // style for today cell column
             var today = new Date();
-            if (self.state.scale !== "day" && date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getYear() === today.getYear()) {
+            if (self.model.metaData.scale.id !== "day" && date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getYear() === today.getYear()) {
                 classes += " o_today";
             }
             return classes;
         };
-        this.dhx_gantt.templates.progress_text = function(start, end, task){
-            if (self.dhx_gantt.config.show_progress) {
-                return _.str.sprintf('%s %%', Math.round(task.progress * 10) / 10);
-            }
-            return '';
-        };
-        this.dhx_gantt.templates.task_class = function(start, end, task){
-            var classes = _.str.sprintf('o_gantt_color_%s', task.color);
-            // decoration class
-            if (task.record_data){
-                classes += self._extractDecorationClasses(task.record_data);
-            }
-            // hide 'consolidate' group row
-            if (task.type === self.dhx_gantt.config.types.project) {
-                classes += ' o_hidden';
-            }
-            return classes;
-        };
-    },
+        this.dhxGantt.templates.task_class = this._dhxTaskClass.bind(this);
 
-    _ganttDrag: function(startPoint, endPoint, startDate, endDate, tasksBetweenDates, tasksInRow) {
-        var data;
-        var currentTask;
-        if (tasksInRow.length !== 0) {
-            var currentTask = tasksInRow[0];
-            data = currentTask.values;
+        // drag options
+        this.dhxGantt.config.drag_resize = this.canEdit; // allow resize gantt task
+        this.dhxGantt.config.drag_move = this.canEdit; // allow moving gantt task
+        this.dhxGantt.config.drag_links = false;
+        this.dhxGantt.config.drag_progress = !!this.progressField && this.canEdit && !this.model.fieldInfos[this.progressField].readonly; // allow changing progress
+        this.dhxGantt.config.multiselect = false;
+        if (this.canCreate) {
+            this.dhxGantt.config.click_drag = {
+                callback: this._dhxDrag.bind(this),
+                singleRow: true,
+            };
         }
 
-        this.trigger_up('drag_task', {
-            dates: [moment(this.dhx_gantt.roundDate(startDate)), moment(this.dhx_gantt.roundDate(endDate))],
-            values: data || {},
-        });
-        return false;
-    },
-
-    _ganttGetScales: function () {
-        var scaleMainFormat = {
-            day: "%D %d %M %Y",
-            week: "Week #%W",
-            month: "%F %Y",
-            year: "%Y",
-        };
-
-        var scale = this.state.scale;
-        var scaleInfo = this.cellPrecisions[this.state.scale];
-        var result = [{unit: scale, step: 1, format: scaleMainFormat[scale]}];
-        switch (scale) {
-            case "day":
-                if (scaleInfo.unit == 'hour') {
-                    switch (scaleInfo.precision) {
-                        case "full":
-                            result.push({unit: 'minute', step: 60, format: "%h %a"});
-                            break;
-                        case "half":
-                            result.push({unit: 'hour', step: 1, format: "%h %a"});
-                            result.push({unit: 'minute', step: 30, format: "%i"});
-                            break;
-                        case "quarter":
-                            result.push({unit: 'hour', step: 1, format: "%h %a"});
-                            result.push({unit: 'minute', step: 15, format: "%i"});
-                            break;
-                    }
-                }
-                break;
-            case "week":
-                if (scaleInfo.unit == 'day') {
-                    switch (scaleInfo.precision) {
-                        case "full":
-                            result.push({unit: 'hour', step: 24, format: "%D %d %M"});
-                            break;
-                        case "half":
-                            result.push({unit: 'hour', step: 12, format: "%h %a"});
-                            break;
-                    }
-                }
-                if (scaleInfo.unit == 'hour') {
-                    if (scaleInfo.precision == 'full') {
-                        result.push({unit: 'day', step: 1, format: "%D %d %M"});
-                        result.push({unit: 'hour', step: 1, format: "%h %a"});
-                    }
-                }
-                break;
-            case "month":
-                if (scaleInfo.unit == 'day') {
-                    switch (scaleInfo.precision) {
-                        case "full":
-                            result.push({unit: 'hour', step: 24, format: "%D %d"});
-                            break;
-                        case "half":
-                            result.push({unit: 'day', step: 1, format: "%D %d"});
-                            result.push({unit: 'hour', step: 12, format: "%d %M %A"});
-                            break;
-                    }
-                }
-                if (scaleInfo.unit == 'week') {
-                    if (scaleInfo.precision == 'full') {
-                        result.push({unit: 'day', step: 7, format: "Week %W"});
-                    }
-                }
-                break;
-            case "year":
-                if (scaleInfo.unit == 'week') {
-                    if (scaleInfo.precision == 'full') {
-                        result.push({unit: 'day', step: 7, format: "Week %W"});
-                    }
-                }
-                if (scaleInfo.unit == 'month') {
-                    if (scaleInfo.precision == 'full') {
-                        result.push({unit: 'month', step: 1, format: "%M %Y"});
-                    }
-                }
-                break;
-        }
-        return result;
-    },
-
-    _ganttGetTaskList: function () {
-        var tasks = this._ganttGenerateTask(this.state.rows);
-        return tasks;
-    },
-    _ganttGenerateTask: function (rows) {
-        var self = this;
-        var tasks = [];
-        rows.forEach(function(row) {
-            if (row.rows) {
-                tasks.push({
-                    id: row.id,
-                    text: row.name,
-                    type: gantt.config.types.project,
-                    open: true,
-                    parent: row.parentId,
-                    values: row.data,
-                    // dummy field to avoid "invalid dates" error. No pill will be displayed.
-                    start_date: time.datetime_to_str(self.state.focusDate.toDate()),
-                    duration: 0,
-                    record_data: false,
-                });
-                tasks = tasks.concat(self._ganttGenerateTask(row.rows));
-            } else {
-                (row.records || []).forEach(function(rec) {
-                    var startDate = rec[self.state.dateStartField];
-                    var stopDate = rec[self.state.dateStopField];
-
-                    tasks.push({
-                        id: rec.id,
-                        text: rec.display_name,
-                        start_date: GanttUtils.dateToServer(startDate, self.useDateOnly),
-                        duration: self.dhx_gantt.calculateDuration(startDate.toDate(), stopDate.toDate()),
-                        type: gantt.config.types.task,
-                        progress: rec[self.progressField] ? rec[self.progressField] / 100.0 : 0.0,
-                        parent: row.parentId,
-                        values: row.data,
-                        color: rec[self.colorField] || 0,
-                        record_data: rec,
-                    });
-                });
-            }
-        });
-        return tasks;
-    },
-    _ganttPopulate: function () {
-        this.dhx_gantt.clearAll();
-        var data = {'data': this._ganttGetTaskList(), 'links': []};
-        this.dhx_gantt.parse(data);
-    },
+        // mark as setup
+        this.dhxSetup = true;
+    }
 
     /**
      * @private
-     * @returns {Deferred}
+     * Transform `allowedScales` into DHX `zoom` config to initialize the extension.
+     * Note: setup is static, the config should not depends on model. It is not reloaded.
      */
-    _render: function () {
-        // horrible hack to make sure that something is in the dom with the required
-        // id. The problem is that the action manager renders the view in a document
-        // fragment.
-        var temp_div_with_id;
-        if (this.$div_with_id){
-            temp_div_with_id = this.$div_with_id;
+    _setUpDhxZoomScales() {
+        const zoomLevels = [];
+        for (const [scaleId, scaleInfo] of Object.entries(this.model.allowedScales)) {
+            const scales = [];
+            switch (scaleId) {
+                case "day":
+                    if (scaleInfo.cellUnit == 'hour') {
+                        scales.push({unit: 'hour', step: 24, format: "%D %d %M"});
+                        switch (scaleInfo.cellPrecision) {
+                            case "full":
+                                scales.push({unit: 'minute', step: 60, format: "%h %a"});
+                                break;
+                            case "half":
+                                scales.push({unit: 'hour', step: 1, format: "%h %a"});
+                                scales.push({unit: 'minute', step: 30, format: "%i"});
+                                break;
+                            case "quarter":
+                                scales.push({unit: 'hour', step: 1, format: "%h %a"});
+                                scales.push({unit: 'minute', step: 15, format: "%i"});
+                                break;
+                        }
+                    }
+                    break;
+                case "week":
+                    if (scaleInfo.cellUnit == 'day') {
+                        switch (scaleInfo.cellPrecision) {
+                            case "full":
+                                scales.push({unit: 'hour', step: 24, format: "%D %d %M"});
+                                break;
+                            case "half":
+                                scales.push({unit: 'day', step: 1, format: "%D %d %M"});
+                                scales.push({unit: 'hour', step: 12, format: "%h %a"});
+                                break;
+                        }
+                    }
+                    if (scaleInfo.cellUnit == 'hour') {
+                        if (scaleInfo.cellPrecision == 'full') {
+                            scales.push({unit: 'day', step: 1, format: "%D %d %M"});
+                            scales.push({unit: 'hour', step: 1, format: "%h %a"});
+                        }
+                    }
+                    break;
+                case "month":
+                    if (scaleInfo.cellUnit == 'day') {
+                        switch (scaleInfo.cellPrecision) {
+                            case "full":
+                                scales.push({unit: 'hour', step: 24, format: "%D %d"});
+                                break;
+                            case "half":
+                                scales.push({unit: 'day', step: 1, format: "%D %d"});
+                                scales.push({unit: 'hour', step: 12, format: "%d %M %A"});
+                                break;
+                        }
+                    }
+                    if (scaleInfo.cellUnit == 'week') {
+                        if (scaleInfo.cellPrecision == 'full') {
+                            scales.push({unit: 'day', step: 7, format: "Week %W"});
+                        }
+                    }
+                    break;
+                case "year":
+                    if (scaleInfo.cellUnit == 'week') {
+                        if (scaleInfo.cellPrecision == 'full') {
+                            scales.push({unit: 'day', step: 7, format: "Week %W"});
+                        }
+                    }
+                    if (scaleInfo.cellUnit == 'month') {
+                        if (scaleInfo.cellPrecision == 'full') {
+                            scales.push({unit: 'month', step: 1, format: "%M %Y"});
+                        }
+                    }
+                    break;
+            }
+            zoomLevels.push({
+                name: scaleId,
+                scales:scales,
+            });
         }
-        var $container = $(QWeb.render('GanttView', {widget: this}));
-        this.$div_with_id = $container.find('#' + this.dhx_id);
-        this.$div_with_id.wrap('<div class="container-fluid p-0"></div>');
-        this.$div = $container;
-        this.$div.prependTo(document.body);
 
-        // Initialize the gantt chart
-        while (this.dhx_events.length) {
-            this.dhx_gantt.detachEvent(this.dhx_events.pop());
+        this.dhxGantt.ext.zoom.init({
+            levels: zoomLevels
+        });
+    }
+
+    _dhxDrag(startPoint, endPoint, startDate, endDate, tasksBetweenDates, tasksInRow) {
+        const serializerFunc = this.useDateOnly ? serializeDate : serializeDateTime;
+        let context = {};
+        if (tasksInRow.length !== 0) {
+            const task = tasksInRow[0];
+            context = tasksInRow[0].context;
+
+            const startDateStr = serializerFunc(DateTime.fromJSDate(this.dhxGantt.roundDate(startDate)));
+            const endDateStr = serializerFunc(DateTime.fromJSDate(this.dhxGantt.roundDate(endDate)));
+
+            context[sprintf('default_%s', this.model.dateStartField)] = startDateStr;
+            context[sprintf('default_%s', this.model.dateStopField)] = endDateStr;
+
+            this.props.openDialog({context: context});
+        }
+    }
+
+    _dhxOnAfterTaskDrag(id, mode, e){
+        const serializerFunc = this.useDateOnly ? serializeDate : serializeDateTime;
+        const modes = this.dhxGantt.config.drag_mode;
+        const task = this.dhxGantt.getTask(id);
+
+        switch (mode) {
+            case modes.move:
+            case modes.resize:
+                const startDate = serializerFunc(DateTime.fromJSDate(task.start_date));
+                const endDate = serializerFunc(DateTime.fromJSDate(task.end_date));
+                this.model.reschedule(task.record.id, startDate, endDate);
+                break;
+            case modes.progress:
+                this.model.updateProgress(task.record.id, Math.round(task.progress * 1000 / 10));
+                break;
+        }
+    }
+
+    _dhxOnTaskClick(id, e){
+        // since `click_drag` also trigger a click event, we arrive here when releasing the dragging
+        // but we want to prevent to open form view of concerned task. This condition filters those
+        // events.
+        if (e.srcElement.classList.contains("gantt_task_row")) {
+            return false;
         }
 
-        this._ganttConfig();
-        this._ganttBindEvents();
-        this.dhx_gantt.init(this.dhx_id);
-        this._ganttPopulate();
-
-        // End of horrible hack
-        var scroll_state = this.dhx_gantt.getScrollState();
-        this.$el.empty();
-        this.$el.append(this.$div.contents());
-        this.dhx_gantt.scrollTo(scroll_state.x, scroll_state.y);
-        this.$div.remove();
-        if (temp_div_with_id) {
-            temp_div_with_id.remove();
+        const task = this.dhxGantt.getTask(id);
+        if (task.record) {
+            this.props.openDialog({resId: task.record.id});
         }
-        return $.when();
-    },
+    }
 
-    //--------------------------------------------------------------------------
-    // Handler
-    //--------------------------------------------------------------------------
+    _dhxTaskClass(start, end, task){
+        let classes = [];
+        if (task.type == gantt.config.types.project) { // hide 'consolidate' group row
+           classes.push("o_hidden");
+        } else {
+            const colorCode = task.color || 0;
+            classes.push(sprintf("o_gantt_color_%s", colorCode));
 
-    _onTaskClick: _.debounce(function (ev) {
-        ev.preventDefault();
-        var taskId = $(ev.currentTarget).attr("task_id");
-        this.trigger_up('open_task', {resId: parseInt(taskId)});
-        return false;
-    }, 500, true),
-});
+            const evalContext = task.evalContext;
+            for (const [decoration, expr] of Object.entries(this.decorationMap || {})) {
+                const tokenExpr = py.parse(py.tokenize(expr));
+                if (py.PY_isTrue(py.evaluate(tokenExpr, evalContext))) {
+                    classes.push(decoration.replace('decoration-', 'o_gantt_decoration_'));
+                }
+            }
+        }
+        return classes.join(" ");
+    }
 
-});
+}
+
+GanttRenderer.template = "web_gantt.GanttRenderer";

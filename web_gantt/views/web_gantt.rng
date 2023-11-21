@@ -1,0 +1,55 @@
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    xmlns:rng="http://relaxng.org/ns/structure/1.0">
+    <define name="gantt">
+        <element name="gantt">
+            <attribute name="string"/>
+            <attribute name="date_start"/>
+            <attribute name="date_stop"/>
+            <attribute name="default_group_by"/>
+            <attribute name="default_order_by"/>
+            <attribute name="scales"/>
+            <attribute name="default_scale"/>
+            <attribute name="precision"/>
+            <optional>
+                <attribute name="class"/>
+            </optional>
+            <optional>
+                <attribute name="js_class"/>
+            </optional>
+            <optional>
+                <attribute name="color"/>
+            </optional>
+            <optional>
+                <attribute name="limit"/>
+            </optional>
+            <optional>
+                <attribute name="progress"/>
+            </optional>
+
+            <rng:optional><rng:attribute name="decoration-danger"/></rng:optional>
+            <rng:optional><rng:attribute name="decoration-info"/></rng:optional>
+            <rng:optional><rng:attribute name="decoration-secondary"/></rng:optional>
+            <rng:optional><rng:attribute name="decoration-success"/></rng:optional>
+            <rng:optional><rng:attribute name="decoration-warning"/></rng:optional>
+
+            <zeroOrMore>
+                <optional>
+                    <ref name="field"/>
+                </optional>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="field">
+        <element name="field">
+            <attribute name="name"/>
+            <optional>
+                <attribute name="string"/>
+            </optional>
+        </element>
+    </define>
+
+    <start>
+        <ref name="gantt"/>
+    </start>
+</grammar>
