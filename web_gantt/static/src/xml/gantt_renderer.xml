@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="web_gantt.GanttRenderer" owl="1">
+        <div class="container-fluid p-0 o_gantt_view" t-ref="container">
+            <div id="gantt_wrapper" class="o_gantt_view_dhx" style="height:100%;"/>
+        </div>
+    </t>
+
+</templates>

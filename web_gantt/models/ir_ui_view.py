@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+import json
+from lxml import etree
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.tools.view_validation import get_variable_names
 
 
 class View(models.Model):
@@ -8,23 +11,21 @@ class View(models.Model):
 
     type = fields.Selection(selection_add=[('gantt', "Gantt")], ondelete={'gantt': 'cascade'})
 
-    # def _postprocess_access_rights(self, model, node):
-    #     super(View, self)._postprocess_access_rights(model, node)
+    def _validate_tag_gantt(self, node, name_manager, node_info):
+        field_names = []
+        for child in node.iterchildren(tag=etree.Element):
+            if child.tag == 'field':
+                field_names.append(child.get('name'))
 
-    #     Model = self.env[model]
-    #     is_base_model = self.env.context.get('base_model_name', model) == model
+        for attr, expr in node.items():
+            if attr == 'precision':
+                try:
+                    dummy = json.loads(expr.replace("'", '"'))
+                except Exception as exc:
+                    self._raise_view_error("'precision' must be a JSON dict.", node=node, from_exception=exc)
 
-    #     if node.tag == 'gantt':
-    #         for action, operation in (('create', 'create'), ('delete', 'unlink'), ('edit', 'write')):
-    #             if (not node.get(action) and
-    #                     not Model.check_access_rights(operation, raise_exception=False) or
-    #                     not self._context.get(action, True) and is_base_model):
-    #                 node.set(action, 'false')
-
-    #     return node
-
-
-class ActWindowView(models.Model):
-    _inherit = 'ir.actions.act_window.view'
-
-    view_mode = fields.Selection(selection_add=[('gantt', "Gantt")], ondelete={'gantt': 'cascade'})
+            # inspired from base/models/ir_ui_view.py L1810
+            if attr.startswith('decoration-'):
+                vnames = get_variable_names(expr)
+                if vnames:
+                    name_manager.must_have_fields(node, vnames, f"{attr}={expr}")
