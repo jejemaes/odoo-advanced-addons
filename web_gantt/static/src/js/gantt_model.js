@@ -1,339 +1,455 @@
-odoo.define('web_gantt.GanttModel', function (require) {
-"use strict";
+/** @odoo-module */
 
-var AbstractModel = require('web.AbstractModel');
-var concurrency = require('web.concurrency');
-var session = require('web.session');
-var GanttUtils = require('web_gantt.GanttUtils');
-var core = require('web.core');
+import { deserializeDate, deserializeDateTime, formatDateTime, serializeDate, serializeDateTime } from "@web/core/l10n/dates";
+import { Domain } from "@web/core/domain";
+import { localization } from "@web/core/l10n/localization";
+import { _t } from "@web/core/l10n/translation";
+import { registry } from "@web/core/registry";
+import { x2ManyCommands } from "@web/core/orm_service";
+import { unique } from "@web/core/utils/arrays";
+import { KeepLast, Mutex } from "@web/core/utils/concurrency";
+import { sprintf } from "@web/core/utils/strings";
+import { Model } from "@web/views/model";
 
-var _t = core._t;
+const { DateTime, Settings } = luxon;
 
 
-return AbstractModel.extend({
+import { status, useComponent, useEffect, useRef, onWillDestroy } from "@odoo/owl";
+/**
+ * Returns start and end dates of the given scale (included), in local timezone.
+ *
+ * @param {ScaleId} scale
+ * @param {DateTime} date DateTime object, in local timezone
+ */
+const computeRange = function(scale, date) {
+    let start = date;
+    let end = date;
 
-    /**
-     * @override
-     */
-    init: function () {
-        this._super.apply(this, arguments);
-        this.gantt = null;
+    if (scale === "week") {
+        // startOf("week") does not depend on locale and will always give the
+        // "Monday" of the week... (ISO standard)
+        const { weekStart } = localization;
+        const weekday = start.weekday < weekStart ? weekStart - 7 : weekStart;
+        start = start.set({ weekday }).startOf("day");
+        end = start.plus({ weeks: 1, days: -1 }).endOf("day");
+    } else {
+        start = start.startOf(scale);
+        end = end.endOf(scale);
+    }
 
-        this.dp = new concurrency.DropPrevious();
-        this.mutex = new concurrency.Mutex();
-        this._ganttInfo = {};
-        this._ganttRows = {}; // map row id --> row object (see generateRows)
-        this.useDateOnly = null;
-    },
+    return { start, end };
+}
 
-    //--------------------------------------------------------------------------
-    // Public
-    //--------------------------------------------------------------------------
 
-    /**
-     * @override
-     * @returns {Object}
-     */
-    get: function () {
-        return _.extend({}, this._ganttInfo);
-    },
-    getRowContext: function (rowId) {
-        var row = this._ganttRows[rowId];
-        if (row) {
-            return row.context;
+export class GanttModel extends Model {
+    setup(params, services) {
+        this.dateStartField = params.archInfo.dateStartField;
+        this.dateStopField = params.archInfo.dateStopField;
+        this.colorField = params.archInfo.colorField;
+        this.progressField = params.archInfo.progressField;
+
+        this.initialGroupBy = params.archInfo.defaultGroupBy;
+        this.initialOrderBy = params.archInfo.defaultOrderBy;
+        this.initialScaleId = params.archInfo.defaultScale;
+
+        this.allowedScales = params.archInfo.scales || {};
+        this.groupLimit = params.archInfo.limit || 80;
+
+        this.fieldInfos = params.fields;
+        this.fieldsToFetch = params.archInfo.fieldNames;
+
+        this.metaData = params;
+        this.data = null;
+        this.searchParams = null;
+
+        /** @type {Data} */
+        this.groupTree = [];
+        this.recordMap = {};
+
+        // concurrency management
+        this.keepLast = new KeepLast();
+        this.mutex = new Mutex();
+    }
+
+    async load(params = {}) {
+        if(!this.metaData.focusDate) {
+            this.metaData.focusDate = params.context && params.context.initial_date
+                ? deserializeDateTime(params.context.initial_date)
+                : luxon.DateTime.local();
         }
-        return {};
-    },
+        if(!this.metaData.groupBy) {
+            this.metaData.groupBy = this.initialGroupBy;
+        }
+        if(!this.metaData.scale) {
+            this.metaData.scale = this.allowedScales[this.initialScaleId];
+            params.scaleId = this.metaData.scale.id; // trigger the compute range
+        }
+        if(!this.metaData.pagerOffset) {
+            this.metaData.pagerOffset = 0;
+        }
+
+        const metaData = this._buildMetaData(params);
+        await this.keepLast.add(this._loadData(metaData));
+
+        this.metaData = metaData;
+        this.notify();
+    }
+
     /**
-     * Load gantt data
+     * Reschedule a task to the given schedule.
      *
-     * @param {Object} params
-     * @returns {Deferred<any>}
+     * @param {number | number[]} ids
+     * @param {String} startDate: server format date
+     * @param {String} stopDate: server format date
+     * @param {(result: any) => any} [callback]
      */
-    load: function (params) {
-        this.modelName = params.modelName;
-        this.fields = params.fields;
-        this.domain = params.domain;
-        this.context = params.context;
-        this.colorField = params.colorField;
-        this.progressField = params.progressField;
-        this.decorationFields = params.decorationFields;
-        this.useDateOnly = params.useDateOnly;
-        // this.displayUnavailability = params.displayUnavailability;
-
-        this.defaultGroupBy = params.defaultGroupBy ? [params.defaultGroupBy] : [];
-        if (!params.groupedBy || !params.groupedBy.length) {
-            params.groupedBy = this.defaultGroupBy;
-        }
-
-        this._ganttInfo = {
-            dateStartField: params.dateStartField,
-            dateStopField: params.dateStopField,
-            groupedBy: params.groupedBy,
-            fields: params.fields,
-        };
-        this._ganttRows = {};
-
-        this._setFocusDate(params.initialDate, params.scale);
-        return this._fetchGanttData();
-    },
-    /**
-     * Update dates of given tasks
-     * @param {Object} schedule
-     */
-    reschedule: function (ids, schedule) {
-        var self = this;
-        if (!_.isArray(ids)) {
+    async reschedule(ids, startDate, stopDate, callback) {
+        if (!Array.isArray(ids)) {
             ids = [ids];
         }
+        const data = {};
+        data[this.dateStartField] = startDate;
+        data[this.dateStopField] = stopDate;
 
-        var allowedFields = [
-            this._ganttInfo.dateStartField,
-            this._ganttInfo.dateStopField,
-        ];
-
-        var data = _.pick(schedule, allowedFields);
-        Object.keys(data).forEach(function(key) {
-            data[key] = GanttUtils.dateToServer(data[key], self.useDateOnly);
+        const context = this.metaData.context;
+        return this.mutex.exec(async () => {
+            try {
+                const result = await this.orm.write(this.metaData.resModel, ids, data, {
+                    context,
+                });
+            } finally {
+                await this.load();
+            }
         });
+    }
 
-        return this.mutex.exec(function () {
-            return self._rpc({
-                model: self.modelName,
-                method: 'write',
-                args: [ids, data],
-                context: self.context,
-            });
+    async updateProgress(ids, progress) {
+        if (!Array.isArray(ids)) {
+            ids = [ids];
+        }
+        const data = {};
+        data[this.progressField] = progress;
+
+        const context = this.metaData.context;
+        return this.mutex.exec(async () => {
+            try {
+                const result = await this.orm.write(this.metaData.resModel, ids, data, {
+                    context,
+                });
+            } finally {
+                await this.load();
+            }
         });
-    },
+    }
+
+    get useDateOnly() {
+        return this.fieldInfos[this.dateStartField].type == 'date';
+    }
+
+    //-------------------------------------------------------------------------
+    // Private
+    //-------------------------------------------------------------------------
+
     /**
-     * Same as 'load'
-     *
-     * @returns {Deferred<any>}
+     * @private
+     * @param {Object} params
+     * @param {string[]} [params.groupBy]
+     * @param {Array} [params.domain]
+     * @param {Object} [params.context]
+     * @param {DateTime} [params.focusDate]
+     * @param {ScaleId} [params.scaleId]
+     * @returns {metaData}
      */
-    reload: function (handle, params) {
-        if ('scale' in params) {
-            this._setFocusDate(this._ganttInfo.focusDate, params.scale);
-        }
-        if ('date' in params) {
-            this._setFocusDate(params.date, this._ganttInfo.scale);
-        }
-        if ('domain' in params) {
-            this.domain = params.domain;
-        }
-        if ('groupBy' in params) {
+    _buildMetaData(params = {}) {
+        const metaData = Object.assign({}, this.metaData, params);
+
+        // Search View
+        if (params.groupBy) {
             if (params.groupBy && params.groupBy.length) {
-                this._ganttInfo.groupedBy = params.groupBy.filter(
+                metaData.groupBy = params.groupBy.filter(
                     groupedByField => {
                         var fieldName = groupedByField.split(':')[0]
-                        return fieldName in this.fields && this.fields[fieldName].type.indexOf('date') === -1;
+                        return fieldName in metaData.fields && metaData.fields[fieldName].type.indexOf('date') === -1;
                     }
                 );
-                if(this._ganttInfo.groupedBy.length !== params.groupBy.length){
+                if(metaData.groupBy.length !== params.groupBy.length){
                     this.do_warn(_t('Invalid group by'), _t('Grouping by date is not supported, ignoring it'));
                 }
             } else {
-                this._ganttInfo.groupedBy = this.defaultGroupBy;
+                metaData.groupBy = this.initialGroupBy;
             }
         }
-        return this._fetchGanttData();
-    },
-    /**
-     * @param {Moment} focusDate
-     */
-    setFocusDate: function (focusDate) {
-        this._setFocusDate(focusDate, this._ganttInfo.scale);
-    },
-    /**
-     * @param {string} scale
-     */
-    setScale: function (scale) {
-        this._setFocusDate(this._ganttInfo.focusDate, scale);
-    },
-    /**
-     * Save the progress (percentage) field value for the given ids
-     *
-     * @param {array} ids
-     * @param {float} progress
-     */
-    changeProgress: function (ids, progress) {
-        if (!_.isArray(ids)) {
-            ids = [ids];
-        }
-        var values = {};
-        values[this.progressField] = Math.round(progress * 10) / 10;
-        return this._rpc({
-            model: this.modelName,
-            method: 'write',
-            args: [ids, values],
-            context: this.context,
-        });
-    },
 
-    //--------------------------------------------------------------------------
-    // Private
-    //--------------------------------------------------------------------------
+        // Gantt Time Scale
+        let recomputeRange = false;
+        if (params.scaleId) {
+            metaData.scale = this.allowedScales[params.scaleId];
+            recomputeRange = true;
+        }
+        if (params.focusDate) {
+            metaData.focusDate = params.focusDate;
+            recomputeRange = true;
+        }
+
+        if (recomputeRange) {
+            const { start, end } = computeRange(metaData.scale.id, metaData.focusDate);
+            metaData.startDate = start;
+            metaData.stopDate = end;
+        }
+
+        // Reset Offset
+        const resetOffset = Object.keys(params).some(k => k in ['groupBy', 'scaleId', 'focusDate', 'domain']);
+        if (resetOffset) {
+            metaData.pagerOffset = 0;
+        }
+        return metaData;
+    }
+
+    /**
+     * @private
+     * @returns {Deferred<any>}
+     */
+    async _fetchGanttData (metaData) {
+        const { groupBy, pagerOffset, resModel } = metaData;
+        const context = {
+            ...metaData.context || {},
+            group_by: groupBy,
+        };
+        const domain = this._getDomain(metaData);
+        const fields = this._getFields(metaData);
+
+        const { length, groups, records } = await this.orm.call(resModel, "gantt_read", [], {
+                domain,
+                fields: fields,
+                groupby: groupBy,
+                offset: pagerOffset,
+                limit: this.groupLimit,
+                orderby: this.initialOrderBy || null,
+                context,
+            })
+        ;
+        return { length, groups, records };
+    }
+
+
+    /**
+     * Return a Tree of group hierachy based on the group by path.
+     * @param {string[]} groupedBy: list of group by field names
+     * @param {object[]} groups: group data from the server
+     * @param {string} parentGroupId: Identifier of the parent group
+     * @param {Object} parentDefaultContext: context containing the default value for record created in this group.
+     */
+    _generateTreeGroup(groupedBy, groups, parentGroupId, parentDefaultContext){
+        let nodes = [];
+
+        if (groupedBy.length) {
+            const headGroupBy = groupedBy[0];
+            const tailGroupBy = groupedBy.slice(1);
+
+            const currentLevelGroups = _.groupBy(groups, headGroupBy);
+
+            for (const [groupBy, subGroups] of Object.entries(currentLevelGroups)) {
+                const headGroupValue = subGroups[0][headGroupBy]; // we are sure there is at least one elem otherwise the group wouldn't exist.
+                // context with default value coming from the group
+                let defaultContext = {};
+                if (parentDefaultContext){
+                    defaultContext = parentDefaultContext;
+                }
+                defaultContext[sprintf("default_%s", headGroupBy)] = this._normalizeContextValue(headGroupBy, headGroupValue);
+                // group record IDs
+                const recordIds = [];
+                for (const g of subGroups) {
+                    recordIds.push(...(g.__record_ids || []));
+                }
+                // row struct
+                const groupId = _.uniqueId('group');
+                const node = {
+                    groupId,
+                    parentGroupId,
+                    name: this._getGroupName(headGroupBy, headGroupValue),
+                    recordIds,
+                    childNodes: this._generateTreeGroup(tailGroupBy, subGroups, groupId, {...defaultContext}),
+                    isGroup: true,
+                    context: {...defaultContext},
+                }
+                nodes.push(node);
+            }
+        } else {
+            // group record IDs
+            const recordIds = [];
+            for (const g of groups) {
+                recordIds.push(...(g.__record_ids || []));
+            }
+            // row struct
+            const groupId = _.uniqueId('group');
+            const node = {
+                groupId,
+                parentGroupId,
+                name: null,
+                recordIds,
+                childNodes: null,
+                isGroup: false,
+                context: {...parentDefaultContext},
+            }
+            nodes = [node];
+        }
+
+        return nodes;
+    }
+
 
     /**
      * Get domain of records to display in the gantt view.
      *
      * @private
+     * @param {metaData} metaData
      * @returns {Array[]}
      */
-    _getDomain: function () {
-        var domain = [
-            [this._ganttInfo.dateStartField, '<=', GanttUtils.dateToServer(this._ganttInfo.stopDate, this.useDateOnly)],
-            [this._ganttInfo.dateStopField, '>=', GanttUtils.dateToServer(this._ganttInfo.startDate, this.useDateOnly)],
+    _getDomain(metaData) {
+        const serializerFunc = this.useDateOnly ? serializeDate : serializeDateTime;
+        const baseDomain = metaData.domain || [];
+        const gantDomain = [
+            "&",
+            [this.dateStartField, '<=', serializerFunc(metaData.stopDate)],
+            [this.dateStopField, '>=', serializerFunc(metaData.startDate)],
         ];
-        return this.domain.concat(domain);
-    },
+        return Domain.and([baseDomain, gantDomain]).toList();
+    }
+
     /**
      * Get all the fields needed.
      *
      * @private
      * @returns {string[]}
      */
-    _getFields: function () {
-        var fields = ['display_name', this._ganttInfo.dateStartField, this._ganttInfo.dateStopField];
-        fields = fields.concat(this._ganttInfo.groupedBy, this.decorationFields || []);
-        if (this.progressField) {
-            fields.push(this.progressField);
-        }
+    _getFields() {
+        let fields = ['display_name', this.dateStartField, this.dateStopField];
+        fields = fields.concat(this.metaData.groupBy);
+
         if (this.colorField) {
             fields.push(this.colorField);
         }
-        return _.uniq(fields);
-    },
-    /**
-     * @private
-     * @returns {Deferred<any>}
-     */
-    _fetchGanttData: function () {
-        var self = this;
-        var domain = this._getDomain();
-        var context = _.extend(this.context, {'group_by': this._ganttInfo.groupedBy});
-
-        var groupsDef;
-        if (this._ganttInfo.groupedBy.length) {
-            groupsDef = this._rpc({
-                model: this.modelName,
-                method: 'read_group',
-                fields: this._getFields(),
-                domain: domain,
-                context: context,
-                groupBy: this._ganttInfo.groupedBy,
-                lazy: this._ganttInfo.groupedBy.length === 1,
-            });
+        if (this.progressField) {
+            fields.push(this.progressField);
         }
+        if (this.fieldsToFetch){
+            fields = fields.concat(this.fieldsToFetch);
+        }
+        return unique(fields);
+    }
 
-        var dataDef = this._rpc({
-            route: '/web/dataset/search_read',
-            model: this.modelName,
-            fields: this._getFields(),
-            context: context,
-            domain: domain,
-        });
+    _getGroupName(fieldName, value) {
+        const field = this.fieldInfos[fieldName];
+        if (field.type === "boolean") {
+            return value ? "True" : "False";
+        } else if (!value) {
+            return _t("Undefined %s", field.string);
+        } else if (field.type === "many2many") {
+            return value[1];
+        }
+        const formatter = registry.category("formatters").get(field.type);
+        return formatter(value, field);
+    }
 
-        return this.dp.add(Promise.all([groupsDef, dataDef])).then(function (results) {
-            var groups = results[0];
-            var searchReadResult = results[1];
+    async _loadData(metaData){
+        const { length, groups, records } = await this._fetchGanttData(metaData);
 
-            var records = self._parseServerData(searchReadResult.records);
-            self._ganttInfo.data = records;
-            self._ganttInfo.rows = self._generateRows(self._ganttInfo.groupedBy, groups, records);
-        });
-    },
+        const parsedRecords = this._parseServerData(metaData, records);
+        const recordMap = {};
+        for (const record of parsedRecords) {
+            recordMap[record.id] = record;
+        }
+        this.recordMap = recordMap;
+        this.groupTree = this._generateTreeGroup(metaData.groupBy, groups, null, metaData.context);  // requires the action context
+    }
 
-    _generateRows: function (groupedBy, groups, records, parentParams) {
-        var self = this;
-        var rows = [];
-
-        var parentParams = parentParams || {};
-        var parentRowId = parentParams.rowId;
-        var parentValues = parentParams.data;
-
-        if (groupedBy.length) {
-            var currentGroupedByField = groupedBy[0];
-            var currentLevelGroups = _.groupBy(groups, currentGroupedByField);
-
-            Object.keys(currentLevelGroups).forEach(function(groupValue) {
-                var subGroups = currentLevelGroups[groupValue];
-                var groupValue = subGroups[0][currentGroupedByField];
-
-                var groupRecords = _.filter(records, function (record) {
-                    return _.isEqual(record[currentGroupedByField], groupValue);
-                });
-
-                // For empty groups, we can't look at the record to get the
-                // formatted value of the field, we have to trust expand_groups
-                var value;
-                if (groupRecords.length) {
-                    value = groupRecords[0][currentGroupedByField];
-                } else {
-                    value = groupValue;
+    _normalizeContextValue(fieldName, value) {
+        const fieldInfo = this.fieldInfos[fieldName];
+        switch (fieldInfo.type) {
+            case "many2one":
+                if (value){
+                    value = value[0];
                 }
+                break;
+            case "many2many": // this is the same as M2O
+                if (value) {
+                    return [[6, 0, [value[0]]]];
+                }
+                break;
+            default:
+                // keep given value
+            }
+        return value;
+    }
 
-                // value of the group row (used as default value later)
-                var data = parentValues ? _.clone(parentValues) : {};
-                data[currentGroupedByField] = _.isArray(value) ? value[0] : value;
-
-                var rowId = _.uniqueId('row');
-                var row = {
-                    id: rowId,
-                    parentId: parentRowId,
-                    name: GanttUtils.formatFieldValue(value, self.fields[currentGroupedByField]),
-                    groupedBy: groupedBy,
-                    groupedByField: currentGroupedByField,
-                    resId: _.isArray(value) ? value[0] : value,
-                    rows: self._generateRows(groupedBy.slice(1), subGroups, groupRecords,{'rowId': rowId, 'data': data}),
-                    data: data,
-                };
-                self._ganttRows[rowId] = row;
-
-                rows.push(row);
-            });
-        } else {
-            var rowId = _.uniqueId('row');
-            var row = {
-                id: rowId,
-                parentId: parentRowId,
-                records: records,
-                data: parentValues,
-            };
-            rows = [row];
-            self._ganttRows[rowId] = row;
+    /**
+     * @private
+     * @param {MetaData} metaData
+     * @param {Record<string, any>[]} records the server records to parse
+     * @returns {Record<string, any>[]}
+     */
+    _parseServerData(metaData, records) {
+        const {
+            startDate,
+            stopDate,
+            fields,
+        } = metaData;
+        /** @type {Record<string, any>[]} */
+        const parsedRecords = [];
+        for (const record of records) {
+            const parsedRecord = this._parseServerValues(metaData.fields, record);
+            const dateStart = parsedRecord[this.dateStartField];
+            const dateStop = parsedRecord[this.dateStopField];
+            if (dateStart <= dateStop) {
+                parsedRecords.push(parsedRecord);
+            }
         }
-        return rows;
-    },
-    /**
-     * Parse in place the server values (and in particular, convert datetime
-     * field values to moment in UTC).
-     *
-     * @private
-     * @param {Object} data the server data to parse
-     * @returns {Promise<any>}
-     */
-    _parseServerData: function (data) {
-        var self = this;
+        return parsedRecords;
+    }
 
-        data.forEach(function (record) {
-            Object.keys(record).forEach(function (fieldName) {
-                record[fieldName] = self._parseServerValue(self.fields[fieldName], record[fieldName]);
-            });
-        });
-        return data;
-    },
     /**
      * @private
-     * @param {any} focusDate
-     * @param {string} scale
+     * @param {fieldInfos} fields
+     * @param {Record<string, any>[]} values:  server records to parse
+     * @returns {Record<string, any>[]}
      */
-    _setFocusDate: function (focusDate, scale) {
-        this._ganttInfo.scale = scale;
-        this._ganttInfo.focusDate = focusDate;
-        this._ganttInfo.startDate = focusDate.clone().startOf(scale);
-        this._ganttInfo.stopDate = focusDate.clone().endOf(scale);
-    },
-});
+    _parseServerValues(fields, values) {
+        const parsedValues = {};
+        if (!values) {
+            return parsedValues;
+        }
+        for (const fieldName in values) {
+            const field = fields[fieldName];
+            const value = values[fieldName];
+            switch (field.type) {
+                case "date": {
+                    parsedValues[fieldName] = value ? deserializeDate(value) : false;
+                    break;
+                }
+                case "datetime": {
+                    parsedValues[fieldName] = value ? deserializeDateTime(value) : false;
+                    break;
+                }
+                case "selection": {
+                    if (value === false) {
+                        // process selection: convert false to 0, if 0 is a valid key
+                        const hasKey0 = field.selection.some((option) => option[0] === 0);
+                        parsedValues[fieldName] = hasKey0 ? 0 : value;
+                    } else {
+                        parsedValues[fieldName] = value;
+                    }
+                    break;
+                }
+                /*case "many2one": {
+                    parsedValues[fieldName] = value ? [value.id, value.display_name] : false;
+                    break;
+                }*/
+                default: {
+                    parsedValues[fieldName] = value;
+                }
+            }
+        }
+        return parsedValues;
+    }
 
-});
+}
