@@ -27,8 +27,12 @@
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="arch" type="xml">
             <field name="date_last_stage_update" position="after">
-                <field name="planned_start_date" attrs="{'required': [('planned_stop_date', '!=', False)]}"/>
-                <field name="planned_stop_date" attrs="{'required': [('planned_start_date', '!=', False)]}"/>
+                <label for="planned_start_date" string="Planned Date"/>
+                <div class="o_row">
+                    <field name="planned_start_date" widget="daterange" nolabel="1" class="oe_inline" options="{'related_end_date': 'date_deadline'}"/>
+                    <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>
+                    <field name="date_deadline" widget="daterange" nolabel="1" class="oe_inline" options="{'related_start_date': 'planned_start_date'}" attrs="{'required': [('planned_start_date', '!=', False)]}"/>
+                </div>
             </field>
         </field>
     </record>
@@ -42,11 +46,12 @@
                 type="planning"
                 string="Schedule"
                 date_start="planned_start_date"
-                date_stop="planned_stop_date"
-                scales="day,week,month,year"
-                precision="{'day': 'hour:half', 'week': 'day:full', 'month': 'day:full', 'year': 'month:full'}"
+                date_stop="date_deadline"
+                scales="week,month,year"
+                precision="{'week': 'day:full', 'month': 'day:full', 'year': 'month:full'}"
                 default_scale="month"
-                default_group_by="user_id"/>
+                default_group_by="user_ids"
+                color="color"/>
         </field>
     </record>
 
