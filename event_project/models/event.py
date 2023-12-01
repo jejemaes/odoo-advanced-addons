@@ -80,7 +80,7 @@ class EventType(models.Model):
 class EventEvent(models.Model):
     _inherit = 'event.event'
 
-    project_id = fields.Many2one('project.project', string="Project")
+    project_id = fields.Many2one('project.project', string="Project", domain=[('privacy_visibility', '=', 'employees')])
 
     @api.onchange('analytic_account_id')
     def _onchange_analytic_accound_id_project(self):
@@ -181,6 +181,7 @@ class EventEvent(models.Model):
             'active': True,
             'company_id': self.company_id.id,
             'description': self.note,
+            'privacy_visibility': "employees", # visible for everybody by default
         }
 
 
