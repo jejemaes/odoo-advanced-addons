@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': "Document in Event",
+    'name': "Event Document",
     'summary': "Document Management System, in Events",
     'description': """
         Upload, manage and share your Documents related to Events

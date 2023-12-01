@@ -11,14 +11,14 @@
         <field name="priority">20</field>
         <field name="arch" type="xml">
             <xpath expr="//notebook/page[@name='advanced_settings']/group[@name='advanced_settings_general']" position="inside">
-                <group string="Documents">
+                <group string="Documents" groups="event_document.group_document_specific_event">
                     <field name="document_folder_id"/>
                     <field name="document_tag_ids" widget="many2many_tags" options="{'no_create_edit': True, 'color_field': 'color'}"/>
                     <field name="document_selectable_tag_ids" invisible="1"/>
                 </group>
             </xpath>
         </field>
-        <field name="groups_id" eval="[(4, ref('event_document.group_document_specific_event'))]"/>
+        <field name="groups_id" eval="[(5, 0, 0)]"/>
     </record>
 
     <!--
@@ -31,14 +31,14 @@
         <field name="priority">15</field>
         <field name="arch" type="xml">
             <xpath expr="//notebook/page[@name='advanced_settings']/group[@name='advanced_settings_general']" position="inside">
-                <group string="Documents">
+                <group string="Documents" groups="event_document.group_document_specific_event">
                     <field name="use_document_folder"/>
                     <field name="document_tag_ids" widget="many2many_tags" options="{'no_create': True, 'color_field': 'color'}" attrs="{'invisible': [('use_document_folder', '=', False)]}"/>
                     <field name="document_selectable_tag_ids" invisible="1"/>
                 </group>
             </xpath>
         </field>
-        <field name="groups_id" eval="[(4, ref('event_document.group_document_specific_event'))]"/>
+        <field name="groups_id" eval="[(5, 0, 0)]"/>
     </record>
 
     <!--
