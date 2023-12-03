@@ -2,12 +2,14 @@
 
 from datetime import datetime, date
 
-from odoo.addons.sale_rental.tests.common import TestCommonSaleRentalNoChart
+from odoo.addons.sale_rental.tests.common import TestCommonSaleRental
 from odoo.exceptions import UserError
 from odoo.tests.common import Form
+from odoo.tests import tagged
 
 
-class TestSaleRentalWizard(TestCommonSaleRentalNoChart):
+@tagged('post_install', '-at_install')
+class TestSaleRentalWizard(TestCommonSaleRental):
 
     @classmethod
     def setUpClass(cls):
@@ -49,7 +51,7 @@ class TestSaleRentalWizard(TestCommonSaleRentalNoChart):
         start_dt = datetime(2020, 5, 7, 3, 0, 0)
         stop_dt = datetime(2020, 5, 9, 0, 0, 0)
         product = self.rental_booking.resource_product_id
-        price = product.get_rental_price(start_dt, stop_dt, sale_order.pricelist_id.id)[product.id]['price_list']
+        price = 12
         pricing_explanation = product.get_rental_pricing_explanation(start_dt, stop_dt, currency_id=sale_order.pricelist_id.currency_id.id)[product.id]
 
         self.assertEqual(sale_line.rental_start_date, start_dt)

@@ -6,9 +6,22 @@ from pytz import timezone, utc
 from odoo import fields
 from odoo.exceptions import ValidationError
 from odoo.addons.resource.models.resource import Intervals
-from odoo.addons.resource.tests.common import TestResourceCommon
-from odoo.addons.resource.tests.test_resource import datetime_tz, datetime_str
 from odoo.tests.common import TransactionCase
+
+
+def datetime_tz(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None):
+    """ Return a `datetime` object with a given timezone (if given). """
+    dt = datetime(year, month, day, hour, minute, second, microsecond)
+    return timezone(tzinfo).localize(dt) if tzinfo else dt
+
+
+def datetime_str(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None):
+    """ Return a fields.Datetime value with the given timezone. """
+    dt = datetime(year, month, day, hour, minute, second, microsecond)
+    if tzinfo:
+        dt = timezone(tzinfo).localize(dt).astimezone(utc)
+    return fields.Datetime.to_string(dt)
+
 
 
 class TestCalendarAdvanced(TransactionCase):

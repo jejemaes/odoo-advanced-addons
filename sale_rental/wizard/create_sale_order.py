@@ -44,20 +44,42 @@ class ProjectCreateSalesOrder(models.TransientModel):
 
     # new SO mode
     partner_id = fields.Many2one('res.partner', string="Customer", required=True, help="Customer of the sales order")
-    partner_shipping_id = fields.Many2one('res.partner', string='Delivery Address', domain="[('commercial_partner_id', '=', partner_id), '|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="Delivery address for current booking.")
+    partner_shipping_id = fields.Many2one('res.partner', string='Delivery Address', compute='_compute_partner_shipping_id', readonly=False, domain="[('commercial_partner_id', '=', partner_id), '|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="Delivery address for current booking.")
     commercial_partner_id = fields.Many2one(related='partner_id.commercial_partner_id')
 
-    pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True)
+    pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True, compute='_compute_pricelist_id', readonly=False)
     currency_id = fields.Many2one(related='pricelist_id.currency_id', depends=["pricelist_id"], store=True)
     analytic_account_id = fields.Many2one('account.analytic.account', 'Analytic Account', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     auto_confirm = fields.Boolean("Auto Confirm Order", compute='_compute_auto_confirm', store=True, readonly=False)
 
     # sale order line details
     product_id = fields.Many2one('product.product', string="Product", required=True, related='rental_booking_id.resource_id.product_id')
-    price_unit = fields.Float("Unit Price")
-    discount = fields.Float("Discount")
+    price_unit = fields.Float(
+        string="Unit Price",
+        compute='_compute_price_unit',
+        digits='Product Price',
+        store=True, readonly=False, required=True
+    )
+    pricelist_item_id = fields.Many2one(
+        comodel_name='product.pricelist.item',
+        compute='_compute_pricelist_item_id'
+    )
+    discount = fields.Float("Discount", compute='_compute_discount', readonly=False)
     rental_pricing_explanation = fields.Text("Pricing explanation", compute='_compute_rental_price_details', compute_sudo=True, help="Helper text to understand rental price computation.")
 
+    @api.depends('partner_id')
+    def _compute_partner_shipping_id(self):
+        for order in self:
+            order.partner_shipping_id = order.partner_id.address_get(['delivery'])['delivery'] if order.partner_id else False
+
+    @api.depends('link_mode', 'sale_order_id')
+    def _compute_pricelist_id(self):
+        for wizard in self:
+            if wizard.link_mode == 'attach':
+                wizard.pricelist_id = wizard.sale_order_id.pricelist_id
+            else:
+                if not wizard.pricelist_id:
+                    wizard.pricelist_id = wizard.with_company(wizard.company_id).partner_id.property_product_pricelist
 
     @api.depends('rental_booking_id')
     def _compute_auto_confirm(self):
@@ -79,6 +101,75 @@ class ProjectCreateSalesOrder(models.TransientModel):
             else:
                 wizard.rental_pricing_explanation = False
 
+    @api.depends('pricelist_id', 'product_id', 'sale_order_id', 'rental_start_date', 'rental_start_date')
+    def _compute_price_unit(self):
+        for wizard in self:
+            if not wizard.product_id or not wizard.pricelist_id:
+                wizard.price_unit = 0.0
+            else:
+                if not wizard.rental_start_date or not wizard.rental_stop_date:
+                    wizard.price_unit = 0.0
+                else:
+                    price = wizard.with_company(wizard.company_id)._get_display_price()
+                    wizard.price_unit = wizard.product_id.with_context(
+                        sale_is_rental=True,
+                        rental_start_dt=fields.Datetime.to_string(wizard.rental_start_date),
+                        rental_stop_dt=fields.Datetime.to_string(wizard.rental_stop_date),
+                    )._get_tax_included_unit_price(
+                        wizard.company_id,
+                        wizard.currency_id,
+                        wizard.sale_order_id.date_order or fields.Datetime.now(),
+                        'sale',
+                        fiscal_position=wizard.sale_order_id.fiscal_position_id or None,
+                        product_price_unit=price,
+                        product_currency=wizard.currency_id
+                    )
+
+    @api.depends('product_id', 'pricelist_id', 'sale_order_id')
+    def _compute_pricelist_item_id(self):
+        for wizard in self:
+            if not wizard.product_id or not wizard.pricelist_id:
+                wizard.pricelist_item_id = False
+            else:
+                wizard.pricelist_item_id = wizard.pricelist_id._get_product_rule(
+                    wizard.product_id,
+                    1.0,
+                    uom=wizard.product_id.uom_id,
+                    date=wizard.sale_order_id.date_order or fields.Datetime.now(),
+                    **self._get_product_price_context()
+                )
+
+    @api.depends('product_id', 'pricelist_id')
+    def _compute_discount(self):
+        for wizard in self:
+            if not wizard.product_id:
+                wizard.discount = 0.0
+
+            if not (
+                wizard.pricelist_id
+                and wizard.pricelist_id.discount_policy == 'without_discount'
+            ):
+                continue
+
+            wizard.discount = 0.0
+
+            if not wizard.pricelist_item_id:
+                # No pricelist rule was found for the product
+                # therefore, the pricelist didn't apply any discount/change
+                # to the existing sales price.
+                continue
+
+            wizard = wizard.with_company(wizard.company_id)
+            pricelist_price = wizard._get_pricelist_price()
+            base_price = wizard._get_pricelist_price_before_discount()
+
+            if base_price != 0:  # Avoid division by zero
+                discount = (base_price - pricelist_price) / base_price * 100
+                if (discount > 0 and base_price > 0) or (discount < 0 and base_price < 0):
+                    # only show negative discounts if price is negative
+                    # otherwise it's a surcharge which shouldn't be shown to the customer
+                    wizard.discount = discount
+
     @api.onchange('link_mode')
     def _onchange_link_mode(self):
         if self.link_mode == 'attach':
@@ -92,13 +183,13 @@ class ProjectCreateSalesOrder(models.TransientModel):
             self.partner_shipping_id = self.partner_id.address_get(['delivery'])['delivery']
             self.pricelist_id = self.with_company(self.company_id).partner_id.property_product_pricelist
 
-    @api.onchange('product_id', 'rental_start_date', 'rental_stop_date', 'pricelist_id')
-    def _onchange_rent_price_and_discount(self):
-        if self.product_id and self.rental_start_date and self.rental_stop_date and self.pricelist_id:
-            if self.rental_start_date <= self.rental_stop_date:
-                pricing_data = self.product_id.get_rental_price(self.rental_start_date, self.rental_stop_date, self.pricelist_id.id, quantity=1)
-                self.price_unit = pricing_data[self.product_id.id]['price_list']
-                self.discount = pricing_data[self.product_id.id]['discount']
+    # @api.onchange('product_id', 'rental_start_date', 'rental_stop_date', 'pricelist_id')
+    # def _onchange_rent_price_and_discount(self):
+    #     if self.product_id and self.rental_start_date and self.rental_stop_date and self.pricelist_id:
+    #         if self.rental_start_date <= self.rental_stop_date:
+    #             pricing_data = self.product_id.get_rental_price(self.rental_start_date, self.rental_stop_date, self.pricelist_id.id, quantity=1)
+    #             self.price_unit = pricing_data[self.product_id.id]['price_list']
+    #             self.discount = pricing_data[self.product_id.id]['discount']
 
     def action_link_to_sale_order(self):
         sale_order = self.sale_order_id
@@ -131,6 +222,13 @@ class ProjectCreateSalesOrder(models.TransientModel):
 
     def _create_sale_order(self):
         """ Private implementation of generating the sales order """
+        print('=========',{
+            'pricelist_id': self.pricelist_id.id,
+            'partner_id': self.partner_id.id,
+            'partner_shipping_id': self.partner_shipping_id.id,
+            'analytic_account_id': self.analytic_account_id.id,
+            'company_id': self.company_id.id,
+        })
         sale_order = self.env['sale.order'].create({
             'pricelist_id': self.pricelist_id.id,
             'partner_id': self.partner_id.id,
@@ -138,7 +236,6 @@ class ProjectCreateSalesOrder(models.TransientModel):
             'analytic_account_id': self.analytic_account_id.id,
             'company_id': self.company_id.id,
         })
-        sale_order.onchange_partner_shipping_id()  # set the fiscal position
         return sale_order
 
     def _create_sale_order_line(self, sale_order):
@@ -158,9 +255,105 @@ class ProjectCreateSalesOrder(models.TransientModel):
             sol_values['resource_ids'] = [(6, 0, [self.rental_booking_id.resource_id.id])]
 
         sale_order_line = self.env['sale.order.line'].create(sol_values)
-        sale_order_line._compute_tax_id()
+        # sale_order_line._compute_tax_id()
 
-        sale_order_line.write({
-            'name': sale_order_line.get_sale_order_line_multiline_description_sale(self.product_id),
-        })
+        # sale_order_line.write({
+        #     'name': sale_order_line.get_sale_order_line_multiline_description_sale(self.product_id),
+        # })
         return sale_order_line
+
+    # copy/paste from sale addon
+
+    def _get_display_price(self):
+        """Compute the displayed unit price for a given line.
+
+        Overridden in custom flows:
+        * where the price is not specified by the pricelist
+        * where the discount is not specified by the pricelist
+
+        Note: self.ensure_one()
+        """
+        self.ensure_one()
+
+        pricelist_price = self._get_pricelist_price()
+
+        if self.pricelist_id.discount_policy == 'with_discount':
+            return pricelist_price
+
+        if not self.pricelist_item_id:
+            # No pricelist rule found => no discount from pricelist
+            return pricelist_price
+
+        base_price = self._get_pricelist_price_before_discount()
+
+        # negative discounts (= surcharge) are included in the display price
+        return max(base_price, pricelist_price)
+
+    def _get_pricelist_price(self):
+        """Compute the price given by the pricelist for the given line information.
+
+        :return: the product sales price in the order currency (without taxes)
+        :rtype: float
+        """
+        self.ensure_one()
+        self.product_id.ensure_one()
+
+        pricelist_rule = self.pricelist_item_id
+        order_date = self.sale_order_id.date_order or fields.Date.today()
+        product = self.product_id.with_context(**self._get_product_price_context())
+        qty = 1.0
+        uom = self.product_id.uom_id
+
+        price = pricelist_rule._compute_price(
+            product, qty, uom, order_date, currency=self.currency_id)
+
+        return price
+
+    def _get_product_price_context(self):
+        """Gives the context for product price computation.
+
+        :return: additional context to consider extra prices from attributes in the base product price.
+        :rtype: dict
+        """
+        result = {}
+        result['sale_is_rental'] = True
+        result['rental_start_dt'] = fields.Datetime.to_string(self.rental_start_date)
+        result['rental_stop_dt'] = fields.Datetime.to_string(self.rental_stop_date)
+        return result
+
+    def _get_pricelist_price_before_discount(self):
+        """Compute the price used as base for the pricelist price computation.
+
+        :return: the product sales price in the order currency (without taxes)
+        :rtype: float
+        """
+        self.ensure_one()
+        self.product_id.ensure_one()
+
+        pricelist_rule = self.pricelist_item_id
+        order_date = self.sale_order_id.date_order or fields.Date.today()
+        product = self.product_id.with_context(**self._get_product_price_context())
+        qty = 1.0
+        uom = self.product_id.uom_id
+
+        if pricelist_rule:
+            pricelist_item = pricelist_rule
+            if pricelist_item.pricelist_id.discount_policy == 'without_discount':
+                # Find the lowest pricelist rule whose pricelist is configured
+                # to show the discount to the customer.
+                while pricelist_item.base == 'pricelist' and pricelist_item.base_pricelist_id.discount_policy == 'without_discount':
+                    rule_id = pricelist_item.base_pricelist_id._get_product_rule(
+                        product, qty, uom=uom, date=order_date)
+                    pricelist_item = self.env['product.pricelist.item'].browse(rule_id)
+
+            pricelist_rule = pricelist_item
+
+        price = pricelist_rule._compute_base_price(
+            product,
+            qty,
+            uom,
+            order_date,
+            target_currency=self.currency_id,
+        )
+
+        return price

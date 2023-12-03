@@ -22,7 +22,7 @@ class ProductRentalTenure(models.Model):
     rent_price = fields.Float("Rent Price", compute='_compute_rent_price', help="This amount is expressed in the currency of the pricelist, or (fallback) in product currency.")
     sequence = fields.Integer("Sequence", default=5)
 
-    duration_value = fields.Integer("Tenue")
+    duration_value = fields.Integer("Tenure")
     duration_uom = fields.Selection([
         ('hour', 'Hour(s)'),
         ('day', 'Day(s)'),

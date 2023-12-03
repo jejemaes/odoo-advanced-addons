@@ -2,15 +2,15 @@
 <odoo>
 
     <record id="rental.resource_resource_caravane" model="resource.resource">
-        <field name="product_template_id" ref="product_template_rental_caravane"/>
+        <field name="product_id" model="product.product" eval="obj().env.ref('sale_rental.product_template_rental_caravane').product_variant_id.id"/>
     </record>
 
     <record id="rental.resource_resource_podium" model="resource.resource">
-        <field name="product_template_id" ref="product_template_rental_podium"/>
+        <field name="product_id" model="product.product" eval="obj().env.ref('sale_rental.product_template_rental_podium').product_variant_id.id"/>
     </record>
 
     <record id="rental.resource_resource_remorque2" model="resource.resource">
-        <field name="product_template_id" ref="product_template_rental_remorque_bar"/>
+        <field name="product_id" model="product.product" eval="obj().env.ref('sale_rental.product_template_rental_remorque_bar').product_variant_id.id"/>
     </record>
 
 </odoo>

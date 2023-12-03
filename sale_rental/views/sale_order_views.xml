@@ -39,9 +39,12 @@
                 <field name="is_rental" invisible="1"/>
                 <group attrs="{'invisible': [('is_rental', '=', False)]}">
                     <group>
-                        <field name="product_id" attrs="{'required': [('display_type', '=', False)], 'readonly': [('product_updatable', '=', False)]}" options="{'no_open': True, 'no_create': True}"/>
+                        <field name="rental_product_id" attrs="{'required': [('display_type', '=', False)], 'readonly': [('product_updatable', '=', False)]}" options="{'no_open': True, 'no_create': True}"/>
+                        <field name="product_id" invisible="1"/>
+                        <field name="product_uom"/>
+                        <field name="pricelist_item_id" invisible="1"/>
                         <field name="product_rental_tracking" invisible="1"/>
-                        <label for="rental_start_date" string="Date"/>
+                        <label for="rental_start_date" string="Dates"/>
                         <div class="o_row">
                             <field name="rental_start_date" widget="daterange" nolabel="1" class="oe_inline" options="{'related_end_date': 'rental_stop_date'}" attrs="{'required': [('is_rental', '=', True)]}"/>
                             <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>

@@ -17,6 +17,7 @@ class Product(models.Model):
     resource_ids = fields.One2many('resource.resource', 'product_id', string='Resources', domain=[('resource_type', '=', 'material')])
     resource_count = fields.Integer("Resource Count", compute='_compute_resource_count')
 
+    # deprecate me ?
     rent_price_unit = fields.Float("Rental Unit Price", compute='_compute_rent_price_details', digits='Product Price')
     rent_price_explanation = fields.Char("Rental Unit Price Explanation", compute='_compute_rent_price_details')
 
@@ -26,6 +27,7 @@ class Product(models.Model):
         mapped_data = {db['product_id'][0]: db['product_id_count'] for db in grouped_data}
         for product in self:
             product.resource_count = mapped_data.get(product.id, 0)
+
 
     @api.depends('rental_tenure_ids.base_price')
     @api.depends_context('rental_start_dt', 'rental_end_dt', 'currency_id')
@@ -68,6 +70,10 @@ class Product(models.Model):
         self.product_tmpl_id._onchange_rental_tracking()
 
     # ----------------------------------------------------------------------------
+    # Business Native Override
+    # ----------------------------------------------------------------------------
+
+    # ----------------------------------------------------------------------------
     # Rental Pricing Methods
     # ----------------------------------------------------------------------------
 
@@ -94,7 +100,6 @@ class Product(models.Model):
 
         result = {}
         for product in self:
-            #currency = self.env['res.currency'].browse(currency_id) if currency_id else product.currency_id
             current_currency = currency
             if not current_currency:
                 current_currency = product.currency_id
@@ -109,11 +114,3 @@ class Product(models.Model):
             'before': relativedelta(hours=before_padding[0], minutes=before_padding[1]),
             'after': relativedelta(hours=after_padding[0], minutes=after_padding[1]),
         }
-
-    def get_product_multiline_description_sale(self):
-        name = super(Product, self).get_product_multiline_description_sale()
-        if self.can_be_rented and not self.sale_ok:
-            name = self.display_name
-        if self.description_rental:
-            name += '\n' + self.description_rental
-        return name
