@@ -166,7 +166,7 @@ class TestSaleService(TestCommonSaleRentalNoChart):
     # Tenure Creation
     # --------------------------------------------------------------
 
-    def test_create_weekday_tenure_consecultive_days(self):
+    def test_create_weekday_tenure_consecutive_days(self):
         product_rental = self.env['product.product'].create({
             'name': "Rental product, test consecutive tenure days",
             'sale_ok': False,

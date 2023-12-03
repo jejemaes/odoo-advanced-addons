@@ -26,18 +26,6 @@ class SaleOrder(models.Model):
         for order in self:
             order.rental_line_count = len(order.order_line.filtered(lambda l: l.is_rental))
 
-    def update_prices(self):
-        super(SaleOrder, self).update_prices()
-
-        lines_to_update = []
-        for line in self.order_line.filtered(lambda line: line.is_rental):
-            pricing_data = line.product_id.get_rental_price(line.rental_start_date, line.rental_stop_date, self.pricelist_id.id, quantity=line.product_uom_qty)
-            discount = pricing_data[line.product_id.id]['discount']
-            price_unit = self.env['account.tax']._fix_tax_included_price_company(pricing_data[line.product_id.id]['price_list'], line.product_id.taxes_id, line.tax_id, self.company_id)
-
-            lines_to_update.append((1, line.id, {'price_unit': price_unit, 'discount': discount}))
-        self.update({'order_line': lines_to_update})
-
     # ---------------------------------------------------------
     # Actions
     # ---------------------------------------------------------
@@ -106,6 +94,11 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    rental_product_id = fields.Many2one(
+        related='product_id', readonly=False,
+        store=False,  # dummy field only for display because of domain on product_id. The onchange will set the real product bypassing the domain
+        domain="[('can_be_rented', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+
     qty_delivered_method = fields.Selection(selection_add=[('rental', 'Rentings')])
     is_rental = fields.Boolean("Is a rental", default=False)
     resource_ids = fields.Many2many('resource.resource', 'sale_order_line_resource_rel', 'sale_line_id', 'resource_id', string='Resources', domain="[('is_available', '=', True), ('product_id', '=', product_id)]")
@@ -122,6 +115,10 @@ class SaleOrderLine(models.Model):
         ('rental_start_date_required_for_rental', "CHECK((is_rental='t' AND rental_start_date IS NOT NULL) or (is_rental = 'f'))", 'A rental sale item requires a start date.'),
         ('rental_stop_date_required_for_rental', "CHECK((is_rental='t' AND rental_stop_date IS NOT NULL) or (is_rental = 'f'))", 'A rental sale item requires a stop date.'),
     ]
+
+    @api.depends('rental_start_date', 'rental_stop_date')
+    def _compute_name(self):
+        super()._compute_name()
 
     @api.depends('product_id', 'is_rental')
     def _compute_qty_delivered_method(self):
@@ -152,74 +149,75 @@ class SaleOrderLine(models.Model):
             else:
                 line.rental_pricing_explanation = False
 
-    @api.onchange('is_rental')
-    def _onchange_is_rental(self):
-        if self.is_rental:
-            return {
-                'domain': {
-                    'product_id': [('can_be_rented', '=', True)]
-                }
-            }
+    @api.depends('is_rental')
+    def _compute_pricelist_item_id(self):
+        for line in self.filtered(lambda sol: sol.is_rental):
+            if not line.product_id or line.display_type or not line.order_id.pricelist_id:
+                line.pricelist_item_id = False
+            else:
+                line.pricelist_item_id = line.order_id.pricelist_id._get_product_rule(
+                    line.product_id,
+                    line.product_uom_qty or 1.0,
+                    uom=line.product_uom,
+                    date=line.order_id.date_order,
+                    **self._rental_get_product_context(), # tell in kwargs that this is a rental, not a sale (dates might be null)
+                )
 
-    @api.onchange('resource_ids')
-    def _onchange_resource_ids(self):
-        if self.product_rental_tracking == 'use_resource':
-            self.product_uom_qty = len(self.resource_ids)
+        super(SaleOrderLine, self.filtered(lambda sol: not sol.is_rental))._compute_pricelist_item_id()
 
-    @api.onchange('product_id', 'rental_start_date', 'rental_stop_date', 'product_uom_qty', 'product_uom_qty')
-    def product_id_change(self):
-        """ Override to apply the most changes required in rental case. Purpose is to completely split flow (sale vs rental) to avoid
-            patching use case flow. As counterpart, this required to copy/paste some common actions (taxes, description, ...) since
-            odoo standart does not have many hooks ...
-        """
-        result = {}
-        if self.is_rental:
-            # set UoM (required field)
-            if not self.product_uom or self.product_id.uom_id != self.product_uom:
-                self.product_uom = self.product_id.uom_id
+    @api.depends('is_rental', 'rental_start_date', 'rental_stop_date')
+    def _compute_price_unit(self):
+        for line in self.filtered(lambda sol: sol.is_rental):
+            # check if there is already invoiced amount. if so, the price shouldn't change as it might have been
+            # manually edited
+            if line.qty_invoiced > 0:
+                continue
+            if not line.product_uom or not line.product_id or not line.order_id.pricelist_id:
+                line.price_unit = 0.0
+            else:
+                if not line.rental_start_date or not line.rental_stop_date:
+                    line.price_unit = 0.0
+                else:
+                    price = line.with_company(line.company_id)._get_display_price()
+                    line.price_unit = line.product_id.with_context(**self._rental_get_product_context())._get_tax_included_unit_price(
+                        line.company_id,
+                        line.order_id.currency_id,
+                        line.order_id.date_order,
+                        'sale',
+                        fiscal_position=line.order_id.fiscal_position_id,
+                        product_price_unit=price,
+                        product_currency=line.currency_id
+                        # TODO force UoM ?
+                    )
 
-            # transfer the relevant taxes from product to SO line
-            self._compute_tax_id()
+        super(SaleOrderLine, self.filtered(lambda sol: not sol.is_rental))._compute_price_unit()
 
-            # compute price for the period
-            if self.rental_start_date and self.rental_stop_date:
-                qty = self.product_uom_qty or 0
-                if self.product_id.rental_tracking == 'use_resource':
-                    qty = len(self.resource_ids)
+    # TODO do we want to force unit Uom when renting ? we did not that before
+    # @api.depends('product_id', 'is_rental')
+    # def _compute_product_uom(self):
+    #     rental_sale_lines = self.filtered(lambda sol: sol.is_rental)
+    #     other_sale_lines = self.filtered(lambda sol: not sol.is_rental)
 
-                if not self.order_id.pricelist_id:
-                    return {'warning': {
-                        'title': _('Wrong Customer or Pricelist'),
-                        'message': _("Please set a Customer and a Pricelist on the Sales Order.")
-                    }}
+    #     if rental_sale_lines:
+    #         unit_uom = self.env.ref('uom.product_uom_unit', raise_if_not_found=False)
+    #         for line in rental_sale_lines:
+    #             line.product_uom = unit_uom
+    #     super(SaleOrderLine, other_sale_lines)._compute_product_uom()
 
-                pricing_data = self.product_id.get_rental_price(self.rental_start_date, self.rental_stop_date, self.order_id.pricelist_id.id, quantity=qty)
-                self.discount = pricing_data[self.product_id.id]['discount']
-                self.price_unit = self.env['account.tax']._fix_tax_included_price_company(pricing_data[self.product_id.id]['price_list'], self.product_id.taxes_id, self.tax_id, self.company_id)
 
-                # update the line description
-                self.name = self.with_context(lang=self.order_id.partner_id.lang).get_sale_order_line_multiline_description_sale(self.product_id)
+    @api.depends('is_rental', 'product_rental_tracking', 'resource_ids')
+    def _compute_product_uom_qty(self):
+        rental_tracked_sale_lines = self.filtered(lambda sol: sol.product_rental_tracking == 'use_resource')
+        other_sale_lines = self.filtered(lambda sol: sol.product_rental_tracking != 'use_resource')
 
-            # auto set the one resource
-            if self.product_id.rental_tracking == 'use_resource' and self.rental_start_date and self.rental_stop_date:
-                if self.product_id.resource_count == 1:
-                    self.resource_ids = self.product_id.resource_ids.with_context(resource_start_dt=self.rental_start_date, resource_stop_dt=self.rental_stop_date).filtered(lambda res: res.is_available)
-        else:
-            result = super(SaleOrderLine, self).product_id_change()
-        return result
+        for line in rental_tracked_sale_lines:
+            line.product_uom_qty = len(line.resource_ids)
 
-    @api.onchange('product_id', 'price_unit', 'product_uom', 'product_uom_qty', 'tax_id')  # need to decorate
-    def _onchange_discount(self):
-        """ Note: for rental the discount is set by the `product_id_change` method """
-        if self.is_rental:
-            return
-        return super(SaleOrderLine, self)._onchange_discount()
+        super(SaleOrderLine, other_sale_lines)._compute_product_uom_qty()
 
-    @api.onchange()
-    def product_uom_change(self):
-        """ Note: for UoM in the rental case, it will be set by the `product_id_change` method """
-        if not self.is_rental:
-            return super(SaleOrderLine, self).product_uom_change()
+    @api.onchange('rental_product_id')
+    def _onchange_rental_product_id(self):
+        self.product_id = self.rental_product_id
 
     @api.constrains('is_rental', 'product_id')
     def _check_is_rental(self):
@@ -281,6 +279,10 @@ class SaleOrderLine(models.Model):
         bookings.unlink()
         return result
 
+    # ---------------------------------------------------------
+    # Sale Business Extension
+    # ---------------------------------------------------------
+
     def _get_delivered_quantity_by_rental(self, additional_domain):
         """ Compute and write the delivered quantity of current SO lines, based on their related rental orders
             :param additional_domain: domain to restrict rental order to include in computation
@@ -299,12 +301,12 @@ class SaleOrderLine(models.Model):
 
         return result
 
-    def get_sale_order_line_multiline_description_sale(self, product):
+    def _get_sale_order_line_multiline_description_sale(self):
         """ Override to customize the sale line description with rental informations (like dates, proper description, ...) """
         if self.is_rental:
-            name = product.display_name
-            if product.description_rental:
-                name += '\n' + product.description_rental
+            name = self.product_id.display_name
+            if self.product_id.description_rental:
+                name += '\n' + self.product_id.description_rental
             name += self._get_sale_order_line_multiline_description_variants()
             # adds dates in description (in TZ and lang of partner)
             if self.rental_start_date and self.rental_stop_date:
@@ -313,8 +315,32 @@ class SaleOrderLine(models.Model):
                 name += '\n'
                 name += _("Rental from %s to %s") % (start_str, end_str)
         else:
-            name = super(SaleOrderLine, self).get_sale_order_line_multiline_description_sale(product)
+            name = super(SaleOrderLine, self).get_sale_order_line_multiline_description_sale()
         return name
+
+    def _get_product_price_context(self):
+        """Gives the context for product price computation. Enrich the native context with rental data if needed.
+
+        :return: additional context to consider extra prices and flag if the price should be a rental price or a sale price.
+        :rtype: dict
+        """
+        result = super()._get_product_price_context()
+        if self.is_rental:
+            result.update(self._rental_get_product_context())
+        return result
+
+    def _rental_get_product_context(self):
+        """ Product context for rental. Used to provide additionnal rental data to compute base price. """
+        result = {}
+        result['sale_is_rental'] = self.is_rental
+        result['rental_start_dt'] = fields.Datetime.to_string(self.rental_start_date)
+        result['rental_stop_dt'] = fields.Datetime.to_string(self.rental_stop_date)
+        return result
+
+    def _get_protected_fields(self):
+        fields = super()._get_protected_fields()
+        fields += ['is_rental', 'rental_start_date', 'rental_stop_date']
+        return fields
 
     # ---------------------------------------------------------
     # Create rental stuff

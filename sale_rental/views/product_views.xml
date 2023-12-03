@@ -47,7 +47,7 @@
                         </group>
                     </group>
                     <group string="Rental Pricing" attrs="{'invisible': [('rental_tenure_type', '=', 'fixed')]}">
-                        <field name="rental_tenure_ids" required="1" nolabel="1">
+                        <field name="rental_tenure_ids" required="1" nolabel="1" colspan="2" >
                             <tree editable="top">
                                 <field name="sequence" widget="handle"/>
                                 <field name="duration_value" attrs="{'column_invisible': [('parent.rental_tenure_type', '!=', 'duration')]}"/>
@@ -60,7 +60,7 @@
                         </field>
                     </group>
                     <group string="Description">
-                        <field name="description_rental" nolabel="1" placeholder="This note is added to sales orders and invoices."/>
+                        <field name="description_rental" nolabel="1" colspan="2" placeholder="This note is added to sales orders and invoices."/>
                     </group>
                 </page>
             </xpath>

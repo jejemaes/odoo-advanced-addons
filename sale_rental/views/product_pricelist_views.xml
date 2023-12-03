@@ -30,10 +30,10 @@
         <field name="model">product.pricelist</field>
         <field name="name">product.pricelist.form.renal.inheirit.items</field>
         <field name="inherit_id" ref="product.product_pricelist_view"/>
-        <field name="groups_id" eval="[(4, ref('product.group_sale_pricelist'))]"/>
+        <field name="groups_id" eval="[(5, 0, 0)]"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='item_ids']/tree//field[@name='name']" position="before">
-                <field name="applicable_on"/>
+                <field name="applicable_on" groups="product.group_sale_pricelist"/>
             </xpath>
         </field>
     </record>

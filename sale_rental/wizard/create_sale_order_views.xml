@@ -13,7 +13,7 @@
                 <group attrs="{'invisible': [('link_mode', '=', 'attach')]}">
                     <group>
                         <field name="partner_id"/>
-                        <field name="partner_shipping_id" groups="sale.group_delivery_invoice_address"/>
+                        <field name="partner_shipping_id" groups="account.group_delivery_invoice_address"/>
                         <field name="company_id" invisible="1"/>
                     </group>
                     <group>

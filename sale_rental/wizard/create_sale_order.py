@@ -54,10 +54,14 @@ class ProjectCreateSalesOrder(models.TransientModel):
 
     # sale order line details
     product_id = fields.Many2one('product.product', string="Product", required=True, related='rental_booking_id.resource_id.product_id')
-    price_unit = fields.Float("Unit Price")
+    price_unit = fields.Float(
+        string="Unit Price",
+        compute='_compute_price_unit',
+        digits='Product Price',
+        store=True, readonly=False, required=True
+    )
     discount = fields.Float("Discount")
     rental_pricing_explanation = fields.Text("Pricing explanation", compute='_compute_rental_price_details', compute_sudo=True, help="Helper text to understand rental price computation.")
-
 
     @api.depends('rental_booking_id')
     def _compute_auto_confirm(self):
@@ -78,6 +82,30 @@ class ProjectCreateSalesOrder(models.TransientModel):
                     wizard.rental_pricing_explanation = False
             else:
                 wizard.rental_pricing_explanation = False
+
+    @api.depends('pricelist_id', 'sale_order_id', 'rental_start_date', 'rental_start_date')
+    def _compute_price_unit(self):
+        for wizard in self:
+            if not wizard.product_id or not wizard.pricelist_id:
+                wizard.price_unit = 0.0
+            else:
+                if not wizard.rental_start_date or not wizard.rental_stop_date:
+                    wizard.price_unit = 0.0
+                else:
+                    price = wizard.with_company(wizard.company_id)._get_display_price()
+                    wizard.price_unit = wizard.product_id.with_context(
+                        sale_is_rental=True,
+                        rental_start_dt=fields.Datetime.to_string(wizard.rental_start_date),
+                        rental_stop_dt=fields.Datetime.to_string(wizard.rental_stop_date),
+                    )._get_tax_included_unit_price(
+                        wizard.company_id,
+                        wizard.currency_id,
+                        wizard.sale_order.date_order or fields.Datetime.now(),
+                        'sale',
+                        fiscal_position=wizard.sale_order_id.fiscal_position_id or None,
+                        product_price_unit=price,
+                        product_currency=wizard.currency_id
+                    )
 
     @api.onchange('link_mode')
     def _onchange_link_mode(self):

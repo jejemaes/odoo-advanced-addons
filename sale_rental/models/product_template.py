@@ -18,6 +18,8 @@ class ProductTemplate(models.Model):
 
     can_be_rented = fields.Boolean('Can be Rented', default=False, help="Specify if the product can be rent in a sales order line.", copy=True)
     description_rental = fields.Text('Rental Description', translate=True, help="A description of the Product to rent it.")
+
+    # Price Tenure
     rental_tenure_type = fields.Selection([
         ('fixed', 'Fixed Price'),
         ('duration', 'Per Duration'),
@@ -26,11 +28,13 @@ class ProductTemplate(models.Model):
     rental_fixed_price = fields.Float("Fixed Price", default=1.0, help="Price used for any rental period.")
     rental_tenure_ids = fields.One2many('product.rental.tenure', 'product_template_id', string="Rental Tenures", copy=True)
     rental_tenure_id = fields.Many2one('product.rental.tenure', compute='_compute_rental_tenure_id', string="First Rental Price")
+    rental_price = fields.Float("Rental Price", compute='_compute_rental_price', digits='Product Price')
+
+    # Resource Tracking and Calendar
     rental_tracking = fields.Selection([
         ('no', 'No Tracking'),
         ('use_resource', 'Track Individual Items'),
     ], string="Tracking Type", default=False, copy=True)
-    rental_agreement_id = fields.Many2one('rental.agreement', "Rental Agreement")
     rental_calendar_id = fields.Many2one("resource.calendar", string="Rental Calendar")
     rental_tz = fields.Selection(_tz_get, string='Timezone', default=lambda self: self._context.get('tz') or self.env.user.tz or 'UTC')
 
@@ -39,6 +43,7 @@ class ProductTemplate(models.Model):
 
     rental_padding_before = fields.Float("Before Security Time", default=0, copy=True, help="Expressed in hours")
     rental_padding_after = fields.Float("After Security Time", default=0, copy=True, help="Expressed in hours")
+    rental_agreement_id = fields.Many2one('rental.agreement', "Rental Agreement")
 
     _sql_constraints = [
         ('rental_tenure_type_required', "CHECK((can_be_rented='t' AND rental_tenure_type IS NOT NULL) OR (can_be_rented = 'f'))", 'A rental product needs a rental tenure type.'),
@@ -46,6 +51,23 @@ class ProductTemplate(models.Model):
         ('rental_calendar_required', "CHECK((rental_tracking = 'no' AND rental_calendar_id IS NOT NULL) OR (rental_tracking != 'no'))", 'A rental product without tracking needs a rental calendar.'),
         ('rental_tz_required', "CHECK((rental_tracking = 'use_resource' AND rental_tz IS NOT NULL) OR (rental_tracking != 'use_resource'))", 'A rental product with tracking needs a rental timezone.'),
     ]
+
+    @api.depends('rental_tenure_type', 'rental_fixed_price', 'rental_tenure_ids.base_price')
+    @api.depends_context('rental_start_dt', 'rental_end_dt')
+    def _compute_rental_price(self):
+        start_dt = fields.Datetime.to_datetime(self._context.get('rental_start_dt')) # might be None
+        stop_dt = fields.Datetime.to_datetime(self._context.get('rental_stop_dt')) # might be None
+
+        rental_prices = {}
+        if start_dt and stop_dt:
+            rental_price_unit_map = self.filtered(lambda tmpl: tmpl.rental_tenure_type in ['duration', 'weekday'])._get_rental_price_unit(start_dt, stop_dt)
+            rental_prices = {key: value['price_unit'] for key, value in rental_price_unit_map.items()}
+
+        for template in self:
+            if template.rental_tenure_type == 'fixed':
+                template.rental_price = template.rental_fixed_price
+            else:
+                template.rental_price = rental_prices.get(template.id, 0.0)
 
     @api.depends('resource_ids')
     def _compute_resource_count(self):
@@ -109,7 +131,7 @@ class ProductTemplate(models.Model):
     # Rental Pricing Methods
     # ----------------------------------------------------------------------------
 
-    def _get_rental_price_unit(self, start_dt, end_dt, currency):  # TODO this might be cache
+    def _get_rental_price_unit(self, start_dt, end_dt, currency=None):  # TODO this might be cache
         """ Compute the price unit for the given rental period of current products by combining the rental tenures. The
             price is expressed in product currency.
             :param start_dt: string of start date
