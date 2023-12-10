@@ -5,10 +5,12 @@ import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
+import { sprintf } from "@web/core/utils/strings";
 import { Layout } from "@web/search/layout";
 import { useModel } from "@web/views/model";
 import { standardViewProps } from "@web/views/standard_view_props";
 import { FormViewDialog } from "@web/views/view_dialogs/form_view_dialog";
+import { SelectCreateDialog } from "@web/views/view_dialogs/select_create_dialog";
 
 import { Component, onWillStart, onWillUpdateProps, onWillUnmount, onWillDestroy } from "@odoo/owl";
 import { SCALES } from "./gantt_arch_parser";
@@ -92,13 +94,40 @@ export class GanttController extends Component {
         this.model.load({ scaleId });
     }
 
+    get rendererProps() {
+        return {
+            deleteDependency: this.deleteDependency.bind(this),
+            planRecords: this.planRecords.bind(this),
+            model: this.model,
+            openRecord: this.openRecord.bind(this),
+            setDate: this.setDate.bind(this),
+        };
+    }
+
+    /* Actions */
+
+    deleteDependency(srcRecord, dstRecord) {
+        this.dialogService.add(ConfirmationDialog, {
+            body: sprintf(this.env._t("Are you sure that you want to dependency from %s to %s ?"), srcRecord.display_name, dstRecord.display_name),
+            confirm: () => {
+                this.model.deleteDependencies([srcRecord.id], [dstRecord.id]);
+            },
+            cancel: () => {},
+        });
+    }
+
+    onClickCreate() {
+        const context = this.model.getDatesContext();
+        this.openRecord({context: context});
+    }
+
     /**
      * Opens dialog to add/edit/view a record
      *
      * @param {Record<string, any>} props FormViewDialog props
      * @param {Record<string, any>} [options={}]
      */
-    openDialog(props, options = {}) {
+    openRecord(props, options = {}) {
         const { resModel, formViewId: viewId } = this.model.metaData;
         const title = props.title || (props.resId ? _t("Open") : _t("Create"));
 
@@ -138,4 +167,40 @@ export class GanttController extends Component {
             }
         );
     }
+
+    /**
+     * Plan records
+     *
+     * @param {String} startDate
+     * @param {String} endDate
+     * @param {Object} extraData
+     * @param {Object} extraContext
+     **/
+    planRecords(startDate, endDate, extraData, extraContext) {
+        const domain = this.model.getPlanDialogDomain();
+        const data =  Object.fromEntries(Object.entries(extraData).map(([k, v]) => [k, this.model.normalizeORMValueToWrite(k, v)]))
+
+        const context = Object.assign(this.props.context, extraContext);
+
+        // for the create button of the modal
+        context[sprintf('default_%s', this.model.dateStartField)] = startDate;
+        context[sprintf('default_%s', this.model.dateStopField)] = endDate;
+
+        this.dialogService.add(
+            SelectCreateDialog,
+            {
+                title: _t("Plan"),
+                resModel: this.model.metaData.resModel,
+                context: context,
+                domain,
+                noCreate: !this.model.canCreate,
+                onSelected: (resIds) => {
+                    if (resIds.length) {
+                        this.model.reschedule(resIds, startDate, endDate, data);
+                    }
+                },
+            }
+        );
+    }
+
 }

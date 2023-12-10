@@ -39,16 +39,17 @@ export class GanttRenderer extends Component {
 
     static props = {
         model: Object,
-        openDialog: Function,
         archInfo: Object,
+        openRecord: Function,
+        planRecords: Function,
+        deleteDependency: Function,
+        setDate: Function,
     };
     static template = "web_gantt.GanttRenderer";
 
 	setup() {
         this.model = this.props.model;
         this.decorationMap = this.model.metaData.archInfo.decorationMap;
-        this.activeActions = this.model.metaData.archInfo.activeActions;
-        this.fieldInfos = this.model.metaData.fields;
 
         // DHX Gantt Lib
         this.dhxGantt = null;
@@ -93,7 +94,8 @@ export class GanttRenderer extends Component {
         });
         this.onTaskClick = this.dhxGantt.attachEvent("onTaskClick", this.debounceOnTaskClick.bind(this));
         this.afterTaskDragEvent = this.dhxGantt.attachEvent("onAfterTaskDrag", this._dhxOnAfterTaskDrag.bind(this));
-
+        this.onLinkCreated = this.dhxGantt.attachEvent("onLinkCreated", this._dhxOnLinkCreated.bind(this));
+        this.onLinkClick = this.dhxGantt.attachEvent("onLinkClick", this._dhxOnLinkClicked.bind(this));
         // refresh the gantt part when resizing window
         browser.addEventListener("resize", this.onResize);
     }
@@ -106,6 +108,8 @@ export class GanttRenderer extends Component {
         this.dhxGantt.detachEvent(this.onTaskClick);
         this.dhxGantt.detachEvent(this.afterTaskDragEvent);
         this.dhxGantt.detachEvent(this.onTaskDblClick);
+        this.dhxGantt.detachEvent(this.onLinkCreated);
+        this.dhxGantt.detachEvent(this.onLinkClick);
 
         // unbind the refreshing
         browser.removeEventListener("resize", this.onResize);
@@ -115,20 +119,8 @@ export class GanttRenderer extends Component {
     // Public
     //--------------------------------------------------------------------------
 
-    get canCreate() {
-        return this.activeActions.create;
-    }
-    get canEdit() {
-        return this.activeActions.edit;
-    }
-
-    get progressField() {
-        return this.model.progressField;
-    }
-
     get rows() {
         const rows = [];
-
         const serializerFunc = this.useDateOnly ? serializeDate : serializeDateTime;
 
         const processNode = (node) => {
@@ -147,17 +139,17 @@ export class GanttRenderer extends Component {
                 }
             } else {
                 const parentId = node.parentGroupId;
-                for (const recordId of node.recordIds || []) {
+                for (const [recordId, ganttId] of Object.entries(node.recordMapIds || {})) {
                     const record = this.model.recordMap[recordId];
                     rows.push({
-                        id: _.uniqueId('record'),
+                        id: ganttId,
                         text: record.display_name,
                         open: true,
                         parent: node.parentGroupId,
                         type: gantt.config.types.task,
                         start_date: serializerFunc(record[this.model.dateStartField]),
                         end_date: serializerFunc(record[this.model.dateStopField]),
-                        progress: this.progressField ? record[this.progressField] / 100 : null,
+                        progress: this.model.progressField ? record[this.model.progressField] / 100 : null,
                         // odoo stuffs
                         color: this.model.colorField ? record[this.model.colorField] : null,
                         context: node.context,
@@ -174,13 +166,39 @@ export class GanttRenderer extends Component {
         return rows;
     }
 
+    get links() {
+        const links = [];
+        for (const [recordId, record] of Object.entries(this.model.recordMap)) {
+            const dstGanttIds = this.model.idsMap[recordId] || [];
+            const srcRecordIds = record[this.model.dependencyField] || [];
+
+            if (dstGanttIds.length && srcRecordIds.length) {
+                let srcGanttIds = [];
+                for (const srcRecordId of srcRecordIds) {
+                    srcGanttIds = srcGanttIds.concat(this.model.idsMap[srcRecordId] || []);
+                }
+                for (const dstGanttId of dstGanttIds) {
+                    for (const srcGanttId of srcGanttIds) {
+                        links.push({
+                            id: _.uniqueId('link'),
+                            target: dstGanttId,
+                            source: srcGanttId,
+                            type: "0", // TODO constant, zero because it is the default type when drawing the link
+                        })
+                    }
+                }
+            }
+        }
+        return links;
+    }
+
     get useDateOnly() {
         return this.model.useDateOnly;
     }
 
     /**
-     * Instantiates a Chart (Chart.js lib) to render the graph according to
-     * the current config.
+     * Initialize the gantt object with
+     * the current config and data.
      */
     renderGantt() {
         // Haskish way of setting the parent div size, as dhtmlx is using 'px' and not relative %. This
@@ -202,7 +220,7 @@ export class GanttRenderer extends Component {
         this.dhxGantt.clearAll(); // as the renderer is not destroy each refresh, we need to clear the data in DHX
 		this.dhxGantt.parse({
 			data: this.rows,
-			links: []
+			links: this.links,
 		});
     }
 
@@ -235,7 +253,7 @@ export class GanttRenderer extends Component {
             this.dhxGantt.config.date_format = DHX_DATE_FORMAT;
             this.dhxGantt.config.duration_unit = "day";
             this.dhxGantt.config.duration_step = 1;
-            this.dhxGantt.config.server_utc = true;
+            this.dhxGantt.config.server_utc = false;
         } else { // datetime
             this.dhxGantt.config.xml_date = DHX_DATETIME_FORMAT;
             this.dhxGantt.config.date_format = DHX_DATETIME_FORMAT;
@@ -254,7 +272,7 @@ export class GanttRenderer extends Component {
             width: '*',
             resize: true,
         }];
-        if (!!this.progressField) {
+        if (!!this.model.progressField) {
             columns.push({
                 name:"progress",
                 label: _t("Progress"),
@@ -265,7 +283,7 @@ export class GanttRenderer extends Component {
         this.dhxGantt.config.columns = columns;
         this.dhxGantt.config.initial_scroll = false;
         this.dhxGantt.config.preserve_scroll = true;
-        this.dhxGantt.config.show_progress = !!this.progressField;
+        this.dhxGantt.config.show_progress = !!this.model.progressField;
 
         // templates
         var self = this;
@@ -281,12 +299,12 @@ export class GanttRenderer extends Component {
         this.dhxGantt.templates.task_class = this._dhxTaskClass.bind(this);
 
         // drag options
-        this.dhxGantt.config.drag_resize = this.canEdit; // allow resize gantt task
-        this.dhxGantt.config.drag_move = this.canEdit; // allow moving gantt task
-        this.dhxGantt.config.drag_links = false;
-        this.dhxGantt.config.drag_progress = !!this.progressField && this.canEdit && !this.model.fieldInfos[this.progressField].readonly; // allow changing progress
+        this.dhxGantt.config.drag_resize = this.model.canEdit; // allow resize gantt task
+        this.dhxGantt.config.drag_move = this.model.canEdit; // allow moving gantt task
+        this.dhxGantt.config.drag_links = this.model.canLink;
+        this.dhxGantt.config.drag_progress = !!this.model.progressField && this.model.canEdit && !this.model.fieldInfos[this.model.progressField].readonly; // allow changing progress
         this.dhxGantt.config.multiselect = false;
-        if (this.canCreate) {
+        if (this.model.canPlan) {
             this.dhxGantt.config.click_drag = {
                 callback: this._dhxDrag.bind(this),
                 singleRow: true,
@@ -393,13 +411,12 @@ export class GanttRenderer extends Component {
             const task = tasksInRow[0];
             context = tasksInRow[0].context;
 
+            const data = _.pick(task.record, this.model.metaData.groupBy);
+
             const startDateStr = serializerFunc(DateTime.fromJSDate(this.dhxGantt.roundDate(startDate)));
             const endDateStr = serializerFunc(DateTime.fromJSDate(this.dhxGantt.roundDate(endDate)));
 
-            context[sprintf('default_%s', this.model.dateStartField)] = startDateStr;
-            context[sprintf('default_%s', this.model.dateStopField)] = endDateStr;
-
-            this.props.openDialog({context: context});
+            this.props.planRecords(startDateStr, endDateStr, data, task.context);
         }
     }
 
@@ -431,7 +448,7 @@ export class GanttRenderer extends Component {
 
         const task = this.dhxGantt.getTask(id);
         if (task.record) {
-            this.props.openDialog({resId: task.record.id});
+            this.props.openRecord({resId: task.record.id});
         }
     }
 
@@ -452,6 +469,18 @@ export class GanttRenderer extends Component {
             }
         }
         return classes.join(" ");
+    }
+
+    _dhxOnLinkCreated(link) {
+        const srcTask = this.dhxGantt.getTask(link.source);
+        const dstTask = this.dhxGantt.getTask(link.target);
+        this.model.makeDependencies([srcTask.record.id], [dstTask.record.id]);
+    }
+    _dhxOnLinkClicked(id) {
+        const link = this.dhxGantt.getLink(id);
+        const srcTask = this.dhxGantt.getTask(link.source);
+        const dstTask = this.dhxGantt.getTask(link.target);
+        this.props.deleteDependency(srcTask.record, dstTask.record);
     }
 
 }

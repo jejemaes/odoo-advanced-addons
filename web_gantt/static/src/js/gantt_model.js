@@ -36,8 +36,20 @@ const computeRange = function(scale, date) {
         start = start.startOf(scale);
         end = end.endOf(scale);
     }
-
     return { start, end };
+}
+
+
+const mergeIdsMap = function(target, extra) {
+    const newMap = {...target};
+    for (const [key, values] of Object.entries(extra)) {
+        if (key in newMap) {
+            newMap[key] = [...newMap[key], ...values];
+        } else {
+            newMap[key] = values;
+        }
+    }
+    return newMap;
 }
 
 
@@ -47,9 +59,10 @@ export class GanttModel extends Model {
         this.dateStopField = params.archInfo.dateStopField;
         this.colorField = params.archInfo.colorField;
         this.progressField = params.archInfo.progressField;
+        this.dependencyField = params.archInfo.dependencyField;
+        this.dependencyInverseField = params.archInfo.dependencyInverseField;
 
         this.initialGroupBy = params.archInfo.defaultGroupBy;
-        this.initialOrderBy = params.archInfo.defaultOrderBy;
         this.initialScaleId = params.archInfo.defaultScale;
 
         this.allowedScales = params.archInfo.scales || {};
@@ -95,19 +108,122 @@ export class GanttModel extends Model {
         this.notify();
     }
 
+    //-------------------------------------------------------------------------
+    // Public
+    //-------------------------------------------------------------------------
+
+    get canCreate() {
+        return this.metaData.archInfo.activeActions.create;
+    }
+
+    get canEdit() {
+        return this.metaData.archInfo.activeActions.edit;
+    }
+
+    get canLink() {
+        return this.dependencyField && this.dependencyInverseField && this.metaData.archInfo.activeActions.edit;
+    }
+
+    get canPlan() {
+        return this.metaData.archInfo.activeActions.edit && !this.fieldInfos[this.dateStartField].required;
+    }
+
+    get useDateOnly() {
+        return this.fieldInfos[this.dateStartField].type == 'date';
+    }
+
+    deleteDependencies(srcIds, dstIds) {
+        const data = {};
+        data[this.dependencyInverseField] = dstIds.map((x) => x2ManyCommands.forget(x));
+        const context = this.metaData.context;
+        return this.mutex.exec(async () => {
+            try {
+                const result = await this.orm.write(this.metaData.resModel, srcIds, data, {
+                    context,
+                });
+            } finally {
+                await this.load();
+            }
+        });
+    }
+
+    /**
+     * Get domain of records for plan dialog in the gantt view.
+     *
+     * @param {Object} state
+     * @returns {any[][]}
+     */
+    getPlanDialogDomain() {
+        // TODO jem: in v17, use removeDomainLeaves
+        return Domain.and([
+            this.env.searchModel.globalDomain,
+            ["|", [this.dateStartField, "=", false], [this.dateStopField, "=", false]],
+        ]).toList({});
+    }
+
+    getDatesContext() {
+        const context = this.env.searchModel.globalContext;
+
+        const serializerFunc = this.useDateOnly ? serializeDate : serializeDateTime;
+        const startDateStr = serializerFunc(this.metaData.startDate);
+        const endDateStr = serializerFunc(this.metaData.stopDate);
+
+        context[sprintf('default_%s', this.dateStartField)] = startDateStr;
+        context[sprintf('default_%s', this.dateStopField)] = endDateStr;
+
+        return context;
+    }
+
+    makeDependencies(srcIds, dstIds) {
+        const data = {};
+        data[this.dependencyInverseField] = dstIds.map((x) => x2ManyCommands.linkTo(x));
+        const context = this.metaData.context;
+        return this.mutex.exec(async () => {
+            try {
+                const result = await this.orm.write(this.metaData.resModel, srcIds, data, {
+                    context,
+                });
+            } finally {
+                await this.load();
+            }
+        });
+    }
+    /**
+     * Convert read server values into write server values
+     *
+     **/
+    normalizeORMValueToWrite(fieldName, value) {
+        const fieldInfo = this.fieldInfos[fieldName];
+        switch (fieldInfo.type) {
+            case "many2one":
+                if (value){
+                    value = value[0];
+                }
+                break;
+            case "many2many": // this is the same as M2O
+                if (value) {
+                    return [[6, 0, [value[0]]]];
+                }
+                break;
+            default:
+                // keep given value
+            }
+        return value;
+    }
+
     /**
      * Reschedule a task to the given schedule.
      *
      * @param {number | number[]} ids
      * @param {String} startDate: server format date
      * @param {String} stopDate: server format date
-     * @param {(result: any) => any} [callback]
+     * @param {Object} extraData: extra data to write, in the server format (ORM commands, ...)
      */
-    async reschedule(ids, startDate, stopDate, callback) {
+    async reschedule(ids, startDate, stopDate, extraData) {
         if (!Array.isArray(ids)) {
             ids = [ids];
         }
-        const data = {};
+        const data = Object.assign({}, extraData || {});
         data[this.dateStartField] = startDate;
         data[this.dateStopField] = stopDate;
 
@@ -140,10 +256,6 @@ export class GanttModel extends Model {
                 await this.load();
             }
         });
-    }
-
-    get useDateOnly() {
-        return this.fieldInfos[this.dateStartField].type == 'date';
     }
 
     //-------------------------------------------------------------------------
@@ -224,10 +336,8 @@ export class GanttModel extends Model {
                 groupby: groupBy,
                 offset: pagerOffset,
                 limit: this.groupLimit,
-                orderby: this.initialOrderBy || null,
                 context,
-            })
-        ;
+            });
         return { length, groups, records };
     }
 
@@ -241,6 +351,7 @@ export class GanttModel extends Model {
      */
     _generateTreeGroup(groupedBy, groups, parentGroupId, parentDefaultContext){
         let nodes = [];
+        let idsMap = {}; // odooId -> [ganttId]
 
         if (groupedBy.length) {
             const headGroupBy = groupedBy[0];
@@ -255,7 +366,7 @@ export class GanttModel extends Model {
                 if (parentDefaultContext){
                     defaultContext = parentDefaultContext;
                 }
-                defaultContext[sprintf("default_%s", headGroupBy)] = this._normalizeContextValue(headGroupBy, headGroupValue);
+                defaultContext[sprintf("default_%s", headGroupBy)] = this.normalizeORMValueToWrite(headGroupBy, headGroupValue);
                 // group record IDs
                 const recordIds = [];
                 for (const g of subGroups) {
@@ -263,22 +374,31 @@ export class GanttModel extends Model {
                 }
                 // row struct
                 const groupId = _.uniqueId('group');
+                const [childNodes, childIdsMap] = this._generateTreeGroup(tailGroupBy, subGroups, groupId, {...defaultContext});
                 const node = {
                     groupId,
                     parentGroupId,
                     name: this._getGroupName(headGroupBy, headGroupValue),
                     recordIds,
-                    childNodes: this._generateTreeGroup(tailGroupBy, subGroups, groupId, {...defaultContext}),
+                    childNodes,
                     isGroup: true,
                     context: {...defaultContext},
                 }
                 nodes.push(node);
+                idsMap = mergeIdsMap(idsMap, childIdsMap);
             }
         } else {
             // group record IDs
             const recordIds = [];
+            const recordMapIds = {};
             for (const g of groups) {
                 recordIds.push(...(g.__record_ids || []));
+
+                for (const recordId of g.__record_ids || []) {
+                    const ganttId = _.uniqueId('record');
+                    recordMapIds[recordId] = ganttId;
+                    idsMap[recordId] = [ganttId];
+                }
             }
             // row struct
             const groupId = _.uniqueId('group');
@@ -287,6 +407,7 @@ export class GanttModel extends Model {
                 parentGroupId,
                 name: null,
                 recordIds,
+                recordMapIds,
                 childNodes: null,
                 isGroup: false,
                 context: {...parentDefaultContext},
@@ -294,7 +415,7 @@ export class GanttModel extends Model {
             nodes = [node];
         }
 
-        return nodes;
+        return [nodes, idsMap];
     }
 
 
@@ -332,6 +453,12 @@ export class GanttModel extends Model {
         if (this.progressField) {
             fields.push(this.progressField);
         }
+        if (this.dependencyField) {
+            fields.push(this.dependencyField);
+        }
+        if (this.dependencyInverseField) {
+            fields.push(this.dependencyInverseField);
+        }
         if (this.fieldsToFetch){
             fields = fields.concat(this.fieldsToFetch);
         }
@@ -343,7 +470,7 @@ export class GanttModel extends Model {
         if (field.type === "boolean") {
             return value ? "True" : "False";
         } else if (!value) {
-            return _t("Undefined %s", field.string);
+            return sprintf(_t("Undefined %s"), field.string);
         } else if (field.type === "many2many") {
             return value[1];
         }
@@ -360,26 +487,7 @@ export class GanttModel extends Model {
             recordMap[record.id] = record;
         }
         this.recordMap = recordMap;
-        this.groupTree = this._generateTreeGroup(metaData.groupBy, groups, null, metaData.context);  // requires the action context
-    }
-
-    _normalizeContextValue(fieldName, value) {
-        const fieldInfo = this.fieldInfos[fieldName];
-        switch (fieldInfo.type) {
-            case "many2one":
-                if (value){
-                    value = value[0];
-                }
-                break;
-            case "many2many": // this is the same as M2O
-                if (value) {
-                    return [[6, 0, [value[0]]]];
-                }
-                break;
-            default:
-                // keep given value
-            }
-        return value;
+        [this.groupTree, this.idsMap] = this._generateTreeGroup(metaData.groupBy, groups, null, metaData.context);  // requires the action context
     }
 
     /**

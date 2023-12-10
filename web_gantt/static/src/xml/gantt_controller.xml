@@ -10,12 +10,14 @@
             <t t-component="props.Renderer"
                 model="model"
                 archInfo="props.archInfo"
-                openDialog.bind="openDialog"/>
+                t-props="rendererProps"
+            />
         </Layout>
     </t>
 
     <t t-name="web_gantt.GanttController.ControlButtons" owl="1">
         <div class="o_gantt_buttons">
+            <button class="btn btn-primary me-3" t-if="model.canCreate" t-on-click="onClickCreate">New</button>
             <span t-if="!env.isSmall" class="o_gantt_navigation_buttons me-1">
                 <button
                     class="btn btn-primary o_gantt_button_prev"
@@ -56,39 +58,7 @@
                     </t>
                 </Dropdown>
             </span>
-            <!-- <button t-if="env.isSmall" class="o_cp_today_button btn btn-sm btn-link" t-on-click="() => this.setDate('today')">
-                <span class="fa-stack o_gantt_button_today">
-                    <i class="fa fa-gantt-o fa-stack-2x" role="img" aria-label="Today" title="Today" />
-                    <strong class="o_gantt_text fa-stack-1x" t-esc="getTodayDay()" />
-                </span>
-            </button>  -->
         </div>
     </t>
-
-<!--
-    <div t-name="GanttView" class="o_gantt_view">
-        <div class="container-fluid p-0">
-            <div t-att-id="widget.dhx_id" class="o_gantt_view_dhx"/>
-        </div>
-    </div>
-
-    <div t-name="GanttView.buttons">
-        <button t-if="widget.is_action_enabled('create')" class="o_gantt_button_add btn btn-primary mr-3" title="Add record"> Add </button>
-        <div class="d-inline-block mr-3">
-            <button class="o_gantt_button_prev btn btn-primary" title="Previous">
-                <span class="fa fa-arrow-left"/>
-            </button>
-            <button class="o_gantt_button_today btn btn-primary"> Today </button>
-            <button class="o_gantt_button_next btn btn-primary" title="Next">
-                <span class="fa fa-arrow-right"/>
-            </button>
-        </div>
-        <button t-foreach="allowedScales" t-as="scale" t-attf-class="o_gantt_button_scale btn btn-secondary #{activateScale == scale ? 'active' : ''}" type="button" t-att-data-value="scale">
-            <t t-esc="SCALES[scale].string"/>
-        </button>
-    </div>
-
-    <div t-name="GanttView.Row" t-attf-class="row no-gutters o_gantt_row">
-    </div> -->
 
 </templates>

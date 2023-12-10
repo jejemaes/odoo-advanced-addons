@@ -105,13 +105,15 @@ export class GanttArchParser extends XMLParser {
 
         const jsClass = xmlDoc.getAttribute("js_class");
         const defaultGroupBy = xmlDoc.getAttribute("default_group_by") ? xmlDoc.getAttribute("default_group_by").split(",") : [];
-        const defaultOrderBy = stringToOrderBy(xmlDoc.getAttribute("default_order_by")) || ['id'];
         const defaultScale = xmlDoc.getAttribute("default_scale") || "month";
         const dateStartField = xmlDoc.getAttribute("date_start");
         const dateStopField = xmlDoc.getAttribute("date_stop");
         const colorField = xmlDoc.getAttribute("color");
         const limit = xmlDoc.getAttribute("limit") || 80;
         const progressField = xmlDoc.getAttribute("progress") || null;
+
+        const dependencyField = xmlDoc.getAttribute("dependency_field") || null;
+        const dependencyInverseField = xmlDoc.getAttribute("dependency_inverted_field") || null;
 
         // scales
         const scaleAttr = xmlDoc.getAttribute("scales");
@@ -171,12 +173,13 @@ export class GanttArchParser extends XMLParser {
             dateStartField,
             dateStopField,
             defaultGroupBy,
-            defaultOrderBy,
             defaultScale,
             limit: limit && parseInt(limit, 10),
             scales: allowedScaleInfos,
             viewTitle,
             progressField,
+            dependencyField,
+            dependencyInverseField,
         };
     }
 }
