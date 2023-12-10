@@ -51,6 +51,8 @@
                 precision="{'week': 'day:full', 'month': 'day:full', 'year': 'month:full'}"
                 default_scale="month"
                 default_group_by="user_ids"
+                dependency_field="depend_on_ids"
+                dependency_inverted_field="dependent_ids"
                 color="color"/>
         </field>
     </record>

@@ -6,7 +6,6 @@
             <attribute name="date_start"/>
             <attribute name="date_stop"/>
             <attribute name="default_group_by"/>
-            <attribute name="default_order_by"/>
             <attribute name="scales"/>
             <attribute name="default_scale"/>
             <attribute name="precision"/>
@@ -25,18 +24,24 @@
             <optional>
                 <attribute name="progress"/>
             </optional>
+            <optional>
+                <attribute name="dependency_field"/>
+                <attribute name="dependency_inverted_field"/>
+            </optional>
 
             <rng:optional><rng:attribute name="decoration-danger"/></rng:optional>
-            <rng:optional><rng:attribute name="decoration-info"/></rng:optional>
-            <rng:optional><rng:attribute name="decoration-secondary"/></rng:optional>
-            <rng:optional><rng:attribute name="decoration-success"/></rng:optional>
             <rng:optional><rng:attribute name="decoration-warning"/></rng:optional>
+            <rng:optional><rng:attribute name="decoration-success"/></rng:optional>
 
             <zeroOrMore>
                 <optional>
                     <ref name="field"/>
                 </optional>
             </zeroOrMore>
+
+            <!-- Not implemented javacsript side -->
+            <rng:optional><rng:attribute name="decoration-info"/></rng:optional>
+            <rng:optional><rng:attribute name="decoration-secondary"/></rng:optional>
         </element>
     </define>
 
