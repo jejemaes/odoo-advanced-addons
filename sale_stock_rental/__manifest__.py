@@ -16,6 +16,6 @@ For now this module only prevent to create delivery order when confirming rental
         # 'views/rental_views.xml',
         # 'views/sale_order_views.xml',
     ],
-    'installable': True,
+    'installable': False,
     'auto_install': True,
 }

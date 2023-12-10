@@ -9,4 +9,5 @@
     'version': '1.0',
     'depends': ['base_geolocalize'],
     'data': [],
+    'installable': False,
 }
