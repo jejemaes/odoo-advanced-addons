@@ -15,6 +15,6 @@
         'web.assets_backend': [
             'pos_customer_required/static/src/js/pos_customer_required.js',
         ]
-    }
+    },
     'installable': False,
 }
