@@ -19,7 +19,7 @@ class Base(models.AbstractModel):
         return E.gantt(string=self._description)
 
     @api.model
-    def gantt_read(self, domain, fields, groupby, offset=0, limit=None, orderby=False):
+    def gantt_read(self, domain, fields, groupby, offset=0, limit=None):
         # TODO check access read
         # combine domaine with access rules
 
@@ -33,6 +33,7 @@ class Base(models.AbstractModel):
             raw_group.pop('__count', None)
             raw_group.pop('__domain', None)
             record_ids = record_ids.union(set(raw_group['__record_ids']))
+            raw_group['__record_ids'].sort()
 
         # read records
         record_domain = expression.AND([domain, [('id', 'in', list(record_ids))]])
