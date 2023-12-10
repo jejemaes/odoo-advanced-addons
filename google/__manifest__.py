@@ -12,4 +12,5 @@ The module provide the OAuth2 flow for Google APIs
         'security/ir.model.access.csv',
         'views/res_config_settings_views.xml',
     ],
+    'installable': False,
 }

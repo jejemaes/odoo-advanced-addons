@@ -22,4 +22,5 @@
         'views/event_type_views.xml',
         'report/event_event_templates.xml',
     ],
+    'installable': False,
 }

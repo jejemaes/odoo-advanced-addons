@@ -14,7 +14,7 @@
         'security/website_gallery_security.xml',
         'data/website_gallery_data.xml',
     ],
-    'installable': True,
+    'installable': False,
     'auto_install': False,
     'assets': {
         'web.assets_frontend': [

@@ -18,4 +18,5 @@
         'views/event_registration_views.xml',
         'views/event_registration_page_templates.xml',
     ],
+    'installable': False,
 }

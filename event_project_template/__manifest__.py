@@ -12,4 +12,5 @@
         'views/event_type_views.xml',
     ],
     'auto_install': True,
+    'installable': False,
 }

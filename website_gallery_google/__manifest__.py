@@ -20,6 +20,6 @@ The module import photos for Google Photos API
         'web.assets_qweb': [
             'website_gallery_google/static/src/xml/gallery_import.xml',
         ],
-    }
-
+    },
+    'installable': False,
 }
