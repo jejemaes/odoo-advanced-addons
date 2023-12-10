@@ -12,5 +12,6 @@ Delivery your products but compute how many kilometer you will have to do.
     'sequence': 330,
     'version': '1.0',
     'depends': ['delivery_distance', 'website_sale_delivery'],
-    'auto_install': True
+    'auto_install': True,
+    'installable': False,
 }

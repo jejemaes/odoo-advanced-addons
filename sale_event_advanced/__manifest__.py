@@ -14,6 +14,6 @@
     "data": [
         'wizards/event_edit_registration.xml'
     ],
-    "installable": True,
+    "installable": False,
     "auto_install": True,
 }

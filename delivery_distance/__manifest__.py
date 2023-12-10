@@ -17,4 +17,5 @@ Delivery your products but compute how many kilometer you will have to do.
         'views/delivery_distance_views.xml',
         'views/res_config_settings_views.xml',
     ],
+    'installable': False,
 }

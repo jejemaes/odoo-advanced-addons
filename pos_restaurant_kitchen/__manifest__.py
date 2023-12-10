@@ -22,7 +22,7 @@ refreshing kanban view.
         'views/pos_order_templates.xml',
         'data/pos_restaurant_kitchen_data.xml',
     ],
-    'installable': True,
+    'installable': False,
     'application': False,
     'auto_install': False,
     'assets': {

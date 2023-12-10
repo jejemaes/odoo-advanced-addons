@@ -29,5 +29,6 @@ Rent your machines and other resources for money to your customer through Sales 
     'demo': [
         'data/product_demo.xml',
         'data/resource_demo.xml',
-    ]
+    ],
+    'installable': False,
 }

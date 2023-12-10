@@ -18,7 +18,6 @@ Rent your machines and other resources for money to your customer through your e
         'views/website_sale_templates.xml',
         'views/product_template_views.xml',
     ],
-    'installable': True,
     'auto_install': True,
     'assets': {
         'web.assets_frontend': [
@@ -27,5 +26,6 @@ Rent your machines and other resources for money to your customer through your e
         'web.assets_qweb': [
             'website_sale_rental/static/src/xml/website_sale_rental_modal.xml',
         ],
-    }
+    },
+    'installable': False,
 }
