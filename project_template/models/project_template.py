@@ -26,7 +26,7 @@ class ProjectTemplate(models.Model):
     task_template_count = fields.Integer("Task Template Count", compute='_compute_task_template_count')
 
     stage_shared = fields.Boolean("Share Stages", help="Share stages between projects, or copy them to projects created with this template.")
-    stage_ids = fields.Many2many('project.task.type', 'project_template_type_rel', 'project_template_id', 'type_id', string='Tasks Stages')
+    stage_ids = fields.Many2many('project.task.type', 'project_template_type_rel', 'project_template_id', 'type_id', string='Tasks Stages', domain=[('user_id', '=', False)])
 
     privacy_visibility = fields.Selection([
         ('followers', 'Invited employees'),
@@ -85,8 +85,8 @@ class ProjectTemplateTask(models.Model):
     name = fields.Char('Title', required=True)
     description = fields.Html(string='Description')
     priority = fields.Selection([
-        ('0', 'Normal'),
-        ('1', 'Important'),
+        ('0', 'Low'),
+        ('1', 'High'),
     ], default='0', string="Priority")
     sequence = fields.Integer(string='Sequence', default=10,
         help="Gives the sequence order when displaying a list of tasks.")
