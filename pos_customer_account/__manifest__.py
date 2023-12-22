@@ -12,5 +12,5 @@
         'views/pos_payment_views.xml',
         'wizard/pos_payment_change_views.xml',
     ],
-    'installable': False,
+    'installable': True,
 }

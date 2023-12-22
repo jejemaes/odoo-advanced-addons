@@ -17,7 +17,7 @@ Wizard to create multiple table on a floor plan
         'views/restaurant_table_views.xml',
         'wizard/restaurant_table_generator_views.xml',
     ],
-    'installable': False,
+    'installable': True,
     'application': False,
     'auto_install': False,
 }
