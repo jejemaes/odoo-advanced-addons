@@ -16,7 +16,7 @@ class EventType(models.Model):
     ], string="Project Mode")
 
     # existing project
-    project_id = fields.Many2one('project.project', string="Project", ondelete="set null")
+    project_id = fields.Many2one('project.project', string="Project", ondelete="set null", domain=[('privacy_visibility', '=', 'employees')])
 
     # new project
     project_start_date_delay = fields.Integer("Project Start Date Delay", default=1)
@@ -128,6 +128,7 @@ class EventEvent(models.Model):
             context = safe_eval(action['context'], eval_context)
         action['context'] = context
 
+        action['context']['active_id'] = self.project_id.id
         action['context']['default_event_id'] = self.id
         action['context']['search_default_event_id'] = self.id
 
