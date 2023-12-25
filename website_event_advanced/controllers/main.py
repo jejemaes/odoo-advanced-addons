@@ -31,3 +31,17 @@ class WebsiteEventAdvancedController(WebsiteEventController):
                 value['quantity'] = 1
 
         return result
+
+
+
+    def _process_attendees_form(self, event, form_details):
+        print('form_details',form_details)
+        result = super()._process_attendees_form(event, form_details)
+        print('================_process_attendees_form', result)
+        return result
+
+    def _create_attendees_from_registration_post(self, event, registration_data):
+        print('registration_data',registration_data)
+        result = super()._create_attendees_from_registration_post(event, registration_data)
+        print('================_create_attendees_from_registration_post', result)
+        return result

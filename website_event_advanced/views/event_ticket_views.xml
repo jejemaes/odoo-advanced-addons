@@ -7,8 +7,8 @@
         <field name="model">event.type.ticket</field>
         <field name="inherit_id" ref="event.event_type_ticket_view_tree_from_type"/>
         <field name="arch" type="xml">
-            <field name="seats_max" position="after">
-                <field name="seats_registration_limit"/>
+            <field name="seats_limited" position="after">
+                <field name="seats_registration_limit" optional="hide"/>
             </field>
         </field>
     </record>
@@ -31,7 +31,7 @@
         <field name="inherit_id" ref="event.event_event_ticket_view_tree_from_event"/>
         <field name="arch" type="xml">
             <field name="seats_max" position="after">
-                <field name="seats_registration_limit"/>
+                <field name="seats_registration_limit" optional="hide"/>
             </field>
         </field>
     </record>
