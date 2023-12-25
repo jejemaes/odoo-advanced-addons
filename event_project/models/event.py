@@ -108,11 +108,6 @@ class EventEvent(models.Model):
         result._generate_project()
         return result
 
-    def write(self, values):
-        result = super(EventEvent, self).write(values)
-        self._generate_project()
-        return result
-
     # ---------------------------------------------------
     #  Actions
     # ---------------------------------------------------
@@ -144,9 +139,10 @@ class EventEvent(models.Model):
     # --------------------------------------------------
 
     def _generate_project(self):
+        """ Note: this mush only be called on create event, not in write. Otherwise, each tasks of the project will have their project changed... """
         projects = self.env['project.project']
         for event in self:
-            if event.stage_id.project_required and event.event_type_id.use_project and not event.project_id:
+            if event.event_type_id.use_project and not event.project_id:
                 event._generate_analytic_account(force_create=True)  # force the project to have an analytic account
                 values = event._prepare_project_values()
                 project = self.env['project.project'].sudo().create(values)
@@ -185,8 +181,3 @@ class EventEvent(models.Model):
             'privacy_visibility': "employees", # visible for everybody by default
         }
 
-
-class EventStage(models.Model):
-    _inherit = 'event.stage'
-
-    project_required = fields.Boolean("Requires a Project")

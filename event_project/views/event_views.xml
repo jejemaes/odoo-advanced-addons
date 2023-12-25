@@ -33,9 +33,6 @@
             <xpath expr="//group[@name='generate_data_settings']" position="attributes">
                 <attribute name="invisible">0</attribute>
             </xpath>
-            <xpath expr="//group[@name='generate_data_settings']" position="inside">
-                <field name="project_required"/>
-            </xpath>
         </field>
     </record>
 
