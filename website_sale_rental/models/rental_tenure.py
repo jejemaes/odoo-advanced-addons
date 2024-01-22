@@ -12,6 +12,46 @@ from odoo import tools
 class ProductRentalTenure(models.Model):
     _inherit = 'product.rental.tenure'
 
+    def _get_tenure_price_info(self, pricelist, date=None):
+        current_website = False
+
+        if self.env.context.get('website_id'):
+            current_website = self.env['website'].get_current_website()
+            if not pricelist:
+                pricelist = current_website.get_current_pricelist()
+
+        result = super()._get_tenure_price_info(pricelist, date=date)
+
+        # TODO jem: add taxes if needed on price and list_price in result ...
+        # if self.env.context.get('website_id'):
+            # product = self.env['product.product'].browse(combination_info['product_id']) or self
+            # partner = self.env.user.partner_id
+            # company_id = current_website.company_id
+
+            # fpos_id = self.env['website'].sudo()._get_current_fiscal_position_id(partner)
+            # fiscal_position = self.env['account.fiscal.position'].sudo().browse(fpos_id)
+            # product_taxes = product.sudo().taxes_id.filtered(lambda x: x.company_id == company_id)
+            # taxes = fiscal_position.map_tax(product_taxes)
+
+            # price = self._price_with_tax_computed(
+            #     combination_info['price'], product_taxes, taxes, company_id, pricelist, product,
+            #     partner
+            # )
+            # if pricelist.discount_policy == 'without_discount':
+            #     list_price = self._price_with_tax_computed(
+            #         combination_info['list_price'], product_taxes, taxes, company_id, pricelist,
+            #         product, partner
+            #     )
+            # else:
+            #     list_price = price
+
+
+        return result
+
+
+
+
+
     website_base_price = fields.Float("Display price without pricelist applied", compute='_compute_website_base_price')
     website_list_price = fields.Float("Display price with pricelist applied", compute='_compute_website_list_price')
 
@@ -27,7 +67,7 @@ class ProductRentalTenure(models.Model):
         result = {}
         price_data_map = self._get_tenure_grouped_by_template()
         for product_template, tenures in price_data_map.items():
-            fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
+            fpos = self.env['account.fiscal.position']._get_fiscal_position(partner)
             taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id))
 
             for tenure in tenures:
@@ -54,9 +94,9 @@ class ProductRentalTenure(models.Model):
             sorted_tenures = tenures.sorted(key=lambda r: r.id)
             price_list = [product_template.currency_id._convert(t.base_price, pricelist.currency_id, company=website.company_id, date=fields.Date.today()) for t in sorted_tenures]
 
-            converted_price_data_list = pricelist.apply_rental_pricelist_on_template(product_template, price_list, quantity=1.0)
+            # converted_price_data_list = pricelist.apply_rental_pricelist_on_template(product_template, price_list, quantity=1.0)
 
-            for tenure, list_price in zip(sorted_tenures, converted_price_data_list):
+            for tenure, list_price in zip(sorted_tenures, price_list):
                 price, discount = pricelist.get_pricelist_discount(tenure.base_price, list_price, product=product_template.product_variant_id, date=False)
                 if discount:
                     price_list_tenure_map[tenure.id] = list_price  # base price with discount applied
@@ -66,7 +106,7 @@ class ProductRentalTenure(models.Model):
         # apply company taxes of the product
         result = {}
         for product_template, tenures in price_data_map.items():
-            fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
+            fpos = self.env['account.fiscal.position']._get_fiscal_position(partner)
             taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id))
 
             for tenure in tenures:

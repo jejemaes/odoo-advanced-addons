@@ -75,25 +75,17 @@ class SaleOrder(models.Model):
                     if len(resource_ids) != quantity:
                         raise UserError(_("Resources are not available anymore for you. Please remove your order line and try to set up new rental."))
 
-                price = product.get_rental_price(rental_start_dt, rental_end_dt, self.pricelist_id.id, quantity=quantity, uom_id=False, date=False)[product.id]['price_list']
                 so_line.write({
                     'product_uom_qty': quantity,
-                    'price_unit': price,
                     'resource_ids': [(6, 0, resource_ids)]
                 })
             else:  # remove zero or negative lines
-                linked_line = so_line.linked_line_id
                 so_line.unlink()
-                if linked_line:  # update description of the parent
-                    linked_line.name = linked_line.with_context(lang=self.partner_id.lang or 'en_US').get_sale_order_line_multiline_description_sale(linked_line.product_id)
                 so_line = None  # as line has been removed
 
         else:  # create a new line
             sol_values = self._rental_cart_update_new_line_prepare_values(product_id, rental_start_dt, rental_end_dt, add_qty or set_qty, **kwargs)
             so_line = SaleOrderLineSudo.create(sol_values)
-
-            # update SO line description
-            so_line.name = so_line.with_context(lang=self.partner_id.lang or 'en_US').get_sale_order_line_multiline_description_sale(so_line.product_id)
 
         # link a product to the sales order
         if so_line and kwargs.get('linked_line_id'):
@@ -101,7 +93,6 @@ class SaleOrder(models.Model):
             so_line.write({
                 'linked_line_id': linked_so_line.id,
             })
-            linked_so_line.name = linked_so_line.with_context(lang=self.partner_id.lang or 'en_US').get_sale_order_line_multiline_description_sale(linked_so_line.product_id)
 
         if not so_line:  # as line has been removed
             return {
@@ -135,29 +126,13 @@ class SaleOrder(models.Model):
                 raise UserError(_("Resources are not available anymore for you. Please remove your order line and try to set up new rental."))
 
         # compute price and discout according to the pricelist discount policy
-        price_data = product.get_rental_price(rental_start_dt, rental_end_dt, self.pricelist_id.id, quantity=qty, uom_id=False, date=False)[product.id]
         return {
             'order_id': self.id,
             'product_id': product_id,
             'product_uom_qty': qty,
-            'price_unit': price_data['price_list'],
-            'discount': price_data['discount'],
             'product_uom': product.uom_id.id,
             'is_rental': True,
             'rental_start_date': rental_start_dt,
             'rental_stop_date': rental_end_dt,
             'resource_ids': [(6, 0, resource_ids)] if resource_ids else False,
         }
-
-
-class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
-
-    website_rental_unit_price = fields.Float(compute='_compute_website_rental_unit_price')
-
-    @api.depends('price_unit')
-    @api.depends_context('uid')
-    def _compute_website_rental_unit_price(self):
-        tax_field = 'total_excluded' if self.user_has_groups('account.group_show_line_subtotals_tax_excluded') else 'total_included'
-        for line in self:
-            line.website_rental_unit_price = line.tax_id.compute_all(line.price_unit, line.currency_id, line.product_uom_qty, line.product_id, line.order_partner_id)[tax_field]

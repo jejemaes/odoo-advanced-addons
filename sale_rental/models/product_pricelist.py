@@ -86,3 +86,38 @@ class PricelistItem(models.Model):
             return price
         # sale flow
         return super(PricelistItem, self)._compute_base_price(product, quantity, uom, date, target_currency)
+
+    #----------------------------------------------------
+    # Helpers
+    #----------------------------------------------------
+
+    def _compute_rental_price(self, product, date_start, date_stop, qty=None, date_order=None, currency=None):
+        if not date_order:
+            date_order = fields.Date.today()
+
+        qty = qty or 1.0
+        context = self.env['product.product']._get_rental_context(date_start, date_stop)
+        return self._compute_price(product.with_context(**context), qty, product.uom_id, date_order, currency=currency or self.currency_id)
+
+    def _compute_rental_price_before_discount(self, product, date_start, date_stop, qty=None, date_order=None, currency=None):
+        if not date_order:
+            date_order = fields.Date.today()
+
+        context = self.env['product.product']._get_rental_context(date_start, date_stop)
+        product = product.with_context(**context)
+        qty = qty or 1.0
+
+        pricelist_rule = self
+        if pricelist_rule:
+            pricelist_item = pricelist_rule
+            if pricelist_item.pricelist_id.discount_policy == 'without_discount':
+                # Find the lowest pricelist rule whose pricelist is configured
+                # to show the discount to the customer.
+                while pricelist_item.base == 'pricelist' and pricelist_item.base_pricelist_id.discount_policy == 'without_discount':
+                    rule_id = pricelist_item.base_pricelist_id._get_product_rule(
+                        product, qty, uom=product.uom_id, date=date_order)
+                    pricelist_item = self.env['product.pricelist.item'].browse(rule_id)
+
+            pricelist_rule = pricelist_item
+
+        return pricelist_rule._compute_base_price(product, qty, product.uom_id, date_order, target_currency=currency or self.currency_id)

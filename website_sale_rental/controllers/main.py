@@ -29,14 +29,19 @@ class WebsiteSaleRental(http.Controller):
 
     @http.route('/shop/rental/<model("product.template"):product_tmpl>/price', type='json', auth="public", website=True)
     def rental_price_simulation(self, product_tmpl, start, stop, qty=1):
+        # TODO avoid product template here
+
         start_dt = timezone_datetime(fields.Datetime.from_string(start))
         stop_dt = timezone_datetime(fields.Datetime.from_string(stop))
         qty = int(qty)
 
-        # TODO use product.product directly
-        product = product_tmpl.product_variant_id.sudo().with_context(lang=request.env.user.lang or 'en_US')
+        # use product.product directly
+        rental_context = request.env['product.product']._get_rental_context(start_dt, stop_dt)
+        product = product_tmpl.product_variant_id.sudo().with_context(lang=request.env.user.lang or 'en_US', **rental_context)
         pricelist = request.website.get_current_pricelist()
         partner = request.env.user.partner_id
+        fpos = request.env['account.fiscal.position']._get_fiscal_position(partner)
+        currency = request.website.company_id.currency_id
 
         # resource and quantity
         error = False
@@ -56,21 +61,40 @@ class WebsiteSaleRental(http.Controller):
                 error = _("The rental calendar does not allow to rent this period.")
 
         # get unit price
-        price_data = product.get_rental_price(start_dt, stop_dt, pricelist_id=pricelist.id, quantity=qty)[product.id]
+        pricelist_rule_id = pricelist._get_product_rule(
+            product,
+            qty,
+            uom=product.uom_id,
+            date=fields.Date.today(),
+            **rental_context
+        )
+        pricelist_rule = request.env['product.pricelist.item'].sudo().browse(pricelist_rule_id) if pricelist_rule_id else request.env['product.pricelist.item'].sudo()
+
+        price = pricelist_rule._compute_rental_price(product, start_dt, stop_dt, date_order=fields.Date.today(), currency=currency)
+        print('===========pricelist_rule', pricelist_rule)
+        print('===========price', price)
+        print('===========rental_context', rental_context)
+        price = product._get_tax_included_unit_price(
+            request.env.company,
+            pricelist.currency_id,
+            fields.Date.today(),
+            'sale',
+            fiscal_position=fpos,
+            product_price_unit=price,
+            product_currency=pricelist.currency_id or currency
+            # TODO force UoM ?
+        )
+        print('===========price', price)
         pricing_explanation = product.with_context(pricelist_id=pricelist.id).get_rental_pricing_explanation(start_dt, stop_dt, show_price=False, currency_id=request.website.pricelist_id.currency_id.id)[product.id]
 
-        # compute amount with discount
-        price = price_data['price_list'] * (1 - (price_data['discount'] or 0.0) / 100.0)
-
-        # aplpy taxes if needed
-        fpos = request.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
+        # apply taxes if needed
         taxes = fpos.map_tax(product_tmpl.sudo().taxes_id.filtered(lambda x: x.company_id == request.website.company_id))
         tax_field = 'total_excluded' if request.env.user.user_has_groups('account.group_show_line_subtotals_tax_excluded') else 'total_included'
         price = taxes.compute_all(price, pricelist.currency_id, 1, product, partner)[tax_field]
 
         return {
             'price': tools.format_amount(request.env, price, pricelist.currency_id, request.env.context.get('lang')),
-            'discount': price_data['discount'],
+            'discount': 0, # TODO
             'pricing_explanation': pricing_explanation,
             'error': error,
         }

@@ -177,6 +177,7 @@ class ProductRentalTenure(models.Model):
     # Pricing Helper Methods
     # ----------------------------------------------------------------------------
 
+    # TODO jem: deprecate me
     def _get_pricelist_price_data(self, pricelist, date=False):
         """ Get pricelist data (unit price, base price and discount) for one unit of given tenure. All amounts here
             are converted in pricelist currency.
@@ -195,10 +196,45 @@ class ProductRentalTenure(models.Model):
             sorted_tenures = tenures.sorted(key=lambda r: r.id)
             price_list = [t.base_price for t in sorted_tenures]
 
-            converted_price_data_list = pricelist.apply_rental_pricelist_on_template(product_template, price_list, date=date, quantity=1.0)
-            for tenure, price_data in zip(sorted_tenures, converted_price_data_list):
+            # converted_price_data_list = pricelist.apply_rental_pricelist_on_template(product_template, price_list, date=date, quantity=1.0)
+            for tenure, price_data in zip(sorted_tenures, price_list):
                 result[tenure.id] = price_data
 
+        return result
+
+    def _get_tenure_price_info(self, pricelist, date=None):
+        """ Get the price details of tenures.
+
+            Note: Follow the same flow of `_get_combination_info` on `product.template` model.
+
+            :param date: datetime object of the date to use to compute the prices
+            :param pricelist: priclist record to use
+        """
+        result = {}
+        for tenure in self:
+            delta = tenure._get_tenure_timedelta()
+            date = date or fields.Datetime.now()
+
+            product_template = tenure.product_template_id.with_context(  # simulate a rental period to compute the prices
+                sale_is_rental=True,
+                rental_start_dt=fields.Datetime.to_string(date),
+                rental_stop_dt=fields.Datetime.to_string(date + delta),
+            )
+            list_price = product_template.price_compute('rental_price', date=date)[product_template.id]
+
+            if pricelist:
+                price = pricelist._get_product_price(product_template, 1.0)
+            else:
+                price = list_price
+
+            price_without_discount = list_price if pricelist and pricelist.discount_policy == 'without_discount' else price
+            has_discounted_price = (pricelist or product_template).currency_id.compare_amounts(price_without_discount, price) == 1
+
+            result[tenure.id] = {
+                'price': price,
+                'list_price': list_price,
+                'has_discounted_price': has_discounted_price,
+            }
         return result
 
     # ----------------------------------------------------------------------------
@@ -211,6 +247,7 @@ class ProductRentalTenure(models.Model):
         return tools.format_amount(self.env, price, currency, self.env.context.get('lang'))
 
     def _get_tenure_timedelta(self):
+        self.ensure_one()
         if self.tenure_type == 'weekday':
             return relativedelta(days=self.weekday_count)
         if self.tenure_type == 'duration':

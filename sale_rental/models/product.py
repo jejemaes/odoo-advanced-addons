@@ -17,32 +17,12 @@ class Product(models.Model):
     resource_ids = fields.One2many('resource.resource', 'product_id', string='Resources', domain=[('resource_type', '=', 'material')])
     resource_count = fields.Integer("Resource Count", compute='_compute_resource_count')
 
-    # deprecate me ?
-    rent_price_unit = fields.Float("Rental Unit Price", compute='_compute_rent_price_details', digits='Product Price')
-    rent_price_explanation = fields.Char("Rental Unit Price Explanation", compute='_compute_rent_price_details')
-
     @api.depends('resource_ids')
     def _compute_resource_count(self):
         grouped_data = self.env['resource.resource'].sudo().read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
         mapped_data = {db['product_id'][0]: db['product_id_count'] for db in grouped_data}
         for product in self:
             product.resource_count = mapped_data.get(product.id, 0)
-
-
-    @api.depends('rental_tenure_ids.base_price')
-    @api.depends_context('rental_start_dt', 'rental_end_dt', 'currency_id')
-    def _compute_rent_price_details(self):
-        """ Set the rental price unit for the context period, in the given currency (or the product one, if not given in context). """
-        start_dt = self._context['rental_start_dt']
-        end_dt = self._context['rental_end_dt']
-        currency = self.env['res.currency'].browse(self._context['currency_id'])
-
-        price_map = self.mapped('product_tmpl_id')._get_rental_price_unit(start_dt, end_dt, currency)
-        for product in self:
-            currency = currency or product.currency_id
-            combinaison = price_map[product.product_tmpl_id.id]['combinaison']
-            product.rent_price_unit = price_map[product.product_tmpl_id.id]['price_unit']
-            product.rent_price_explanation = product.product_tmpl_id._rental_get_human_pricing_details(combinaison, show_price=True, currency_dst=currency)
 
     @api.onchange('can_be_rented')
     def _onchange_can_be_rented(self):
@@ -96,7 +76,7 @@ class Product(models.Model):
         if currency_id:
             currency = self.env['res.currency'].browse(currency_id)
 
-        price_map = self.mapped('product_tmpl_id')._get_rental_price_unit(start_dt, end_dt, currency)
+        price_map = self.mapped('product_tmpl_id')._compute_rental_base_price(start_dt, end_dt, currency)
 
         result = {}
         for product in self:
@@ -104,8 +84,12 @@ class Product(models.Model):
             if not current_currency:
                 current_currency = product.currency_id
             combinaison = price_map[product.product_tmpl_id.id]['combinaison']
-            result[product.id] = product.product_tmpl_id._rental_get_human_pricing_details(combinaison, show_price=show_price, currency_dst=current_currency)
+            result[product.id] = product.product_tmpl_id._compute_rental_pricing_description(combinaison, show_price=show_price, currency_dst=current_currency)
         return result
+
+    # ----------------------------------------------------------------------------
+    # Helpers
+    # ----------------------------------------------------------------------------
 
     def _get_rental_paddings_timedelta(self):
         before_padding = divmod(self.rental_padding_before * 60, 60)
@@ -113,4 +97,18 @@ class Product(models.Model):
         return {
             'before': relativedelta(hours=before_padding[0], minutes=before_padding[1]),
             'after': relativedelta(hours=after_padding[0], minutes=after_padding[1]),
+        }
+
+    @api.model
+    def _get_rental_context(self, date_start, date_stop):
+        """
+            :param date_start:
+            :type date_start: datetime
+            :param date_stop:
+            :type date_stop: datetime
+        """
+        return {
+            'sale_is_rental': True,
+            'rental_start_dt': fields.Datetime.to_string(date_start),
+            'rental_stop_dt': fields.Datetime.to_string(date_stop),
         }

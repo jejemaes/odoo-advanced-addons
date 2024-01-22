@@ -234,25 +234,6 @@
     </template>
 
     <!--
-        Cart Page
-    -->
-    <template id="cart_lines" inherit_id="website_sale.cart_lines" name="eShop: extend for rental">
-       <xpath expr="//div[hasclass('css_quantity')]" position="attributes">
-            <attribute name="t-if">not line.is_rental</attribute>
-        </xpath>
-        <xpath expr="//div[hasclass('css_quantity')]" position="after">
-            <div t-if="line.is_rental" class="css_quantity input-group mx-auto">
-                <input type="text" class="js_quantity form-control quantity" t-att-data-line-id="line.id" t-att-data-product-id="line.product_id.id" t-att-value="int(line.product_uom_qty) == line.product_uom_qty and int(line.product_uom_qty) or line.product_uom_qty" disabled="1"/>
-            </div>
-        </xpath>
-        <xpath expr="//t[@t-set='list_price_converted']" position="after">
-            <t t-if="line.is_rental">
-                <t t-set="list_price_converted" t-value="line.website_rental_unit_price"/>
-            </t>
-        </xpath>
-    </template>
-
-    <!--
         Display rental tenure price, with reduction
         :param tenure (with the pricelist in context)
         :param product : product to display the price of

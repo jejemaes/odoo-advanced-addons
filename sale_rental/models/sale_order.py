@@ -166,14 +166,16 @@ class SaleOrderLine(models.Model):
         for line in self.filtered(lambda sol: sol.is_rental):
             if not line.product_id or line.display_type or not line.order_id.pricelist_id:
                 line.pricelist_item_id = False
-            else:
+            elif line.rental_start_date and line.rental_stop_date:
                 line.pricelist_item_id = line.order_id.pricelist_id._get_product_rule(
                     line.product_id,
                     line.product_uom_qty or 1.0,
                     uom=line.product_uom,
                     date=line.order_id.date_order,
-                    **self._rental_get_product_context(), # tell in kwargs that this is a rental, not a sale (dates might be null)
+                    **self.env['product.product']._get_rental_context(line.rental_start_date, line.rental_stop_date), # tell in kwargs that this is a rental, not a sale (dates might be null)
                 )
+            else:
+                line.pricelist_item_id = False
 
         super(SaleOrderLine, self.filtered(lambda sol: not sol.is_rental))._compute_pricelist_item_id()
 
@@ -190,8 +192,9 @@ class SaleOrderLine(models.Model):
                 if not line.rental_start_date or not line.rental_stop_date:
                     line.price_unit = 0.0
                 else:
+                    rental_context = self.env['product.product']._get_rental_context(line.rental_start_date, line.rental_stop_date)
                     price = line.with_company(line.company_id)._get_display_price()
-                    line.price_unit = line.product_id.with_context(**self._rental_get_product_context())._get_tax_included_unit_price(
+                    line.price_unit = line.product_id.with_context(**rental_context)._get_tax_included_unit_price(
                         line.company_id,
                         line.order_id.currency_id,
                         line.order_id.date_order,
@@ -338,21 +341,16 @@ class SaleOrderLine(models.Model):
         """
         result = super()._get_product_price_context()
         if self.is_rental:
-            result.update(self._rental_get_product_context())
-        return result
-
-    def _rental_get_product_context(self):
-        """ Product context for rental. Used to provide additionnal rental data to compute base price. """
-        result = {}
-        result['sale_is_rental'] = self.is_rental
-        result['rental_start_dt'] = fields.Datetime.to_string(self.rental_start_date)
-        result['rental_stop_dt'] = fields.Datetime.to_string(self.rental_stop_date)
+            result.update(self.env['product.product']._get_rental_context(self.rental_start_date, self.rental_stop_date))
         return result
 
     def _get_protected_fields(self):
         fields = super()._get_protected_fields()
         fields += ['is_rental', 'rental_start_date', 'rental_stop_date']
         return fields
+
+    def _is_not_sellable_line(self):
+        return self.is_rental or super(SaleOrderLine, self)._is_not_sellable_line()
 
     # ---------------------------------------------------------
     # Create rental stuff

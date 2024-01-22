@@ -88,7 +88,7 @@ class ProductTemplate(models.Model):
         partner = self.env.user.partner_id
 
         tax_field = 'total_excluded' if self.user_has_groups('account.group_show_line_subtotals_tax_excluded') else 'total_included'
-        fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
+        fpos = self.env['account.fiscal.position']._get_fiscal_position(partner)
 
         for product_template in self:
             taxes = fpos.map_tax(product_template.sudo().taxes_id.filtered(lambda x: x.company_id == website.company_id))
@@ -103,7 +103,7 @@ class ProductTemplate(models.Model):
         partner = self.env.user.partner_id
 
         tax_field = 'total_excluded' if self.user_has_groups('account.group_show_line_subtotals_tax_excluded') else 'total_included'
-        fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id).sudo()
+        fpos = self.env['account.fiscal.position']._get_fiscal_position(partner)
 
         price_list = [p.currency_id._convert(p.rental_fixed_price, pricelist.currency_id, company=website.company_id, date=fields.Date.today()) for p in self]
         products = [p.product_variant_id for p in self]

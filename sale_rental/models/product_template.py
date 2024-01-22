@@ -28,7 +28,10 @@ class ProductTemplate(models.Model):
     rental_fixed_price = fields.Float("Fixed Price", default=1.0, help="Price used for any rental period.")
     rental_tenure_ids = fields.One2many('product.rental.tenure', 'product_template_id', string="Rental Tenures", copy=True)
     rental_tenure_id = fields.Many2one('product.rental.tenure', compute='_compute_rental_tenure_id', string="First Rental Price")
+
+    # Rental Price Computation
     rental_price = fields.Float("Rental Price", compute='_compute_rental_price', digits='Product Price')
+    rental_price_explanation = fields.Char("Rental Price Details", compute='_compute_rental_pricing_data')
 
     # Resource Tracking and Calendar
     rental_tracking = fields.Selection([
@@ -61,7 +64,24 @@ class ProductTemplate(models.Model):
 
         rental_prices = {}
         if start_dt and stop_dt:
-            rental_price_unit_map = self.filtered(lambda tmpl: tmpl.rental_tenure_type in ['duration', 'weekday'])._get_rental_price_unit(start_dt, stop_dt)
+            rental_price_unit_map = self.filtered(lambda tmpl: tmpl.rental_tenure_type in ['duration', 'weekday'])._compute_rental_base_price(start_dt, stop_dt)
+            rental_prices = {key: value['price_unit'] for key, value in rental_price_unit_map.items()}
+
+        for template in self:
+            if template.rental_tenure_type == 'fixed':
+                template.rental_price = template.rental_fixed_price
+            else:
+                template.rental_price = rental_prices.get(template.id, 0.0)
+
+    @api.depends('rental_tenure_type', 'rental_fixed_price', 'rental_tenure_ids.base_price')
+    @api.depends_context('rental_start_dt', 'rental_end_dt')
+    def _compute_rental_pricing_data(self):
+        start_dt = fields.Datetime.to_datetime(self._context.get('rental_start_dt')) # might be None
+        stop_dt = fields.Datetime.to_datetime(self._context.get('rental_stop_dt')) # might be None
+
+        rental_prices = {}
+        if start_dt and stop_dt:
+            rental_price_unit_map = self.filtered(lambda tmpl: tmpl.rental_tenure_type in ['duration', 'weekday'])._compute_rental_base_price(start_dt, stop_dt)
             rental_prices = {key: value['price_unit'] for key, value in rental_price_unit_map.items()}
 
         for template in self:
@@ -132,7 +152,9 @@ class ProductTemplate(models.Model):
     # Rental Pricing Methods
     # ----------------------------------------------------------------------------
 
-    def _get_rental_price_unit(self, start_dt, end_dt, currency=None):
+    # TODO currency param deprecated ?
+    # TODO compute details too ?
+    def _compute_rental_base_price(self, start_dt, end_dt, currency=None):
         """ Compute the price unit for the given rental period of current products by combining the rental tenures. The
             price is expressed in product currency.
             :param start_dt: string of start date
@@ -145,34 +167,30 @@ class ProductTemplate(models.Model):
 
         result = {}
         for product_template in self:
-            # convert into product timezome to compute price
-            tz = timezone(product_template._get_rental_timezone())
-            start_dt = start_dt.astimezone(tz)
-            end_dt = end_dt.astimezone(tz)
-            combinaison, price = product_template._rental_price_combinaison(start_dt, end_dt, currency)
-            result[product_template.id] = {
-                'combinaison': combinaison,
-                'price_unit': price,
-            }
+            if product_template.rental_tenure_type == 'fixed':  # fixed prices for any period
+                result[product_template.id] = {
+                    'combinaison': {'fixed': True},
+                    'price_unit': product_template.rental_fixed_price,
+                }
+            else: # from tenures
+                # convert into product timezome to compute price
+                tz = timezone(product_template._get_rental_timezone())
+                start_dt = start_dt.astimezone(tz)
+                end_dt = end_dt.astimezone(tz)
+                combinaison, price = product_template._compute_rental_tenure_combinaison(start_dt, end_dt, currency)
+                result[product_template.id] = {
+                    'combinaison': combinaison,
+                    'price_unit': price,
+                }
         return result
 
-    def _get_rental_timezone(self):
-        if self.rental_tracking == 'no':
-            return self.rental_calendar_id.tz
-        if self.rental_tracking == 'use_resource':
-            return self.rental_tz
-        return 'UTC'
-
-    # ----------------------------------------------------------------------------
-    # Rental Tenure API
-    # ----------------------------------------------------------------------------
-
-    def _rental_price_combinaison(self, start_dt, end_dt, currency_dst):
+    def _compute_rental_tenure_combinaison(self, start_dt, end_dt, currency_dst):
         """ Compute the rental price unit in the given currency for the given period.
             :param start_dt : timezoned datetime representing the beginning of the rental period
             :param end_dt : timezoned datetime representing the end of the rental period
             :param currency_dst : currency record --> TODO remove that param as we only use currency of the product
         """
+        self.ensure_one()
         # ignore dates, and return fixed price
         if self.rental_tenure_type == 'fixed':
             return {'fixed': True}, self.rental_fixed_price
@@ -180,14 +198,14 @@ class ProductTemplate(models.Model):
         if not self.rental_tenure_ids:
             return {}, 0.0
 
-        # TODO check sart/end are timezoned
+        # TODO check start/end are timezoned
         tenure_type = self.rental_tenure_type
         if hasattr(self, '_tenure_%s_price_combinaison' % (tenure_type,)):
             return getattr(self, '_tenure_%s_price_combinaison' % (tenure_type,))(start_dt, end_dt, currency_dst)
         raise NotImplementedError
 
     @api.model
-    def _rental_get_human_pricing_details(self, combinaison_map, show_price=True, currency_dst=False):
+    def _compute_rental_pricing_description(self, combinaison_map, show_price=True, currency_dst=False):
         if not combinaison_map:
             return _("Free")
         if 'fixed' in combinaison_map:
@@ -322,3 +340,15 @@ class ProductTemplate(models.Model):
                 computation_members.append(_("%s * %s") % (occurence, tenure.tenure_name))
 
         return _(' + ').join(computation_members)
+
+    # ----------------------------------------------------------------------------
+    # Helpers Methods
+    # ----------------------------------------------------------------------------
+
+    def _get_rental_timezone(self):
+        self.ensure_one()
+        if self.rental_tracking == 'no':
+            return self.rental_calendar_id.tz
+        if self.rental_tracking == 'use_resource':
+            return self.rental_tz
+        return 'UTC'

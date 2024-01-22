@@ -22,10 +22,8 @@ Rent your machines and other resources for money to your customer through your e
     'assets': {
         'web.assets_frontend': [
             'website_sale_rental/static/src/js/website_sale_rental.js',
-        ],
-        'web.assets_qweb': [
             'website_sale_rental/static/src/xml/website_sale_rental_modal.xml',
         ],
     },
-    'installable': False,
+    'installable': True,
 }
