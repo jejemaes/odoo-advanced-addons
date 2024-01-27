@@ -15,7 +15,7 @@
             </xpath>
             <xpath expr="//group[@name='mode_computation']" position="inside">
                 <field name="analytic_account_id" attrs="{'invisible': [('mode', '!=', 'analytic')], 'required': [('mode', '=', 'analytic')]}"/>
-                <field name="analytic_budget_tag_ids" attrs="{'invisible': [('mode', '!=', 'analytic')], 'required': [('mode', '=', 'analytic')]}" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="analytic_budget_tag_ids" attrs="{'invisible': [('mode', '!=', 'analytic')]}" widget="many2many_tags" options="{'color_field': 'color'}"/>
             </xpath>
         </field>
     </record>

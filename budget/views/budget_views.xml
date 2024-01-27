@@ -33,6 +33,23 @@
                     <field name="state" widget="statusbar" />
                 </header>
                 <sheet string="Budget">
+                    <div class="oe_button_box" name="button_box" attrs="{'invisible': [('state', '=', 'model')]}">
+                        <button
+                            class="oe_stat_button"
+                            name="%(budget_budget_line_action_budget)d"
+                            string="Lines"
+                            type="action"
+                            icon="fa-list"
+                        />
+                        <button
+                            class="oe_stat_button"
+                            name="%(budget_category_action_budget)d"
+                            string="Categories"
+                            type="action"
+                            icon="fa-tags"
+                        />
+                    </div>
+
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only"/>
                         <h1>
@@ -53,25 +70,18 @@
                     </group>
                     <notebook>
                         <page string="Budget Lines">
-                            <field name="budget_line_ids" colspan="4" attrs="{'readonly':[('state','!=','draft')]}">
-                                <tree string="Budget Lines" decoration-danger="is_above_budget">
+                            <field name="budget_line_ids" attrs="{'readonly':[('state','!=','draft')]}" context="{'default_budget_id': id}">
+                                <tree string="Budget Lines" decoration-danger="is_above_budget" editable="top">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
-                                    <field name="category_id" optional="show"/>
+                                    <field name="mode" invisible="1"/>
+                                    <field name="category_id" optional="show" domain="['|', ('budget_id','=', context.get('default_budget_id')), ('budget_id','=', False)]" options="{'no_create': True, 'no_open': True}"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="budget_id" invisible="1"/>
                                     <field name="planned_amount" sum="Planned Amount"/>
-                                    <field name="practical_amount" sum="Practical Amount"/>
+                                    <field name="practical_amount" sum="Practical Amount" attrs="{'readonly': [('mode', '!=', 'manual')]}"/>
                                     <field name="percentage" widget="percentage" optional="show"/>
                                     <field name="is_above_budget" invisible="1"/>
-                                </tree>
-                            </field>
-                        </page>
-                        <page string="Categories">
-                            <field name="category_ids">
-                                <tree string="Categories" editable="bottom">
-                                    <field name="name"/>
-                                    <field name="color" widget="color_picker"/>
                                 </tree>
                             </field>
                         </page>

@@ -5,6 +5,24 @@
         Budget Lines
     -->
 
+    <record id="budget_budget_line_view_list" model="ir.ui.view">
+        <field name="name">budget.budget.line.tree</field>
+        <field name="model">budget.budget.line</field>
+        <field name="arch" type="xml">
+             <tree string="Budget Lines" decoration-danger="is_above_budget" default_order="sequence asc">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="category_id" optional="show"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="budget_id" invisible="1"/>
+                <field name="planned_amount" sum="Planned Amount"/>
+                <field name="practical_amount" sum="Practical Amount"/>
+                <field name="percentage" widget="percentage" optional="show"/>
+                <field name="is_above_budget" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
     <record id="budget_budget_line_view_form" model="ir.ui.view">
         <field name="name">budget.budget.line.form</field>
         <field name="model">budget.budget.line</field>
@@ -21,7 +39,7 @@
                         <group>
                             <field name="budget_state" invisible="1"/>
                             <field name="budget_id" invisible="1"/>
-                            <field name="category_id"/>
+                            <field name="category_id" domain="['|', ('budget_id','=', context.get('default_budget_id')), ('budget_id','=', False)]" options="{'no_create': True, 'no_open': True}"/>
                             <field name="mode" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
@@ -51,14 +69,25 @@
         <field name="model">budget.budget.line</field>
         <field name="arch" type="xml">
             <search string="Budget Lines">
-                <field name="budget_id"/>
                 <field name="category_id"/>
                 <filter name="filter_not_cancelled" string="Not Cancelled" domain="[('budget_state','!=','cancel')]"/>
                 <group expand="0" string="Group By">
-                    <filter name="group_budget_id" string="Budgets" domain="[]" context="{'group_by':'budget_id'}"/>
+                    <filter name="group_by_category_id" string="Category" domain="[]" context="{'group_by':'category_id'}"/>
                 </group>
             </search>
         </field>
+    </record>
+
+    <!--
+        Actions
+    -->
+    <record id="budget_budget_line_action_budget" model="ir.actions.act_window">
+        <field name="name">Budget Lines</field>
+        <field name="res_model">budget.budget.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" eval="False"/>
+        <field name="domain">[('budget_id', '=', active_id)]</field>
+        <field name="context">{'default_budget_id': active_id, 'search_default_group_by_category_id': 1}</field>
     </record>
 
 </odoo>
