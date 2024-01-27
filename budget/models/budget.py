@@ -75,7 +75,7 @@ class BudgetLine(models.Model):
     name = fields.Char("Name", required=True)
     budget_id = fields.Many2one('budget.budget', 'Budget', ondelete='cascade', index=True, required=True)
     budget_state = fields.Selection(related='budget_id.state', string='Budget State', store=True, readonly=True)
-    category_id = fields.Many2one('budget.category', "Category", domain="[('budget_id', '=', budget_id)]")
+    category_id = fields.Many2one('budget.category', "Category")
     sequence = fields.Integer("Sequence", default=10)
     description = fields.Text('Note')
     mode = fields.Selection([
@@ -139,10 +139,10 @@ class BudgetLine(models.Model):
                 line.practical_amount_manual = 0.0
 
     @api.constrains('category_id', 'budget_id')
-    def _check_catergory(self):
+    def _check_category(self):
         for line in self:
             if line.category_id and line.category_id.budget_id != line.budget_id:
-                raise ValidationError(_("Budget mismatch."))
+                raise ValidationError(_("Budget Category mismatch."))
 
     @api.constrains('category_id', 'company_id')
     def _check_company(self):

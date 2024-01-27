@@ -11,6 +11,7 @@ Use budgets to compare actual with expected revenues and costs
     'data': [
         'security/budget_security.xml',
         'security/ir.model.access.csv',
+        'views/budget_category_views.xml',
         'views/budget_line_views.xml',
         'views/budget_views.xml',
         'report/budget_print_report_templates.xml',
