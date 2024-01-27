@@ -2,7 +2,7 @@
 <odoo>
 
     <!--
-        Budget
+        Views
     -->
 
     <record id="budget_budget_view_list" model="ir.ui.view">
@@ -95,11 +95,46 @@
         </field>
     </record>
 
+    <record id="budget_budget_view_form_simplified" model="ir.ui.view">
+        <field name="name">budget.budget.view.form.simplified</field>
+        <field name="model">budget.budget</field>
+        <field name="arch" type="xml">
+            <form string="Budget">
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name" placeholder="My Budget"/>
+                    </h1>
+                </div>
+                <group>
+                    <label for="date_from" string="Period"/>
+                    <div class="o_row">
+                        <field name="date_from" widget="daterange" nolabel="1" class="oe_inline" options="{'related_end_date': 'date_to'}"/>
+                        <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>
+                        <field name="date_to" widget="daterange" nolabel="1" class="oe_inline" options="{'related_start_date': 'date_from'}"/>
+                    </div>
+                    <field name="budget_template_id" options="{'no_create': True}"/>
+                    <field name="state" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- on create action for kanban view -->
+    <record id="budget_budget_action_create" model="ir.actions.act_window">
+        <field name="name">Create a Budget</field>
+        <field name="res_model">budget.budget</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="budget_budget_view_form_simplified"/>
+        <field name="target">new</field>
+    </record>
+
     <record id="budget_budget_view_kanban" model="ir.ui.view">
         <field name="name">budget.budget.kanban</field>
         <field name="model">budget.budget</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile">
+            <kanban class="o_kanban_mobile" on_create="budget.budget_budget_action_create"
+>
                 <field name="name"/>
                 <field name="date_from"/>
                 <field name="date_to"/>
@@ -180,6 +215,7 @@
         </field>
     </record>
 
+
     <!--
         Menus
     -->
@@ -201,5 +237,12 @@
             name="Configuration"
             parent="budget_menu_root"
             sequence="15"/>
+
+            <menuitem
+                id="budget_configuration_menu_template"
+                name="Budget Templates"
+                parent="budget.budget_menu_settings"
+                action="budget_template_action"
+                sequence="5"/>
 
 </odoo>

@@ -10,6 +10,7 @@ class Budget(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char('Budget Name', required=True, states={'done': [('readonly', True)]}, tracking=True)
+    budget_template_id = fields.Many2one('budget.template', 'Template')
     user_id = fields.Many2one('res.users', 'Responsible', default=lambda self: self.env.user)
     date_from = fields.Date('Start Date', required=True, states={'done': [('readonly', True)]})
     date_to = fields.Date('End Date', required=True, states={'done': [('readonly', True)]})
@@ -42,6 +43,29 @@ class Budget(models.Model):
             budget.practical_credit_amount = sum(budget.budget_line_ids.filtered(lambda l: l.practical_amount > 0.0).mapped('practical_amount'))
             budget.practical_debit_amount = sum(budget.budget_line_ids.filtered(lambda l: l.practical_amount < 0.0).mapped('practical_amount'))
 
+    @api.model_create_multi
+    def create(self, list_value):
+        template_ids = [item['budget_template_id'] for item in list_value if item.get('budget_template_id')]
+        template_map = {template.id: template for template in self.env['budget.template'].browse(template_ids)}
+
+        new_list_value = []
+        for values in list_value:
+            if values.get('budget_template_id'):
+                template = template_map[values['budget_template_id']]
+                template_values = template._prepare_budget_values()
+                template_values.update(values)
+                new_list_value.append(template_values)
+            else:
+                new_list_value.append(values)
+
+        budgets = super(Budget, self).create(new_list_value)
+
+        for budget in budgets:
+            if budget.budget_template_id.category_ids:
+                budget.budget_template_id.category_ids._create_category(budget.id)
+
+        return budgets
+
     def action_budget_confirm(self):
         self.write({'state': 'confirm'})
 
@@ -63,6 +87,7 @@ class BudgetCategory(models.Model):
     name = fields.Char("Name", required=True)
     color = fields.Integer("Color", default=5)
     budget_id = fields.Many2one('budget.budget', 'Budget', ondelete='cascade', index=True, required=True)
+    budget_template_category_id = fields.Many2one('budget.template.category', 'Template Category')
     sequence = fields.Integer("Sequence", default=10)
     company_id = fields.Many2one(related='budget_id.company_id', store=True)
 

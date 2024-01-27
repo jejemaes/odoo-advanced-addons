@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        Budget Templates
+    -->
+    <record id="budget_template_view_list" model="ir.ui.view">
+        <field name="name">budget.template.view.tree</field>
+        <field name="model">budget.template</field>
+        <field name="arch" type="xml">
+            <tree string="Budget Templates">
+                <field name="name"/>
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="budget_template_view_form" model="ir.ui.view">
+        <field name="name">budget.template.view.form</field>
+        <field name="model">budget.template</field>
+        <field name="arch" type="xml">
+            <form string="Budget Template">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Template Categories">
+                            <field name="category_ids">
+                                <tree string="Categories" editable="top">
+                                    <field name="name"/>
+                                    <field name="color" widget="color_picker"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="budget_template_view_kanban" model="ir.ui.view">
+        <field name="name">budget.template.kanban</field>
+        <field name="model">budget.template</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="row mb4">
+                                <div class="col-8">
+                                    <strong>
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="budget_template_view_search" model="ir.ui.view">
+        <field name="name">budget.template.search</field>
+        <field name="model">budget.template</field>
+        <field name="arch" type="xml">
+            <search string="Budget">
+                <field name="name" filter_domain="[('name','ilike',self)]" string="Budget"/>
+            </search>
+        </field>
+    </record>
+
+    <!--
+        Actions
+    -->
+
+    <record id="budget_template_action" model="ir.actions.act_window">
+        <field name="name">Budget Templates</field>
+        <field name="res_model">budget.template</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="budget_template_view_search"/>
+         <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Click to create a new budget template.
+            </p>
+            <p>
+                Use budget templates to predefine budget skeleton
+            </p>
+        </field>
+    </record>
+
+</odoo>
