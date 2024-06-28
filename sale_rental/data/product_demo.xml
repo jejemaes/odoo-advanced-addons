@@ -11,8 +11,8 @@
         <field name="type">consu</field>
         <field name="list_price">0.00</field>
         <field name="standard_price">0.00</field>
-        <field name="uom_id" ref="uom.product_uom_hour"/>
-        <field name="uom_po_id" ref="uom.product_uom_hour"/>
+        <field name="uom_id" ref="uom.product_uom_categ_unit"/>
+        <field name="uom_po_id" ref="uom.product_uom_categ_unit"/>
         <field name="rental_calendar_id" ref="rental.resource_calendar_rental_work_week"/>
         <field name="rental_tenure_type">weekday</field>
         <field name="rental_tracking">use_resource</field>
@@ -125,8 +125,8 @@
         <field name="type">consu</field>
         <field name="list_price">0.00</field>
         <field name="standard_price">0.00</field>
-        <field name="uom_id" ref="uom.product_uom_hour"/>
-        <field name="uom_po_id" ref="uom.product_uom_hour"/>
+        <field name="uom_id" ref="uom.product_uom_categ_unit"/>
+        <field name="uom_po_id" ref="uom.product_uom_categ_unit"/>
         <field name="rental_calendar_id" ref="rental.resource_calendar_rental_work_week"/>
         <field name="rental_tenure_type">weekday</field>
         <field name="rental_tracking">use_resource</field>
@@ -240,8 +240,8 @@
         <field name="type">consu</field>
         <field name="list_price">0.00</field>
         <field name="standard_price">0.00</field>
-        <field name="uom_id" ref="uom.product_uom_hour"/>
-        <field name="uom_po_id" ref="uom.product_uom_hour"/>
+        <field name="uom_id" ref="uom.product_uom_categ_unit"/>
+        <field name="uom_po_id" ref="uom.product_uom_categ_unit"/>
         <field name="rental_calendar_id" ref="rental.resource_calendar_rental_work_week"/>
         <field name="rental_tenure_type">weekday</field>
         <field name="rental_tracking">use_resource</field>
