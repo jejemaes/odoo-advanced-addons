@@ -240,7 +240,8 @@
         :param heading_class : class name of the displayed price (ex: h2, h3, ...)
     -->
     <template id="rental_tenure_price">
-        <t t-if="not heading_class">
+        <p t-esc="tenure._get_tenure_price_info(website.get_current_pricelist())"/>
+        <!-- <t t-if="not heading_class">
             <t t-set="heading_class" t-value="h4"/>
         </t>
         <t t-set="show_reduction" t-value="website.currency_id.compare_amounts(tenure.website_base_price, tenure.website_list_price) != 0 and website.get_current_pricelist().discount_policy == 'without_discount'"/>
@@ -258,7 +259,7 @@
                        "display_currency": product.currency_id,
                    }'/>
             </p>
-        </div>
+        </div> -->
     </template>
 
      <!--

@@ -1,12 +1,25 @@
 # -*- coding: utf-8 -*-
 import functools
-from datetime import date, datetime
+from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
-from odoo.tools.date_utils import add, subtract, start_of, end_of
+from odoo.tools.date_utils import start_of
 from odoo import tools
+from odoo.addons.resource.models.resource_mixin import timezone_datetime
+
+
+def next_weekday(d, weekday):
+    """
+    ```
+        next_monday = next_weekday(now, 0) # 0 = Monday, 1=Tuesday, 2=Wednesday.
+    ```
+    """
+    days_ahead = weekday - d.weekday()
+    if days_ahead <= 0: # Target day already happened this week
+        days_ahead += 7
+    return d + timedelta(days_ahead)
 
 
 class ProductRentalTenure(models.Model):
@@ -19,7 +32,6 @@ class ProductRentalTenure(models.Model):
     tenure_type = fields.Selection(related='product_template_id.rental_tenure_type', store=True)
     currency_id = fields.Many2one('res.currency', "Currency", related='product_template_id.currency_id')
     base_price = fields.Monetary("Base Rent Price", required=True, default=1)
-    rent_price = fields.Float("Rent Price", compute='_compute_rent_price', help="This amount is expressed in the currency of the pricelist, or (fallback) in product currency.")
     sequence = fields.Integer("Sequence", default=5)
 
     duration_value = fields.Integer("Tenure")
@@ -53,26 +65,6 @@ class ProductRentalTenure(models.Model):
             else:
                 tenure.tenure_name = False
 
-    @api.depends('base_price')
-    @api.depends_context('pricelist_id', 'quantity', 'date_order')
-    def _compute_rent_price(self):
-        """ This will show the price for one unit of the tenure, with the pricelist (if given in context) applied. No tax is applied here. """
-        pricelist_id = self._context.get('pricelist_id', False)
-        date_order = self._context.get('date_order', False)
-
-        tenure_price_map = {}  # if no pricelist, this map is not updated
-
-        pricelist = None
-        if pricelist_id:
-            pricelist = self.env['product.pricelist'].browse(pricelist_id)
-
-            price_data_map = self._get_pricelist_price_data(pricelist, date=date_order)
-            for tenure in self:
-                tenure_price_map[tenure.id] = price_data_map[tenure.id]['price_list']
-
-        for tenure in self:
-            tenure.rent_price = tenure_price_map.get(tenure.id, tenure.base_price)
-
     @api.depends('weekday_ids')
     def _compute_weekday_selectable_ids(self):
         resource_days = self.env['resource.day'].get_all_days()
@@ -95,9 +87,9 @@ class ProductRentalTenure(models.Model):
     @api.depends('weekday_ids')
     def _compute_weekday_start(self):
         # TODO : find a better algorithm
-        dayofweeks = self.env['resource.day'].get_all_days()
+        dayofweeks = self.env['resource.day'].sudo().get_all_days()  # need sudo for public user in website_sale
 
-        for tenure in self:
+        for tenure in self.sudo():
             tenure_weekofdays = tenure.weekday_ids.mapped('dayofweek')
             dayofweek_current = min(tenure_weekofdays)
             while dayofweek_current:
@@ -206,24 +198,41 @@ class ProductRentalTenure(models.Model):
         """ Get the price details of tenures.
 
             Note: Follow the same flow of `_get_combination_info` on `product.template` model.
+            Note2: For now this method is only used in website_sale_rental, and is extended there
+                to add tax managment.
 
             :param date: datetime object of the date to use to compute the prices
             :param pricelist: priclist record to use
         """
         result = {}
         for tenure in self:
-            delta = tenure._get_tenure_timedelta()
-            date = date or fields.Datetime.now()
 
-            product_template = tenure.product_template_id.with_context(  # simulate a rental period to compute the prices
-                sale_is_rental=True,
-                rental_start_dt=fields.Datetime.to_string(date),
-                rental_stop_dt=fields.Datetime.to_string(date + delta),
-            )
-            list_price = product_template.price_compute('rental_price', date=date)[product_template.id]
+            if not date:
+                date = fields.Datetime.now()
+
+            currency = self.env.company.currency_id
+            if pricelist:
+                currency = pricelist.currency_id
+
+            date = timezone_datetime(date)
+
+            # simulate a rental period to compute the prices
+            start_date, stop_date = tenure._get_tenure_closest_period(date)
+
+            rental_context = self.env['product.product']._get_rental_context(start_date, stop_date)
+            product_template = tenure.product_template_id.with_context(**rental_context)
+            list_price = product_template.price_compute('rental_price', date=date, currency=currency)[product_template.id]
 
             if pricelist:
-                price = pricelist._get_product_price(product_template, 1.0)
+                pricelist_rule_id = pricelist._get_product_rule(
+                    product_template,
+                    1,
+                    uom=product_template.uom_id, # TODO quid UoM ?
+                    date=fields.Date.today(),
+                    **rental_context
+                )
+                pricelist_rule = self.env['product.pricelist.item'].browse(pricelist_rule_id) if pricelist_rule_id else self.env['product.pricelist.item']
+                price = pricelist_rule._compute_rental_price(product_template, start_date, stop_date, date_order=fields.Date.today(), currency=pricelist.currency_id)
             else:
                 price = list_price
 
@@ -280,7 +289,25 @@ class ProductRentalTenure(models.Model):
         applicable_tenures = self.sorted(lambda t: t.weekday_count, reverse=True)
 
         for tenure in applicable_tenures:
-            # minus one second bacuase a day is from 00:00:00 to 23:59:59,99999 accordting to start_of/end_of
             if start + tenure._get_tenure_timedelta() <= stop:
                 return tenure
         return applicable_tenures[-1]  # the last is the less worth
+
+    def _get_tenure_time_granularity(self):
+        """ granilarity to map the `start_of` function in date_utils """
+        if self.tenure_type == 'weekday':
+            return 'day'
+        return self.duration_uom
+
+    def _get_tenure_closest_period(self, start_date):
+        """ Compute the next (closest) start and end dates for the period represented by the tenure after the give `date`. """
+        granularity = self._get_tenure_time_granularity()
+        delta = self._get_tenure_timedelta()
+        if self.tenure_type == 'weekday':
+            start_date = next_weekday(start_of(start_date, granularity), self.weekday_start - 1)
+            stop_date = start_date + delta
+        else:
+            start_date = start_of(date, granularity) + delta
+            stop_date = start_date + delta
+
+        return start_date, stop_date

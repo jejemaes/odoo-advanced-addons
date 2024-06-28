@@ -78,12 +78,9 @@ class PricelistItem(models.Model):
             if not rental_start_date or not rental_stop_date:
                 return 0.0
 
-            price = product.price_compute('rental_price', uom=uom, date=date)[product.id]
-
-            src_currency = product.currency_id or self.env.company.currency_id
-            if src_currency != target_currency:
-                price = src_currency._convert(price, target_currency, self.env.company, date, round=False)
+            price = product.price_compute('rental_price', uom=uom, date=date, currency=target_currency)[product.id]
             return price
+
         # sale flow
         return super(PricelistItem, self)._compute_base_price(product, quantity, uom, date, target_currency)
 

@@ -57,7 +57,7 @@ class ProductTemplate(models.Model):
     ]
 
     @api.depends('rental_tenure_type', 'rental_fixed_price', 'rental_tenure_ids.base_price')
-    @api.depends_context('rental_start_dt', 'rental_end_dt')
+    @api.depends_context('rental_start_dt', 'rental_stop_dt')
     def _compute_rental_price(self):
         start_dt = fields.Datetime.to_datetime(self._context.get('rental_start_dt')) # might be None
         stop_dt = fields.Datetime.to_datetime(self._context.get('rental_stop_dt')) # might be None
@@ -152,9 +152,7 @@ class ProductTemplate(models.Model):
     # Rental Pricing Methods
     # ----------------------------------------------------------------------------
 
-    # TODO currency param deprecated ?
-    # TODO compute details too ?
-    def _compute_rental_base_price(self, start_dt, end_dt, currency=None):
+    def _compute_rental_base_price(self, start_dt, end_dt):
         """ Compute the price unit for the given rental period of current products by combining the rental tenures. The
             price is expressed in product currency.
             :param start_dt: string of start date
@@ -175,16 +173,19 @@ class ProductTemplate(models.Model):
             else: # from tenures
                 # convert into product timezome to compute price
                 tz = timezone(product_template._get_rental_timezone())
+                print('=========', start_dt.isoformat())
                 start_dt = start_dt.astimezone(tz)
                 end_dt = end_dt.astimezone(tz)
-                combinaison, price = product_template._compute_rental_tenure_combinaison(start_dt, end_dt, currency)
+                print('=========', start_dt.isoformat())
+
+                combinaison, price = product_template._compute_rental_tenure_combinaison(start_dt, end_dt)
                 result[product_template.id] = {
                     'combinaison': combinaison,
                     'price_unit': price,
                 }
         return result
 
-    def _compute_rental_tenure_combinaison(self, start_dt, end_dt, currency_dst):
+    def _compute_rental_tenure_combinaison(self, start_dt, end_dt):
         """ Compute the rental price unit in the given currency for the given period.
             :param start_dt : timezoned datetime representing the beginning of the rental period
             :param end_dt : timezoned datetime representing the end of the rental period
@@ -199,9 +200,8 @@ class ProductTemplate(models.Model):
             return {}, 0.0
 
         # TODO check start/end are timezoned
-        tenure_type = self.rental_tenure_type
-        if hasattr(self, '_tenure_%s_price_combinaison' % (tenure_type,)):
-            return getattr(self, '_tenure_%s_price_combinaison' % (tenure_type,))(start_dt, end_dt, currency_dst)
+        if hasattr(self, f'_tenure_{self.rental_tenure_type}_price_combinaison'):
+            return getattr(self, f'_tenure_{self.rental_tenure_type}_price_combinaison')(start_dt, end_dt)
         raise NotImplementedError
 
     @api.model
@@ -211,9 +211,8 @@ class ProductTemplate(models.Model):
         if 'fixed' in combinaison_map:
             return _("Fixed Price")
 
-        tenure_type = self.rental_tenure_type
-        if hasattr(self, '_tenure_%s_get_human_pricing_details' % (tenure_type,)):
-            return getattr(self, '_tenure_%s_get_human_pricing_details' % (tenure_type,))(combinaison_map, show_price=show_price, currency_dst=currency_dst)
+        if hasattr(self, f'_tenure_{self.rental_tenure_type}_get_human_pricing_details'):
+            return getattr(self, f'_tenure_{self.rental_tenure_type}_get_human_pricing_details')(combinaison_map, show_price=show_price, currency_dst=currency_dst)
         raise NotImplementedError()
 
     #
@@ -242,13 +241,13 @@ class ProductTemplate(models.Model):
                 while start_dt + delta <= end_dt:
                     combinaison.append(tenure.id)
                     start_dt += delta
-                    cost += tenure.currency_id._convert(tenure.base_price, currency_dst or tenure.currency_id, tenure.product_template_id.company_id or self.env.company, fields.Date.today(), round=True)
+                    cost += tenure.base_price
 
                 # if the last tenure uom period is started, then count it entirely
                 if is_last and start_dt < end_dt:
                     combinaison.append(tenure.id)
                     start_dt += delta
-                    cost += tenure.currency_id._convert(tenure.base_price, currency_dst or tenure.currency_id, tenure.product_template_id.company_id or self.env.company, fields.Date.today(), round=True)
+                    cost += tenure.base_price
 
         # transform into a map tenure.id -> number of time it is used
         tenure_occurence = {}
@@ -272,9 +271,9 @@ class ProductTemplate(models.Model):
             tenure = tenure_map[tenure_id]
             if show_price:
                 if currency_dst:
-                    price = tenure.currency_id._convert(tenure.rent_price, currency_dst, tenure.product_template_id.company_id or self.env.company, fields.Date.today(), round=True)
+                    price = tenure.currency_id._convert(tenure.base_price, currency_dst, tenure.product_template_id.company_id or self.env.company, fields.Date.today(), round=True)
                 else:
-                    price = tenure.rent_price
+                    price = tenure.base_price
                 computation_members.append(_("%s * %s (%s)") % (occurence, tenure.tenure_name, self.env['product.rental.tenure']._display_price(price, tenure.currency_id, currency_dst)))
             else:
                 computation_members.append(_("%s * %s") % (occurence, tenure.tenure_name))
@@ -284,28 +283,25 @@ class ProductTemplate(models.Model):
     # Weekday Tenure
     #
 
-    def _tenure_weekday_price_combinaison(self, start_dt, end_dt, currency_dst):
+    def _tenure_weekday_price_combinaison(self, start_dt, end_dt):
         assert start_dt <= end_dt, "Start dates must be before the end date."
 
-        tzinfo = start_dt.tzinfo
-        start_dt = start_of(start_dt, 'day').replace(tzinfo=tzinfo)
-
-        # 00:00:00 of the next does not count the next day in the combinaison, but ease the computation.
-        # renting from 2021-10-21 00:00:00 to 2021-10-23 00:00:00 reprensent 2 days (Thursday and Friday)
-        # To 2021-10-23 00:00:01 will add Saturday.
-        if end_dt.time() != time.min:
-            end_dt = start_of(end_dt + relativedelta(days=1), 'day')
-        end_dt = end_dt.replace(tzinfo=tzinfo)
+        from odoo.tools.date_utils import start_of, end_of
+        start_dt = start_of(start_dt, 'day')
+        end_dt = start_of(end_dt, 'day') + relativedelta(days=1)
+        print(':::::::::::::::::', start_dt.isoformat(), end_dt.isoformat())
 
         cost = 0.0
         combinaison = []
         while start_dt < end_dt:
             applicable_tenures = self.rental_tenure_ids.filtered(lambda t: t.weekday_start == start_dt.weekday() + 1)
             if applicable_tenures:
+                print('===== applicable_tenures', applicable_tenures.mapped('tenure_name'))
                 tenure = applicable_tenures._tenure_weekday_find_best_tenure(start_dt, end_dt)
+                print('===== tenure', tenure.tenure_name)
                 combinaison.append(tenure.id)
 
-                cost += tenure.currency_id._convert(tenure.base_price, currency_dst or tenure.currency_id, tenure.product_template_id.company_id or self.env.company, fields.Date.today(), round=True)
+                cost += tenure.base_price
                 start_dt += tenure._get_tenure_timedelta()
             else:
                 start_dt += relativedelta(days=1) # one day free to continue the way to stop dt
@@ -315,9 +311,6 @@ class ProductTemplate(models.Model):
         for tenure_id in combinaison:
             tenure_occurence.setdefault(tenure_id, 0)
             tenure_occurence[tenure_id] += 1
-
-        if currency_dst:
-            cost = currency_dst.round(cost)
 
         return tenure_occurence, cost
 
@@ -332,9 +325,9 @@ class ProductTemplate(models.Model):
             tenure = tenure_map[tenure_id]
             if show_price:
                 if currency_dst:
-                    price = tenure.currency_id._convert(tenure.rent_price, currency_dst, tenure.product_template_id.company_id or self.env.company, fields.Date.today(), round=True)
+                    price = tenure.currency_id._convert(tenure.base_price, currency_dst, tenure.product_template_id.company_id or self.env.company, fields.Date.today(), round=True)
                 else:
-                    price = tenure.rent_price
+                    price = tenure.base_price
                 computation_members.append(_("%s * %s (%s)") % (occurence, tenure.tenure_name, self.env['product.rental.tenure']._display_price(price, tenure.currency_id, currency_dst)))
             else:
                 computation_members.append(_("%s * %s") % (occurence, tenure.tenure_name))

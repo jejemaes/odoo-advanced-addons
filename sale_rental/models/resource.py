@@ -1,23 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from itertools import chain
-from pytz import utc
-
-
-import math
-from datetime import datetime, time, timedelta
-from dateutil.rrule import rrule, DAILY
-from functools import partial
-from itertools import chain
-from pytz import timezone, utc
-
 from odoo import api, fields, models, _
-from odoo.addons.base.models.res_partner import _tz_get
 from odoo.exceptions import ValidationError
-from odoo.tools.float_utils import float_round
-
-from odoo import api, fields, models, _
-from odoo.addons.resource.models.resource import Intervals
 
 
 class Resource(models.Model):

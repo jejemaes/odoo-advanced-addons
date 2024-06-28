@@ -303,7 +303,8 @@ var RentalCalendar = publicWidget.Widget.extend({
                 right: allowedViews.join(','),
             },
             defaultView: defaultView,
-            timeZone: 'local',
+           // timeZone: 'local',
+            timeZone: 'Europe/Brussels',
             defaultDate: moment().format("YYYY-MM-DD"),
             navLinks: true, // can click day/week names to navigate views
             selectable: true,
@@ -378,6 +379,7 @@ var RentalCalendar = publicWidget.Widget.extend({
                 'end': moment.utc(item[1]).format(),
                 'allDay': false, // default
             };
+            console.log(moment.utc(item[1]).format());
 
             if (_.contains(['draft', 'confirmed'], item[2])) {
                 values['classNames'] = item[2] == 'draft' ? ['bg-warning'] : ['bg-danger'];

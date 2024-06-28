@@ -1,14 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from pytz import timezone
-
-import pytz
-
 from odoo import http, fields, _, tools
 from odoo.http import request
-from odoo.osv import expression
 from odoo.addons.resource.models.resource_mixin import timezone_datetime
 
 
@@ -29,11 +22,11 @@ class WebsiteSaleRental(http.Controller):
 
     @http.route('/shop/rental/<model("product.template"):product_tmpl>/price', type='json', auth="public", website=True)
     def rental_price_simulation(self, product_tmpl, start, stop, qty=1):
-        # TODO avoid product template here
-
         start_dt = timezone_datetime(fields.Datetime.from_string(start))
         stop_dt = timezone_datetime(fields.Datetime.from_string(stop))
         qty = int(qty)
+        start_dt = fields.Datetime.from_string(start)
+        stop_dt = fields.Datetime.from_string(stop)
 
         # use product.product directly
         rental_context = request.env['product.product']._get_rental_context(start_dt, stop_dt)
@@ -41,7 +34,7 @@ class WebsiteSaleRental(http.Controller):
         pricelist = request.website.get_current_pricelist()
         partner = request.env.user.partner_id
         fpos = request.env['account.fiscal.position']._get_fiscal_position(partner)
-        currency = request.website.company_id.currency_id
+        currency = pricelist.currency_id
 
         # resource and quantity
         error = False
@@ -71,9 +64,6 @@ class WebsiteSaleRental(http.Controller):
         pricelist_rule = request.env['product.pricelist.item'].sudo().browse(pricelist_rule_id) if pricelist_rule_id else request.env['product.pricelist.item'].sudo()
 
         price = pricelist_rule._compute_rental_price(product, start_dt, stop_dt, date_order=fields.Date.today(), currency=currency)
-        print('===========pricelist_rule', pricelist_rule)
-        print('===========price', price)
-        print('===========rental_context', rental_context)
         price = product._get_tax_included_unit_price(
             request.env.company,
             pricelist.currency_id,
@@ -84,7 +74,6 @@ class WebsiteSaleRental(http.Controller):
             product_currency=pricelist.currency_id or currency
             # TODO force UoM ?
         )
-        print('===========price', price)
         pricing_explanation = product.with_context(pricelist_id=pricelist.id).get_rental_pricing_explanation(start_dt, stop_dt, show_price=False, currency_id=request.website.pricelist_id.currency_id.id)[product.id]
 
         # apply taxes if needed

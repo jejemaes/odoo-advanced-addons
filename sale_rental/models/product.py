@@ -76,7 +76,7 @@ class Product(models.Model):
         if currency_id:
             currency = self.env['res.currency'].browse(currency_id)
 
-        price_map = self.mapped('product_tmpl_id')._compute_rental_base_price(start_dt, end_dt, currency)
+        price_map = self.mapped('product_tmpl_id')._compute_rental_base_price(start_dt, end_dt)
 
         result = {}
         for product in self:
