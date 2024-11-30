@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="layout_no_branding" name="Survey Layout" inherit_id="survey.layout">
+        <xpath expr="//div[hasclass('o_survey_brand_message')]" position="attributes">
+            <attribute name="class" add="o_hidden" separator=" "/>
+        </xpath>
+    </template>
+
+    <template id="question_container" inherit_id="survey.question_container" name="Survey User Input Session Manage for Audio">
+        <xpath expr="//span[@t-field='question.title']" position="before">
+            <span t-field="question.sequence"/>.
+        </xpath>
+    </template>
+
+    <template id="user_input_session_manage_content" inherit_id="survey.user_input_session_manage_content" name="Survey User Input Session Manage for Audio">
+        <xpath expr="//div[hasclass('row')]//h1" position="after">
+            <t t-if="question.audio_attachment_id">
+                <div>
+                    <p>Sequence: <span t-field="question.sequence"/></p>
+                    <figure>
+                        <figcaption>Listen to the <t t-esc="question.audio_attachment_id.name"/></figcaption>
+                        <t t-if="question.audio_autoplay">
+                            <audio controls="1" t-att-src="question.audio_file_url" preload="auto" autoplay="1" currentTime="25">
+                                Your browser does not support the
+                                <code>audio</code> element.
+                            </audio>
+                        </t>
+                        <t t-if="not question.audio_autoplay">
+                            <audio controls="1" t-att-src="question.audio_file_url" preload="auto">
+                                Your browser does not support the
+                                <code>audio</code> element.
+                            </audio>
+                        </t>
+                    </figure>
+                </div>
+
+            </t>
+        </xpath>
+    </template>
+
+</odoo>
